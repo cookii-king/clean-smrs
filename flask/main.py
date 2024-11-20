@@ -1,11 +1,16 @@
-import os
-from flask import Flask # type: ignore
-app = Flask(__name__)
+from config.config import app, db
+import endpoints.endpoints
+
+with app.app_context():
+    db.create_all()
 
 @app.get("/")
 def root():
     return "Hello World!"
 
 @app.get("/about")
-def root():
+def about():
     return "About."
+
+if __name__ == "__main__":
+    app.run(debug=True)

@@ -1,0 +1,28 @@
+curl --verbose --request GET http://127.0.0.1:5001/orders
+
+curl --verbose --request POST http://127.0.0.1:5001/order/create \
+--header "Content-Type: application/json" \
+--data '{
+  "user_id": "user_001",
+  "total_amount": "150.75",
+  "status": "pending"
+}'
+
+curl --verbose --request GET http://127.0.0.1:5001/order/12345
+
+curl --verbose --request PUT http://127.0.0.1:5000/order/12345/update \
+--header "Content-Type: application/json" \
+--data '{
+  "total_amount": 200.50,
+  "status": "completed"
+}'
+
+curl --verbose --request PATCH http://127.0.0.1:5000/order/12345/update \
+--header "Content-Type: application/json" \
+--data '{
+  "total_amount": 250.00
+}'
+
+
+
+curl --verbose --request POST http://127.0.0.1:5001/order/12345/delete-pemenently
