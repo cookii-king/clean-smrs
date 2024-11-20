@@ -1,0 +1,2 @@
+## Github Commands
+git add .
