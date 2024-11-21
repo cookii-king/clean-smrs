@@ -1,9 +1,9 @@
 curl --verbose --request GET http://127.0.0.1:5001/orders
 
-curl --verbose --request POST http://127.0.0.1:5001/order/create \
+curl --verbose --request POST http://127.0.0.1:5000/order/create \
 --header "Content-Type: application/json" \
 --data '{
-  "user_id": "user_001",
+  "user_id": "user_00123",
   "total_amount": "150.75",
   "status": "pending"
 }'
