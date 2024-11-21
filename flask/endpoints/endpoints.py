@@ -1,10 +1,7 @@
-import endpoints.order.get
-import endpoints.order.patch
-import endpoints.order.post
-import endpoints.order.put
+import endpoints.root.get
 
-import endpoints.order_item.get
-import endpoints.order_item.patch
-import endpoints.order_item.post
-import endpoints.order_item.put
-
+import endpoints.observation.get
+import endpoints.observation.patch
+import endpoints.observation.post
+import endpoints.observation.put
+import endpoints.observation.delete

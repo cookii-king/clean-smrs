@@ -1,28 +1,72 @@
-curl --verbose --request GET http://127.0.0.1:5001/orders
+curl --verbose --request GET http://127.0.0.1:5000/observations
 
-curl --verbose --request POST http://127.0.0.1:5000/order/create \
+curl --verbose --request POST http://127.0.0.1:5000/observation/create \
 --header "Content-Type: application/json" \
 --data '{
-  "user_id": "user_00123",
-  "total_amount": "150.75",
-  "status": "pending"
-}'
-
-curl --verbose --request GET http://127.0.0.1:5001/order/12345
-
-curl --verbose --request PUT http://127.0.0.1:5000/order/12345/update \
---header "Content-Type: application/json" \
---data '{
-  "total_amount": 200.50,
-  "status": "completed"
-}'
-
-curl --verbose --request PATCH http://127.0.0.1:5000/order/12345/update \
---header "Content-Type: application/json" \
---data '{
-  "total_amount": 250.00
+  "date": "2024-11-21",
+  "time": "14:30:00",
+  "time_zone_offset": "UTC-05:00",
+  "latitude": 37.7749,
+  "longitude": -122.4194,
+  "temperature_water": 15.5,
+  "temperature_air": 20.3,
+  "humidity": 12.8,
+  "wind_speed": 25.4,
+  "wind_direction": 90.0,
+  "precipitation": 0.3,
+  "haze": 10.5,
+  "becquerel": 0.45,
+  "notes": "Test observation for random location."
 }'
 
 
+curl --verbose --request GET http://127.0.0.1:5000/observation/123e4567-e89b-12d3-a456-426614174000
 
-curl --verbose --request POST http://127.0.0.1:5001/order/12345/delete-pemenently
+curl --verbose --request PUT http://127.0.0.1:5000/observation/09a5be54-a739-4cbb-aeb2-bce8e4c786bb/update \
+--header "Content-Type: application/json" \
+--data '{
+  "temperature_air": 25.0,
+  "humidity": 15.0,
+  "notes": "Updated observation with new air temperature and humidity."
+}'
+
+
+curl --verbose --request PATCH http://127.0.0.1:5000/observation/09a5be54-a739-4cbb-aeb2-bce8e4c786bb/update \
+--header "Content-Type: application/json" \
+--data '{
+  "wind_speed": 30.5
+}'
+
+curl --verbose --request POST http://127.0.0.1:5000/observation/123e4567-e89b-12d3-a456-426614174000/delete
+
+curl --verbose --request DELETE http://127.0.0.1:5000/observation/17c9aa69-1d7c-4c2a-9ad1-851bed8445fd/delete
+
+
+# curl --verbose --request GET http://127.0.0.1:5000/orders
+
+# curl --verbose --request POST http://127.0.0.1:5000/order/create \
+# --header "Content-Type: application/json" \
+# --data '{
+#   "user_id": "user_00123",
+#   "total_amount": "150.75",
+#   "status": "pending"
+# }'
+
+# curl --verbose --request GET http://127.0.0.1:5000/order/12345
+
+# curl --verbose --request PUT http://127.0.0.1:5000/order/12345/update \
+# --header "Content-Type: application/json" \
+# --data '{
+#   "total_amount": 200.50,
+#   "status": "completed"
+# }'
+
+# curl --verbose --request PATCH http://127.0.0.1:5000/order/12345/update \
+# --header "Content-Type: application/json" \
+# --data '{
+#   "total_amount": 250.00
+# }'
+
+
+
+# curl --verbose --request POST http://127.0.0.1:5000/order/12345/delete-pemenently
