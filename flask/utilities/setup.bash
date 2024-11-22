@@ -9,3 +9,4 @@ pip3 install flasgger
 pip3 install flask_swagger_ui
 touch main.py
 flask --app main.py run --debug
+#windows python -m flask --app main.py run --debug
