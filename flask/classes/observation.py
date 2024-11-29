@@ -4,24 +4,10 @@ from decimal import Decimal
 from config.config import db, ma
 
 
-
-
-# classes/observation.py
-from datetime import datetime
-import uuid
-
-from datetime import datetime
-from flask_sqlalchemy import SQLAlchemy
-
-
-from datetime import datetime
-import uuid
-from config.config import db, ma
-
 class Observation(db.Model):
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    date = db.Column(db.Date, nullable=False)  # Store as Date type
-    time = db.Column(db.String(8), nullable=False)  # Store as String (HH:MM:SS format)
+    date = db.Column(db.Date, nullable=False)
+    time = db.Column(db.Time, nullable=False)
     time_zone_offset = db.Column(db.String(10), nullable=False)
     coordinates = db.Column(db.String(50), nullable=False)
     temperature_water = db.Column(db.Float, nullable=True)
@@ -44,7 +30,7 @@ class Observation(db.Model):
     def create(data):
         new_observation = Observation(
             date=data.get("date"),
-            time=data.get("time"),  # Time is now a string
+            time=data.get("time"),
             time_zone_offset=data.get("time_zone_offset"),
             coordinates=data.get("coordinates"),
             temperature_water=data.get("temperature_water"),
@@ -60,8 +46,6 @@ class Observation(db.Model):
         db.session.add(new_observation)
         db.session.commit()
         return new_observation
-
-
 
     @staticmethod
     def get(observation_id):

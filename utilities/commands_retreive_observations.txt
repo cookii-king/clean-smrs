@@ -1,9 +1,0 @@
-
-PRINT ALL observations
-curl -X GET http://127.0.0.1:5000/observations/
-
-PRINT A SPECIFIC observation
-curl -X GET http://127.0.0.1:5000/observations/b7da56c7-b550-47dd-a07c-b5e74f98dcbe
-
-I ILL DO REST IN CLASS TMRW
-
