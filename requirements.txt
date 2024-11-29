@@ -1,0 +1,11 @@
+django
+drf-spectacular
+djangorestframework
+PyJWT
+django-cors-headers
+flask
+flask_sqlalchemy
+flask_marshmallow
+marshmallow-sqlalchemy
+flasgger
+flask_swagger_ui
