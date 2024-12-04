@@ -1,0 +1,78 @@
+curl --verbose --request GET  http://127.0.0.1:8000/cart \
+--header "Content-Type: application/json"
+
+curl --verbose --request POST  http://127.0.0.1:8000/cart \
+--header "Content-Type: application/json" \
+--data '{
+    "account_id": "3f9094e4e4be403bbd6dc65516c82b8d",
+    "products" : null
+}'
+
+curl --verbose --request POST  http://127.0.0.1:8000/subscription/create \
+--header "Content-Type: application/json" \
+--data '{
+    "account_id": "3f9094e4-e4be-403b-bd6d-c65516c82b8d",
+    "plan_id": null,
+    "status": "Pending"
+}'
+
+curl --verbose --request GET  http://127.0.0.1:8000/subscription/f23dd2dc-bc88-4b7f-8200-f0f1262dc2cd \
+--header "Content-Type: application/json"
+
+curl --verbose --request GET  http://127.0.0.1:8000/subscriptions \
+--header "Content-Type: application/json"
+
+curl --verbose --request POST  http://127.0.0.1:8000/order/create \
+--header "Content-Type: application/json" \
+--data '{
+    "account_id": "283323e1ce704e4a90875a02d42bce64",
+    "total_amount": "100.50",
+    "status": "Pending"
+}'
+
+curl --verbose --request GET  http://127.0.0.1:8000/order/f23dd2dc-bc88-4b7f-8200-f0f1262dc2cd \
+--header "Content-Type: application/json"
+
+curl --verbose --request GET  http://127.0.0.1:8000/orders \
+--header "Content-Type: application/json"
+
+curl --verbose --request POST  http://127.0.0.1:8000/product/create \
+--header "Content-Type: application/json" \
+--data '{
+    "name": "Test Pro",
+    "description": "No description",
+    "price": "1099.99",
+    "category": "basic",
+    "status": "available"
+}'
+
+curl --verbose --request GET  http://127.0.0.1:8000/product/f23dd2dc-bc88-4b7f-8200-f0f1262dc2cd \
+--header "Content-Type: application/json"
+
+curl --verbose --request GET  http://127.0.0.1:8000/products \
+--header "Content-Type: application/json"
+
+
+curl --verbose --request GET  http://127.0.0.1:8000/account \
+--header "Content-Type: application/json" \
+--header "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjhhNTcxMWNiLWE2ZWItNDE5Zi04MWEwLTM3ZjVkNTU0ZjA3ZiIsImV4cCI6MTczMjg5MDMyMywiaWF0IjoxNzMyODg2NzIzfQ.oouN5hnwQJiOGShGBS0LCaSfttr4fk1NJGcgUZarJRY"
+
+curl --verbose --request POST http://127.0.0.1:8000/register \
+--header "Content-Type: application/json" \
+--data '{
+  "username": "test-username",
+  "name": "Test Name",
+  "email": "testing@cleansmrs.com",
+  "password": "123456@Aa"
+}'
+
+curl --verbose --request POST http://127.0.0.1:8000/login \
+--header "Content-Type: application/json" \
+--data '{
+  "email": "testing@cleansmrs.com",
+  "password": "123456@Aa"
+}'
+
+curl --verbose --request POST http://127.0.0.1:8000/logout \
+--header "Content-Type: application/json" \
+--header "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjhhNTcxMWNiLWE2ZWItNDE5Zi04MWEwLTM3ZjVkNTU0ZjA3ZiIsImV4cCI6MTczMjg5MDMyMywiaWF0IjoxNzMyODg2NzIzfQ.oouN5hnwQJiOGShGBS0LCaSfttr4fk1NJGcgUZarJRY"
