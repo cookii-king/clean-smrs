@@ -76,7 +76,7 @@ class Subscription(models.Model):
     )
     account_id= models.ForeignKey(Account, on_delete=models.CASCADE, related_name='subscriptions')
     # plan_id= models.ForeignKey(SubscriptionPlan, on_delete=models.CASCADE, related_name='subscriptions')
-    status = models.CharField(max_length=50)
+    status = models.CharField(max_length=50, default='active')
     created = models.DateTimeField(default=now)
     updated = models.DateTimeField(auto_now=True)
     deleted = models.DateTimeField(null=True, blank=True)
