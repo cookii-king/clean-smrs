@@ -12,6 +12,8 @@ class Account(AbstractUser):
     username = models.CharField(max_length=255, unique=True, null=True, blank=True )
     name = models.CharField(max_length=255)
     email = models.CharField(max_length=255, unique=True)
+    mfa_secret = models.CharField(max_length=16, blank=True, null=True)
+    mfa_enabled = models.BooleanField(default=False)
     password = models.CharField(max_length=255)
     created = models.DateTimeField(default=now)
     updated = models.DateTimeField(auto_now=True)

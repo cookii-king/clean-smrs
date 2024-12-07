@@ -28,6 +28,8 @@ class Product(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
+    quantity = models.PositiveIntegerField(default=1)
+    # stock = models.PositiveIntegerField(default=1)
     category = models.CharField(max_length=100)
     status = models.CharField(max_length=50)
     created = models.DateTimeField(default=now)
@@ -41,19 +43,20 @@ class Cart(models.Model):
         editable=False,
     )
     account_id= models.ForeignKey(Account, on_delete=models.CASCADE, related_name='carts')
-    products = models.ManyToManyField(Product, through='CartProduct', related_name='carts')
+    # products = models.ManyToManyField(Product, through='CartProduct', related_name='carts')
+    # products = models.ManyToManyField(Product, through='Product', related_name='carts')
     created = models.DateTimeField(default=now)
     updated = models.DateTimeField(auto_now=True)
     deleted = models.DateTimeField(null=True, blank=True)
 
-class CartProduct(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='cart_items')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_items')
-    quantity = models.PositiveIntegerField(default=1)
-    created = models.DateTimeField(default=now)
-    updated = models.DateTimeField(auto_now=True)
-    deleted = models.DateTimeField(null=True, blank=True)
+# class CartProduct(models.Model):
+#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+#     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='cart_items')
+#     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_items')
+#     quantity = models.PositiveIntegerField(default=1)
+#     created = models.DateTimeField(default=now)
+#     updated = models.DateTimeField(auto_now=True)
+#     deleted = models.DateTimeField(null=True, blank=True)
 
 class SubscriptionPlan(models.Model):
     id = models.UUIDField(

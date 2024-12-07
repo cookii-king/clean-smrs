@@ -8,6 +8,7 @@ from .serializers import AccountSerializer
 from .models import Account
 import datetime
 import jwt
+from django.shortcuts import render
 
 class JWTAuthentication(BaseAuthentication):
     def authenticate(self, request):
@@ -55,6 +56,9 @@ class RegisterView(APIView):
         serializer.save()
         return Response(serializer.data)
     
+    def get(self, request):
+        return render(request, 'register.html')
+    
 class LoginView(APIView):
     def post(self, request):
         email = request.data['email']
@@ -84,6 +88,8 @@ class LoginView(APIView):
             'jwt': token
         }
         return response
+    def get(self, request):
+        return render(request, 'login.html')
     
 class LogoutView(APIView):
     def post(self, request):

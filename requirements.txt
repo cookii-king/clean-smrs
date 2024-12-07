@@ -3,6 +3,8 @@ drf-spectacular
 djangorestframework
 PyJWT
 django-cors-headers
+qrcode
+pyotp
 flask
 flask_sqlalchemy
 flask_marshmallow
