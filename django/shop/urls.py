@@ -1,7 +1,11 @@
 from django.urls import path
-from .views import OrderView, OrdersView, ProductView, ProductsView, CartView, SubscriptionView, SubscriptionsView
+from .views import OrderView, OrdersView, ProductView, ProductsView, CartView, SubscriptionView, SubscriptionsView, index, cart_page
 
 urlpatterns = [
+
+    path('', index, name='home'),
+    path('cart', cart_page, name='cart'),
+    
     path('order/create', OrderView.as_view(), name='order-create'),
     path('order/<uuid:order_id>', OrderView.as_view(), name='order-detail'),
     path('orders', OrdersView.as_view()),

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account | CleanSMRS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        nav {
+            background-color: #333;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .account-details {
+            margin-bottom: 20px;
+        }
+        .account-details h2 {
+            margin: 0 0 10px;
+        }
+        .account-details p {
+            margin: 5px 0;
+            font-size: 1rem;
+        }
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .actions a {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #333;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            text-align: center;
+            flex: 1;
+            margin: 0 10px;
+        }
+        .actions a:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div>
+            <a href="/">CleanSMRS</a>
+        </div>
+        <div>
+            <a href="/products">Products</a>
+            <a href="/orders">Orders</a>
+            <a href="/subscriptions">Subscriptions</a>
+            <a href="/cart">Cart</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>My Account</h1>
+
+        <div class="account-details">
+            <h2>Account Details</h2>
+            <p><strong>Name:</strong> {{ name }}</p>
+            <p><strong>Email:</strong> {{ email }}</p>
+            <p><strong>Subscription Status:</strong> {{ subscription_status }}</p>
+        </div>
+
+        <div class="actions">
+            <a href="/account/edit">Update Profile</a>
+            <a href="/orders">View Orders</a>
+            <a href="/subscriptions">Manage Subscriptions</a>
+        </div>
+    </div>
+
+    <footer>
+        <p style="text-align: center; padding: 10px 0; background-color: #333; color: white;">
+            &copy; 2024 CleanSMRS. All rights reserved.
+        </p>
+    </footer>
+</body>
+</html>

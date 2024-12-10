@@ -46,8 +46,11 @@ class AccountView(APIView):
 
     def get(self, request):
         account = request.user
-        serializer = AccountSerializer(account)
-        return Response(serializer.data)
+        return render(request, 'account.html', {
+            'name': account.name,
+            'email': account.email,
+            'subscription_status': account.subscription_status
+             })
     
 class RegisterView(APIView):
     def post(self, request):
@@ -107,3 +110,5 @@ class LogoutView(APIView):
         response.delete_cookie('jwt')
         response.data = {"message": "success"}
         return response
+    
+

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Subscription</title>
+</head>
+<body>
+    <h1>Subscription</h1>
+    {% if subscription %}
+        <h2>Active Subscription</h2>
+        <p>Type: {{ subscription.subscription_type }}</p>
+        <p>Start Date: {{ subscription.start_date }}</p>
+        <p>End Date: {{ subscription.end_date }}</p>
+        <form action="{% url 'cancel-subscription' %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Cancel Subscription</button>
+        </form>
+    {% else %}
+        <h2>No Active Subscription</h2>
+        <form action="{% url 'subscribe' %}" method="post">
+            {% csrf_token %}
+            <select name="subscription_type">
+                <option value="basic">Basic</option>
+                <option value="premium">Premium</option>
+            </select>
+            <button type="submit">Subscribe</button>
+        </form>
+    {% endif %}
+</body>
+</html>

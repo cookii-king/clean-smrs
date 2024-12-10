@@ -6,4 +6,5 @@ urlpatterns = [
     path('login', LoginView.as_view()),
     path('account', AccountView.as_view()),
     path('logout', LogoutView.as_view()),
+    
 ]

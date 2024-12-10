@@ -97,3 +97,41 @@ class SubscriptionsView(APIView):
         subscriptions = Subscription.objects.all()
         serializer = SubscriptionSerializer(subscriptions, many=True) 
         return Response(serializer.data)
+    
+class ProductListView(APIView):
+    def get(self, request):
+        products = Product.objects.all()  # Fetch all products from the database
+        return render(request, 'products.html', {'products': products})
+
+
+class ProductDetailView(APIView):
+    def get(self, request, product_id):
+        product = Product.objects.get(id=product_id)  # Fetch the product by ID
+        return render(request, 'product_detail.html', {'product': product})
+
+
+class CartView(APIView):
+    def get(self, request):
+        # Assuming cart is fetched based on user (adjust logic based on your requirements)
+        cart = Cart.objects.filter(user=request.user).first()
+        return render(request, 'cart.html', {'cart': cart})
+
+
+class OrderHistoryView(APIView):
+    def get(self, request):
+        # Fetch all orders for the logged-in user
+        orders = Order.objects.filter(account_id=request.user)
+        return render(request, 'order_history.html', {'orders': orders})
+
+
+class SubscriptionView(APIView):
+    def get(self, request):
+        # Assuming subscription is fetched based on user (adjust logic as needed)
+        subscription = Subscription.objects.filter(user=request.user).first()
+        return render(request, 'subscription.html', {'subscription': subscription})
+
+def index(request):
+    return render(request, 'index.html')
+
+def cart_page(request):
+    return render(request, 'cart.html')
