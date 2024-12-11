@@ -105,6 +105,25 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            BASE_DIR / 'templates',  # This points to the root 'templates' folder in your project
+        ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
@@ -140,3 +159,13 @@ REST_FRAMEWORK = {
 SPECTACULAR_SETTINGS={
     'TITLE': 'Clean SMRs',
 }
+
+
+LOGOUT_REDIRECT_URL = '/login'
+
+
+MEDIA_URL = '/media/'  # URL to access media files
+MEDIA_ROOT = BASE_DIR / 'media'  # Directory where uploaded media files are stored
+
+LOGIN_URL = '/login'
+LOGIN_REDIRECT_URL = 'shop:home'

@@ -4,107 +4,109 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Account | CleanSMRS</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        /* Full height layout */
+        html, body {
+            height: 100%;
             margin: 0;
-            padding: 0;
         }
-        nav {
+
+        body {
+            display: flex;
+            flex-direction: column;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Footer at the bottom */
+        footer {
             background-color: #333;
             color: white;
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        nav a {
-            color: white;
-            text-decoration: none;
-            margin: 0 15px;
-        }
-        nav a:hover {
-            text-decoration: underline;
-        }
-        .container {
-            max-width: 800px;
-            margin: 30px auto;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background-color: #f9f9f9;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
             text-align: center;
-            margin-bottom: 20px;
-        }
-        .account-details {
-            margin-bottom: 20px;
-        }
-        .account-details h2 {
-            margin: 0 0 10px;
-        }
-        .account-details p {
-            margin: 5px 0;
-            font-size: 1rem;
-        }
-        .actions {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-        .actions a {
-            display: inline-block;
-            padding: 10px 15px;
-            background-color: #333;
-            color: white;
-            border-radius: 5px;
-            text-decoration: none;
-            text-align: center;
-            flex: 1;
-            margin: 0 10px;
-        }
-        .actions a:hover {
-            background-color: #555;
+            padding: 10px 0;
+            margin-top: auto; /* Pushes footer to the bottom */
         }
     </style>
 </head>
 <body>
-    <nav>
-        <div>
-            <a href="/">CleanSMRS</a>
-        </div>
-        <div>
-            <a href="/products">Products</a>
-            <a href="/orders">Orders</a>
-            <a href="/subscriptions">Subscriptions</a>
-            <a href="/cart">Cart</a>
+    <!-- Navbar -->
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">CleanSMRS</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto"> <!-- Keep this ml-auto for alignment to the right in Bootstrap 4 -->
+                    <!-- Products Link (Updated) -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="/products">Products</a>
+                    </li>
+                    <!-- Orders Link (Unchanged) -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="/orders">Orders</a>
+                    </li>
+                    <!-- Subscriptions Link (Updated) -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'subscriptions' %}">Subscriptions</a>
+                    </li>
+                    <!-- Cart Link (Unchanged) -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="/cart">Cart</a>
+                    </li>
+                    <!-- Account Link (Updated) -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'account' %}">Account</a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
 
-    <div class="container">
-        <h1>My Account</h1>
 
-        <div class="account-details">
-            <h2>Account Details</h2>
-            <p><strong>Name:</strong> {{ name }}</p>
-            <p><strong>Email:</strong> {{ email }}</p>
-            <p><strong>Subscription Status:</strong> {{ subscription_status }}</p>
+    <!-- Account Details Section -->
+    <div class="container mt-5 mb-4">
+        <h1 class="text-center mb-4">My Account</h1>
+
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title">Account Details</h2>
+                <p><strong>Name:</strong> {{ name }}</p>
+                <p><strong>Email:</strong> {{ email }}</p>
+                <p><strong>Subscription Status:</strong> {{ subscription_status }}</p>
+            </div>
         </div>
 
-        <div class="actions">
-            <a href="/account/edit">Update Profile</a>
-            <a href="/orders">View Orders</a>
-            <a href="/subscriptions">Manage Subscriptions</a>
+        <!-- Actions -->
+        <div class="mt-4">
+            <div class="row">
+                <div class="col-md-4">
+                    <a href="/account/edit" class="btn btn-primary btn-block">Update Profile</a>
+                </div>
+                <div class="col-md-4">
+                    <a href="/orders" class="btn btn-secondary btn-block">View Orders</a>
+                </div>
+                <div class="col-md-4">
+                    <a href="/subscriptions" class="btn btn-warning btn-block">Manage Subscriptions</a>
+                </div>
+            </div>
         </div>
     </div>
 
-    <footer>
-        <p style="text-align: center; padding: 10px 0; background-color: #333; color: white;">
-            &copy; 2024 CleanSMRS. All rights reserved.
-        </p>
+    <!-- Footer -->
+    <footer class="bg-primary text-light text-center py-3 mt-auto">
+        <div class="container">
+            <p class="mb-1">&copy; 2024 CleanSMRS. All rights reserved.</p>
+        </div>
     </footer>
+
+    <!-- Bootstrap JS and dependencies (jQuery, Popper.js) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

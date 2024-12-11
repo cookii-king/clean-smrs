@@ -1,5 +1,7 @@
 from django.urls import path
-from .views import OrderView, OrdersView, ProductView, ProductsView, CartView, SubscriptionView, SubscriptionsView, index, cart_page
+from .views import OrderView, OrdersView, CartView, index, cart_page
+from . import views 
+
 
 urlpatterns = [
 
@@ -10,13 +12,18 @@ urlpatterns = [
     path('order/<uuid:order_id>', OrderView.as_view(), name='order-detail'),
     path('orders', OrdersView.as_view()),
 
-    path('product/create', ProductView.as_view(), name='product-create'),
-    path('product/<uuid:product_id>', ProductView.as_view(), name='product-detail'),
-    path('products', ProductsView.as_view()),
+    path('products/', views.product_list, name='product_list'),  # Product list page
+    path('product/<uuid:product_id>/', views.product_detail, name='product_detail'),  # Product detail page
 
-    path('subscription/create', SubscriptionView.as_view(), name='subscription-create'),
-    path('subscription/<uuid:subscription_id>', SubscriptionView.as_view(), name='subscription-detail'),
-    path('subscriptions', SubscriptionsView.as_view()),
+    path('product/<uuid:product_id>/', views.product_detail, name='product_detail'),
+    #path('add_to_cart/<uuid:product_id>/', views.add_to_cart, name='add_to_cart'),
+    #path('buy_now/<uuid:product_id>/', views.buy_now, name='buy_now'),
 
-    path('cart', CartView.as_view(), name='cart-detail'),
+    path('subscriptions/', views.subscription_page, name='subscriptions'),
+    path('subscribe/', views.subscribe, name='subscribe'), 
+    path('subscription/', views.subscription_view, name='subscription'),
+
+    path('add_to_cart/<uuid:product_id>/', views.add_to_cart, name='add_to_cart'),
+    path('remove-from-cart/<uuid:cart_product_id>/', views.remove_from_cart, name='remove-from-cart'),
+    path('cart', views.cart_view, name='cart_view'), 
 ]
