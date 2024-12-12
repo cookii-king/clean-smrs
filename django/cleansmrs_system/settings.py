@@ -168,4 +168,3 @@ MEDIA_URL = '/media/'  # URL to access media files
 MEDIA_ROOT = BASE_DIR / 'media'  # Directory where uploaded media files are stored
 
 LOGIN_URL = '/login'
-LOGIN_REDIRECT_URL = 'shop:home'
