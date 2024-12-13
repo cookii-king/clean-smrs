@@ -13,6 +13,8 @@ python3 manage.py createsuperuser
 # Email address: admin@cleansmrs.com
 # Password: 123456@Aa
 python3 manage.py startapp accounts
-python3 manage.py startapp catalog
-python3 manage.py spectacular --file schema.yml
+python3 manage.py startapp cleansmrs_system
+python3 manage.py startapp payments
+python3 manage.py startapp shop
+python3 manage.py spectacular --file schema.yaml
 python3 manage.py spectacular --file schema.json

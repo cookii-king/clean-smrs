@@ -62,6 +62,14 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'account' %}">Account</a>
                     </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <form action="{% url 'logout' %}" method="post" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-light">Logout</button>
+                        </form>
+                    </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
@@ -78,12 +86,17 @@
                 <p><strong>Name:</strong> {{ name }}</p>
                 <p><strong>Email:</strong> {{ email }}</p>
                 <p><strong>Subscription Status:</strong> {{ subscription_status }}</p>
+                <p><strong>JWT Token:</strong> {{ token }}</p>
+                <p><strong>Email Confirmed:</strong> {{ email_confirmed }}</p>
             </div>
         </div>
 
         <!-- Actions -->
         <div class="mt-4">
             <div class="row">
+                <div class="col-md-4">
+                    <a href="/confirm-email" class="btn btn-primary btn-block">Confirm Email</a>
+                </div>
                 <div class="col-md-4">
                     <a href="/account/edit" class="btn btn-primary btn-block">Update Profile</a>
                 </div>

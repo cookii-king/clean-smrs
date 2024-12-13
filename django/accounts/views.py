@@ -21,6 +21,9 @@ from django.contrib.auth import logout
 from django.views import View
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.mail import send_mail, EmailMessage
+from cleansmrs_system.settings import DEFAULT_FROM_EMAIL, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD
+
 
 
 # JWT Authentication
@@ -77,17 +80,86 @@ class AccountView(APIView):
 
     def get(self, request):
         account = request.user
+        token = request.COOKIES.get('jwt')
         return render(request, 'account.html', {
             'name': account.name,
             'email': account.email,
+            'token': token,
+            'email_confirmed': account.email_confirmed
              })
+class ConfirmEmailView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
     
+    def post(self, request):
+        account = request.user
+        if(account.email_confirmation_secret == request.data["confirmation_secret"]):
+            account.validate_email_confirmed()
+            return redirect('account')
+        else:
+            return Response(data={"error":"email could not be confirmed"})
+
+    # def get(self, request):
+    #     account = request.user
+    #     if(account.email_confirmation_secret == None):
+    #         account.generate_email_confirmation_secret()
+    #         send_mail(subject=f"Please confirm your email ${account.name??account.username}", message=f"You confirmation secret is: ${account.email_confirmation_secret}", from_email=DEFAULT_FROM_EMAIL, auth_user=EMAIL_HOST_USER, auth_password=EMAIL_HOST_PASSWORD, recipient_list=["cookiekingsn2001@gmail.com"], fail_silently=True)
+    #     else:
+    #         pass
+    #     return render(request, 'confirm_email.html')
+    def get(self, request):
+        account = request.user
+
+        if not account.email_confirmation_secret:
+            # Generate a new email confirmation secret
+            account.generate_email_confirmation_secret()
+
+            # Determine the name to use in the email subject
+            if account.name:
+                user_name = account.name
+            elif account.username:
+                user_name = account.username
+            else:
+                user_name = "Please confirm your email"  # Default message
+
+            # Send confirmation email
+            try:
+                send_mail(
+                    subject=f"Please confirm your email, {user_name}" if user_name != "Please confirm your email" else user_name,
+                    message=f"Your confirmation secret is: {account.email_confirmation_secret}",
+                    from_email=DEFAULT_FROM_EMAIL,
+                    recipient_list=[account.email],  # Send to user's email
+                    fail_silently=False,  # Set to False to raise exceptions on failure
+                )
+            except Exception as e:
+                # Log or handle the email sending error as needed
+                print(f"Failed to send email: {e}")
+        else:
+            # Secret already exists; optionally handle this case
+            pass
+
+        # Render the confirmation email page
+        return render(request, 'confirm_email.html')
+
 class RegisterView(APIView):
     def post(self, request):
         serializer = AccountSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
+        account = serializer.save()
+        # Generate a JWT token for the registered user
+        payload = {
+            'id': str(account.id),  # Convert UUID to string
+            'username': str(account.username),
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
+            'iat': datetime.datetime.utcnow()
+        }
+        token = jwt.encode(payload, 'secret-key', algorithm='HS256')
+        
+        response = redirect('confirm-email')  # Redirects to /account
+        response.set_cookie(key='jwt', value=token, httponly=True)  # Set the JWT token in the cookies
+        
+        # return Response(serializer.data)
+        return response
     
     def get(self, request):
         return render(request, 'register.html')
@@ -133,7 +205,17 @@ class LoginView(APIView):
 class LogoutView(View):
     def post(self, request):
         logout(request)
-        return redirect('login')
+        # return redirect('login')
+        response = redirect('/')  # Redirects to the homepage (/)
+        response.delete_cookie('jwt')  # Delete the JWT token cookie
+        return response
+    
+    def get(self, request):
+        logout(request)
+        # return redirect('login')
+        response = redirect('/')  # Redirects to the homepage (/)
+        response.delete_cookie('jwt')  # Delete the JWT token cookie
+        return response
     
 
 

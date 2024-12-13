@@ -157,7 +157,33 @@ paths:
                 type: object
                 additionalProperties: {}
           description: ''
+  /confirm-email:
+    get:
+      operationId: confirm_email_retrieve
+      tags:
+      - confirm-email
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: confirm_email_create
+      tags:
+      - confirm-email
+      responses:
+        '200':
+          description: No response body
   /login:
+    get:
+      operationId: login_retrieve
+      tags:
+      - login
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
     post:
       operationId: login_create
       tags:
@@ -169,30 +195,7 @@ paths:
       responses:
         '200':
           description: No response body
-  /logout:
-    get:
-      operationId: logout_retrieve
-      tags:
-      - logout
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      - {}
-      responses:
-        '200':
-          description: No response body
-    post:
-      operationId: logout_create
-      tags:
-      - logout
-      security:
-      - cookieAuth: []
-      - basicAuth: []
-      - {}
-      responses:
-        '200':
-          description: No response body
-  /order/{order_id}/:
+  /order/{order_id}:
     get:
       operationId: order_retrieve
       parameters:
@@ -264,7 +267,41 @@ paths:
       responses:
         '200':
           description: No response body
+  /payment_links:
+    get:
+      operationId: payment_links_retrieve
+      tags:
+      - payment_links
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: payment_links_create
+      tags:
+      - payment_links
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
   /register:
+    get:
+      operationId: register_retrieve
+      tags:
+      - register
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
     post:
       operationId: register_create
       tags:

@@ -42,6 +42,29 @@ class Product(models.Model):
     # Optional method to calculate the total price of a product depending on its quantity in a cart
     def total_price(self, quantity):
         return self.price * quantity
+
+class ProductMedia(models.Model):
+    MEDIA_TYPE_CHOICES = [
+        ('image', 'Image'),
+        ('video', 'Video'),
+    ]
+
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+    )
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="media")
+    media_type = models.CharField(max_length=10, choices=MEDIA_TYPE_CHOICES)
+    url = models.URLField(blank=True, null=True)  # For external video/image URLs
+    file = models.FileField(upload_to="product_media/", blank=True, null=True)  # For uploaded files
+    created = models.DateTimeField(default=now)
+
+    def get_media_url(self):
+        """Return file URL if uploaded, otherwise return the external URL."""
+        if self.file:
+            return self.file.url
+        return self.url
     
 
 class Cart(models.Model):
