@@ -1,0 +1,10 @@
+<form method="POST" action="{% url 'verify-mfa' %}">
+   
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="otp" class="form-label">Verify OTP</label>
+        <input type="text" class="form-control" id="otp" name="otp" required>
+        <input type="hidden" id="account_id" name="account_id" value="{{ account_id }}" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Verify OTP</button>
+</form>

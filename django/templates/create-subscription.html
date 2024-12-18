@@ -1,0 +1,51 @@
+<form method="POST" action="{% url 'subscription-create' %}">
+    {% csrf_token %}
+    
+    <!-- Customer ID Input -->
+    <div class="mb-3">
+        <label for="customer" class="form-label">Customer ID</label>
+        <input type="text" id="customer" name="customer" class="form-control" placeholder="Enter Stripe Customer ID" required>
+    </div>
+
+    <!-- Dynamic Price ID Fields -->
+    <div id="price-fields">
+        <div class="mb-3 price-field">
+            <label for="price_0" class="form-label">Price ID</label>
+            <input type="text" id="price_0" name="items[0][price]" class="form-control" placeholder="Enter Price ID" required>
+        </div>
+    </div>
+
+    <!-- Add More Prices Button -->
+    <button type="button" id="add-price" class="btn btn-secondary mb-3">Add Another Price</button>
+
+    <!-- Submit Button -->
+    <div class="d-grid">
+        <button type="submit" class="btn btn-primary">Create Subscription</button>
+    </div>
+</form>
+
+<!-- JavaScript to Dynamically Add Price Fields -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    let priceCount = 1;  // Counter for price input fields
+
+    // Add price input field dynamically
+    document.getElementById("add-price").addEventListener("click", function() {
+        const priceFields = document.getElementById("price-fields");
+
+        // Create a new div for the price field
+        const newPriceField = document.createElement("div");
+        newPriceField.className = "mb-3 price-field";
+
+        // Create the input field
+        newPriceField.innerHTML = `
+            <label for="price_${priceCount}" class="form-label">Price ID</label>
+            <input type="text" id="price_${priceCount}" name="items[${priceCount}][price]" class="form-control" placeholder="Enter Price ID" required>
+        `;
+
+        // Append the new field
+        priceFields.appendChild(newPriceField);
+        priceCount++;  // Increment the counter
+    });
+});
+</script>

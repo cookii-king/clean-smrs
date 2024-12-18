@@ -1,0 +1,32 @@
+<form method="POST" action="{% url 'plan-create' %}">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="currency" class="form-label">Currency</label>
+        <input type="text" id="currency" name="currency" class="form-control" placeholder="Enter plan currency" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="product" class="form-label">Product</label>
+        <input type="text" id="product" name="product" class="form-control" placeholder="Enter plan product" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="amount" class="form-label">Amount</label>
+        <input type="number" id="amount" name="amount" class="form-control" placeholder="Enter plan amount" step="0.01" min="0.01" required>
+    </div>    
+    
+    <div class="mb-3">
+        <label for="interval" class="form-label">Recurring Interval</label>
+        <select id="interval" name="interval" class="form-control">
+            <option value="" selected>-- Select Interval --</option>
+            <option value="day">Day</option>
+            <option value="week">Week</option>
+            <option value="month">Month</option>
+            <option value="year">Year</option>
+        </select>
+    </div>
+
+    <div class="d-grid">
+        <button type="submit" class="btn btn-primary">Create Plan</button>
+    </div>
+</form>

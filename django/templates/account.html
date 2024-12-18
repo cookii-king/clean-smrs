@@ -1,125 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Account | CleanSMRS</title>
+<h2 class="card-title">Account Details</h2>
+<p><strong>Name:</strong> {{ account.name }}</p>
+<p><strong>Email:</strong> {{ account.email }}</p>
+<p><strong>Subscription Status:</strong> {{ subscription_status }}</p>
+<p><strong>JWT Token:</strong> {{ token }}</p>
+<p><strong>Email Confirmed:</strong> {{ account.email_confirmed }}</p>
+<p><strong>2FA Enabled:</strong> {{ account.mfa_enabled }}</p>
+{% if not account.mfa_enabled %}
+<img src="{{ qrcode }}">
+<form method="GET" action="{% url 'enable-mfa' %}">
 
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary">Enable 2FA</button>
+</form>
+{% else %}
+<form method="POST" action="{% url 'disable-mfa' %}">
+   
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary">Disable 2FA</button>
+</form>
+{% endif %}
 
-    <style>
-        /* Full height layout */
-        html, body {
-            height: 100%;
-            margin: 0;
-        }
-
-        body {
-            display: flex;
-            flex-direction: column;
-            font-family: Arial, sans-serif;
-        }
-
-        /* Footer at the bottom */
-        footer {
-            background-color: #333;
-            color: white;
-            text-align: center;
-            padding: 10px 0;
-            margin-top: auto; /* Pushes footer to the bottom */
-        }
-    </style>
-</head>
-<body>
-    <!-- Navbar -->
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="/">CleanSMRS</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ml-auto"> <!-- Keep this ml-auto for alignment to the right in Bootstrap 4 -->
-                    <!-- Products Link (Updated) -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="/products">Products</a>
-                    </li>
-                    <!-- Orders Link (Unchanged) -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="/orders">Orders</a>
-                    </li>
-                    <!-- Subscriptions Link (Updated) -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'subscriptions' %}">Subscriptions</a>
-                    </li>
-                    <!-- Cart Link (Unchanged) -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="/cart">Cart</a>
-                    </li>
-                    <!-- Account Link (Updated) -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'account' %}">Account</a>
-                    </li>
-                    {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <form action="{% url 'logout' %}" method="post" class="d-inline">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-outline-light">Logout</button>
-                        </form>
-                    </li>
-                    {% endif %}
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-
-    <!-- Account Details Section -->
-    <div class="container mt-5 mb-4">
-        <h1 class="text-center mb-4">My Account</h1>
-
-        <div class="card">
-            <div class="card-body">
-                <h2 class="card-title">Account Details</h2>
-                <p><strong>Name:</strong> {{ name }}</p>
-                <p><strong>Email:</strong> {{ email }}</p>
-                <p><strong>Subscription Status:</strong> {{ subscription_status }}</p>
-                <p><strong>JWT Token:</strong> {{ token }}</p>
-                <p><strong>Email Confirmed:</strong> {{ email_confirmed }}</p>
-            </div>
-        </div>
-
-        <!-- Actions -->
-        <div class="mt-4">
-            <div class="row">
-                <div class="col-md-4">
-                    <a href="/confirm-email" class="btn btn-primary btn-block">Confirm Email</a>
-                </div>
-                <div class="col-md-4">
-                    <a href="/account/edit" class="btn btn-primary btn-block">Update Profile</a>
-                </div>
-                <div class="col-md-4">
-                    <a href="/orders" class="btn btn-secondary btn-block">View Orders</a>
-                </div>
-                <div class="col-md-4">
-                    <a href="/subscriptions" class="btn btn-warning btn-block">Manage Subscriptions</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Footer -->
-    <footer class="bg-primary text-light text-center py-3 mt-auto">
-        <div class="container">
-            <p class="mb-1">&copy; 2024 CleanSMRS. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <!-- Bootstrap JS and dependencies (jQuery, Popper.js) -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
+{% if user.is_authenticated %}
+<form method="POST" action="{% url 'logout' %}">
+   
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary">Logout</button>
+</form>
+{% endif %}
+<a class="nav-link text-light" href="{% url 'products' %}">Products</a>

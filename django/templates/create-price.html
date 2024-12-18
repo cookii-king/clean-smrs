@@ -1,0 +1,44 @@
+<form method="POST" action="{% url 'price-create' %}">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="currency" class="form-label">Currency</label>
+        <input type="text" id="currency" name="currency" class="form-control" placeholder="Enter price currency" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="product" class="form-label">Product</label>
+        <input type="text" id="product" name="product" class="form-control" placeholder="Enter price product" required>
+    </div>
+
+    <div class="mb-3">
+        <label for="unit_amount" class="form-label">Amount</label>
+        <input type="number" id="unit_amount" name="unit_amount" class="form-control" placeholder="Enter price amount" step="0.01" min="0.01" required>
+    </div>    
+
+    <div class="mb-3">
+        <label for="recurring_interval" class="form-label">Recurring Interval</label>
+        <select id="recurring_interval" name="recurring[interval]" class="form-control">
+            <option value="" selected>-- Select Interval --</option>
+            <option value="day">Day</option>
+            <option value="week">Week</option>
+            <option value="month">Month</option>
+            <option value="year">Year</option>
+        </select>
+    </div>
+    
+    <div class="mb-3">
+        <label for="recurring_aggregate_usage" class="form-label">Aggregate Usage</label>
+        <select id="recurring_aggregate_usage" name="recurring[aggregate_usage]" class="form-control">
+            <option value="" selected>-- Select Aggregate Usage --</option>
+            <option value="sum">Sum (default)</option>
+            <option value="last_during_period">Last During Period</option>
+            <option value="last_ever">Last Ever</option>
+            <option value="max">Max</option>
+        </select>
+    </div>
+    
+
+    <div class="d-grid">
+        <button type="submit" class="btn btn-primary">Create Price</button>
+    </div>
+</form>

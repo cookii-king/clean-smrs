@@ -1,0 +1,13 @@
+{% if not account.email_confirmed %}
+<form method="POST" action="{% url 'confirm-email' %}">
+   
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="confirmation_secret" class="form-label">Confirm Email</label>
+        <input type="text" class="form-control" id="confirmation_secret" name="confirmation_secret" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Confirm Email</button>
+</form>
+{%else%}
+Email Confirmed Already!
+{% endif %}

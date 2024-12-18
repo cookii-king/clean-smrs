@@ -1,0 +1,25 @@
+<h5 class="card-title">{{ product.id }}</h5>
+<h5 class="card-title">{{ product.stripe_product_id }}</h5>
+<h5 class="card-title">{{ product.name }}</h5>
+<p class="card-text">{{ product.description }}</p>
+<p class="card-text"><strong>£{{ product.price }}</strong></p>
+<!-- <a href="" class="btn btn-primary">Buy Now</a> -->
+<form method="POST" action="{% url 'payment-link-create' %}">
+    {% csrf_token %}
+    <input type="hidden" name="product_id" value="{{ product.id }}">
+
+    <!-- List all available prices -->
+    {% for price in prices %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="price_id" id="price_{{ price.id }}" value="{{ price.id }}" required>
+        <label class="form-check-label" for="price_{{ price.id }}">
+            £{{ price.formatted_unit_amount }} - {{ price.currency }}
+            {% if price.recurring %}
+                ({{ price.recurring.interval }})
+            {% endif %}
+        </label>
+    </div>
+    {% endfor %}
+
+    <button type="submit" class="btn btn-primary">Buy Now</button>
+</form>

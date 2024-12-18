@@ -1,0 +1,6 @@
+{% for subscription in subscriptions %}
+<h5 class="card-title">{{ subscription.customer }}</h5>
+<p class="card-text">{{ subscription.currency }}</p>
+<p class="card-text"><strong>£{{ subscription.items }}</strong></p>
+<a href="{% url 'subscription' subscription.id %}" class="btn btn-primary">View Details</a>
+{% endfor %}

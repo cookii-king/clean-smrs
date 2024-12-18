@@ -4,9 +4,9 @@ djangorestframework
 drf-spectacular
 flask
 flasgger
-flask_marshmallow
-flask_sqlalchemy
-flask_swagger_ui
+flask-marshmallow
+Flask-SQLAlchemy
+flask-swagger-ui
 marshmallow-sqlalchemy
 pillow
 pyotp
