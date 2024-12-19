@@ -1,16 +1,125 @@
-<form method="POST" action="{% url 'product-create' %}">
-    {% csrf_token %}
-    <div class="mb-3">
-        <label for="name" class="form-label">Name</label>
-        <input type="text" id="name" name="name" class="form-control" placeholder="Enter product name" required>
-    </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Product</title>
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #ECE6DB; /* White text color */
+            --secondary-color: #BABABA; /* Light gray for accents */
+            --background-color: #272727; /* Black background */
+            --text-color: #ECE6DB; /* White for main text */
+        }
 
-    <div class="mb-3">
-        <label for="description" class="form-label">Description</label>
-        <input type="text" id="description" name="description" class="form-control" placeholder="Enter product description" required>
-    </div>
+        /* General Styles */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            font-family: 'Arial', sans-serif;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
 
-    <div class="d-grid">
-        <button type="submit" class="btn btn-primary">Create Product</button>
+        a {
+            text-decoration: none;
+            color: var(--primary-color);
+        }
+
+        a:hover {
+            text-decoration: underline;
+            color: var(--secondary-color);
+        }
+
+        button {
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        /* Form Container */
+        .form-container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 2rem;
+            background-color: var(--background-color);
+            border: 1px solid var(--secondary-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-container h1 {
+            text-align: center;
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .form-container .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .form-container input {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--secondary-color);
+            border-radius: 5px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .form-container input::placeholder {
+            color: var(--secondary-color);
+        }
+
+        .form-container input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px var(--primary-color);
+        }
+
+        .form-container .btn {
+            display: inline-block;
+            width: 100%;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 5px;
+            background-color: var(--primary-color);
+            color: var(--background-color);
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .form-container .btn:hover {
+            background-color: var(--secondary-color);
+            color: var(--background-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>Create Product</h1>
+        <form method="POST" action="{% url 'product-create' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" id="name" name="name" placeholder="Enter product name" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <input type="text" id="description" name="description" placeholder="Enter product description" required>
+            </div>
+
+            <button type="submit" class="btn">Create Product</button>
+        </form>
     </div>
-</form>
+</body>
+</html>

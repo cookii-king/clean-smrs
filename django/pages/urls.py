@@ -29,7 +29,7 @@ urlpatterns = [
     path('product', ProductView.as_view(), name="product"),
     path('product/create', ProductView.as_view(), name="product-create"),
     path('product/<uuid:product_id>', ProductView.as_view(), name="product"),
-    path('products', ProductsView.as_view(), name="products"),
+    path('products/', ProductsView.as_view(), name="products"),
     # # product end
     # # ========================================================================== #
     # # ========================================================================== #
