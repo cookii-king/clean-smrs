@@ -1,13 +1,106 @@
-{% if not account.email_confirmed %}
-<form method="POST" action="{% url 'confirm-email' %}">
-   
-    {% csrf_token %}
-    <div class="mb-3">
-        <label for="confirmation_secret" class="form-label">Confirm Email</label>
-        <input type="text" class="form-control" id="confirmation_secret" name="confirmation_secret" required>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Email</title>
+    <style>
+        :root {
+            --primary-color: #ECE6DB;
+            --secondary-color: #BABABA;
+            --background-color: #272727;
+            --text-color: #ECE6DB;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            font-family: 'Arial', sans-serif;
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 2rem;
+            background-color: var(--background-color);
+            border: 1px solid var(--secondary-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .container h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .form-label {
+            font-size: 1rem;
+            color: var(--primary-color);
+        }
+
+        .form-control {
+            padding: 0.75rem;
+            border: 1px solid var(--secondary-color);
+            border-radius: 5px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px var(--primary-color);
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            background-color: var(--primary-color);
+            color: var(--background-color);
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+            color: var(--background-color);
+        }
+
+        .message {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Confirm Email</h1>
+        {% if not account.email_confirmed %}
+        <form method="POST" action="{% url 'confirm-email' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="confirmation_secret" class="form-label">Confirmation Code</label>
+                <input type="text" class="form-control" id="confirmation_secret" name="confirmation_secret" required>
+            </div>
+            <button type="submit">Confirm Email</button>
+        </form>
+        {% else %}
+        <p class="message">Email Confirmed Already!</p>
+        {% endif %}
     </div>
-    <button type="submit" class="btn btn-primary">Confirm Email</button>
-</form>
-{%else%}
-Email Confirmed Already!
-{% endif %}
+</body>
+</html>

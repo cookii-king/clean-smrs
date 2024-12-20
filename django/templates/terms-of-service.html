@@ -4,68 +4,182 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Terms of Service</title>
+    <style>
+        :root {
+            --primary-color: #ECE6DB;
+            --secondary-color: #BABABA;
+            --background-color: #272727;
+            --text-color: #ECE6DB;
+            --highlight-color: #4CAF50;
+            --card-bg-color: #3E3E3E;
+            --form-bg-color: #4A4A4A;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            font-family: 'Arial', sans-serif;
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 2rem;
+            background-color: #3E3E3E;
+            border-radius: 8px;
+        }
+
+        h1, h2 {
+            color: var(--primary-color);
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        p, ul {
+            font-size: 1rem;
+            margin: 10px 0;
+        }
+
+        .card {
+            background-color: var(--card-bg-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .form-control {
+            background-color: var(--form-bg-color);
+            border: none;
+            color: var(--text-color);
+            padding: 0.75rem;
+            border-radius: 4px;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .form-control::placeholder {
+            color: var(--secondary-color);
+        }
+
+        .btn {
+            background-color: var(--highlight-color);
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 1.1rem;
+            text-align: center;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        .contact-info {
+            background-color: var(--card-bg-color);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .contact-info a {
+            color: var(--highlight-color);
+            text-decoration: none;
+        }
+
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        ul li {
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Terms of Service</h1>
-    <p>Welcome to CleanSMRs! By accessing or using our website, services, or platform, you agree to comply with and be bound by the following Terms of Service. Please read them carefully before proceeding.</p>
-    
-    <h2>1. Acceptance of Terms</h2>
-    <p>By using our services, you agree to be bound by these Terms of Service, as well as our Privacy Policy. If you do not agree with any part of these terms, you must not use our website or services.</p>
-    
-    <h2>2. Use of Our Services</h2>
-    <ul>
-        <li>Our platform provides clean energy solutions and access to data-driven tools, APIs, and eCommerce features.</li>
-        <li>You agree to use our services only for lawful purposes and in compliance with all applicable laws and regulations.</li>
-        <li>You must not misuse or attempt to disrupt our platform, services, or infrastructure.</li>
-    </ul>
+    <div class="container">
+        <h1>Terms of Service</h1>
+        <p>Welcome to CleanSMRs! By accessing or using our website, services, or platform, you agree to comply with and be bound by the following Terms of Service. Please read them carefully before proceeding.</p>
+        
+        <h2>1. Acceptance of Terms</h2>
+        <p>By using our services, you agree to be bound by these Terms of Service, as well as our Privacy Policy. If you do not agree with any part of these terms, you must not use our website or services.</p>
+        
+        <h2>2. Use of Our Services</h2>
+        <div class="card">
+            <ul>
+                <li>Our platform provides clean energy solutions and access to data-driven tools, APIs, and eCommerce features.</li>
+                <li>You agree to use our services only for lawful purposes and in compliance with all applicable laws and regulations.</li>
+                <li>You must not misuse or attempt to disrupt our platform, services, or infrastructure.</li>
+            </ul>
+        </div>
 
-    <h2>3. User Accounts</h2>
-    <p>To access certain features of our services, you may need to create an account:</p>
-    <ul>
-        <li>You are responsible for maintaining the confidentiality of your account credentials.</li>
-        <li>All activities under your account are your responsibility.</li>
-        <li>We reserve the right to terminate or suspend accounts that violate these terms.</li>
-    </ul>
+        <h2>3. User Accounts</h2>
+        <div class="card">
+            <ul>
+                <li>You are responsible for maintaining the confidentiality of your account credentials.</li>
+                <li>All activities under your account are your responsibility.</li>
+                <li>We reserve the right to terminate or suspend accounts that violate these terms.</li>
+            </ul>
+        </div>
 
-    <h2>4. Payments and Subscriptions</h2>
-    <p>CleanSMRs may provide products, services, or subscriptions through its platform:</p>
-    <ul>
-        <li>All payments must be completed through approved payment gateways.</li>
-        <li>Subscription plans are billed in accordance with the pricing structure provided.</li>
-        <li>You may cancel your subscription at any time, but refunds will not be provided for unused portions.</li>
-    </ul>
+        <h2>4. Payments and Subscriptions</h2>
+        <div class="card">
+            <ul>
+                <li>All payments must be completed through approved payment gateways.</li>
+                <li>Subscription plans are billed in accordance with the pricing structure provided.</li>
+                <li>You may cancel your subscription at any time, but refunds will not be provided for unused portions.</li>
+            </ul>
+        </div>
 
-    <h2>5. Intellectual Property</h2>
-    <p>All content, logos, trademarks, and materials on our website are the property of CleanSMRs:</p>
-    <ul>
-        <li>You may not reproduce, distribute, or modify any content without prior written permission.</li>
-        <li>Unauthorized use of our intellectual property will result in legal action.</li>
-    </ul>
+        <h2>5. Intellectual Property</h2>
+        <div class="card">
+            <ul>
+                <li>All content, logos, trademarks, and materials on our website are the property of CleanSMRs.</li>
+                <li>You may not reproduce, distribute, or modify any content without prior written permission.</li>
+                <li>Unauthorized use of our intellectual property will result in legal action.</li>
+            </ul>
+        </div>
 
-    <h2>6. Limitation of Liability</h2>
-    <p>To the fullest extent permitted by law:</p>
-    <ul>
-        <li>CleanSMRs is not liable for any indirect, incidental, or consequential damages resulting from your use of our services.</li>
-        <li>We provide our platform “as is” and make no warranties regarding its accuracy, availability, or performance.</li>
-    </ul>
+        <h2>6. Limitation of Liability</h2>
+        <div class="card">
+            <ul>
+                <li>CleanSMRs is not liable for any indirect, incidental, or consequential damages resulting from your use of our services.</li>
+                <li>We provide our platform “as is” and make no warranties regarding its accuracy, availability, or performance.</li>
+            </ul>
+        </div>
 
-    <h2>7. Termination</h2>
-    <p>We reserve the right to terminate or suspend access to our services at any time, without notice, if you breach these Terms of Service or for other reasons at our discretion.</p>
+        <h2>7. Termination</h2>
+        <p>We reserve the right to terminate or suspend access to our services at any time, without notice, if you breach these Terms of Service or for other reasons at our discretion.</p>
 
-    <h2>8. Governing Law</h2>
-    <p>These Terms of Service are governed by and construed in accordance with the laws of [Your Country/State]. Any disputes arising under these terms will be resolved in the courts of [Your Jurisdiction].</p>
+        <h2>8. Governing Law</h2>
+        <p>These Terms of Service are governed by and construed in accordance with the laws of [Your Country/State]. Any disputes arising under these terms will be resolved in the courts of [Your Jurisdiction].</p>
 
-    <h2>9. Changes to These Terms</h2>
-    <p>We may update or modify these Terms of Service at any time. The revised version will be posted on this page with an updated effective date. Your continued use of our services constitutes acceptance of the updated terms.</p>
+        <h2>9. Changes to These Terms</h2>
+        <p>We may update or modify these Terms of Service at any time. The revised version will be posted on this page with an updated effective date. Your continued use of our services constitutes acceptance of the updated terms.</p>
 
-    <h2>10. Contact Us</h2>
-    <p>If you have any questions about these Terms of Service, please contact us:</p>
-    <p>
-        <strong>Email:</strong> support@cleansmrs.com<br>
-        <strong>Phone:</strong> +1 (123) 456-7890<br>
-        <strong>Address:</strong> 123 Clean Energy Road, Green City, GC 12345
-    </p>
+        <h2>10. Contact Us</h2>
+        <p>If you have any questions about these Terms of Service, please contact us:</p>
+        <div class="contact-info">
+            <p><strong>Email:</strong> support@cleansmrs.com<br>
+            <strong>Phone:</strong> +1 (123) 456-7890<br>
+            <strong>Address:</strong> 123 Clean Energy Road, Green City, GC 12345</p>
+        </div>
 
-    <p>Thank you for using CleanSMRs!</p>
+        <p>Thank you for using CleanSMRs!</p>
+    </div>
 </body>
 </html>

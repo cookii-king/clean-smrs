@@ -1,51 +1,137 @@
-<form method="POST" action="{% url 'subscription-create' %}">
-    {% csrf_token %}
-    
-    <!-- Customer ID Input -->
-    <div class="mb-3">
-        <label for="customer" class="form-label">Customer ID</label>
-        <input type="text" id="customer" name="customer" class="form-control" placeholder="Enter Stripe Customer ID" required>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Subscription</title>
+    <style>
+        :root {
+            --primary-color: #ECE6DB;
+            --secondary-color: #BABABA;
+            --background-color: #272727;
+            --text-color: #ECE6DB;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            font-family: 'Arial', sans-serif;
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 2rem;
+            background-color: var(--background-color);
+            border: 1px solid var(--secondary-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .container h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .form-label {
+            font-size: 1rem;
+            color: var(--primary-color);
+        }
+
+        .form-control {
+            padding: 0.75rem;
+            border: 1px solid var(--secondary-color);
+            border-radius: 5px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px var(--primary-color);
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            background-color: var(--primary-color);
+            color: var(--background-color);
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+            color: var(--background-color);
+        }
+
+        #add-price {
+            background-color: var(--secondary-color);
+            color: var(--background-color);
+            border: 1px solid var(--primary-color);
+        }
+
+        #add-price:hover {
+            background-color: var(--primary-color);
+            color: var(--background-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Create Subscription</h1>
+        <form method="POST" action="{% url 'subscription-create' %}">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                <label for="customer" class="form-label">Customer ID</label>
+                <input type="text" id="customer" name="customer" class="form-control" placeholder="Enter Stripe Customer ID" required>
+            </div>
+            
+            <div id="price-fields">
+                <div class="mb-3 price-field">
+                    <label for="price_0" class="form-label">Price ID</label>
+                    <input type="text" id="price_0" name="items[0][price]" class="form-control" placeholder="Enter Price ID" required>
+                </div>
+            </div>
+
+            <button type="button" id="add-price" class="btn btn-secondary mb-3">Add Another Price</button>
+            
+            <div class="d-grid">
+                <button type="submit">Create Subscription</button>
+            </div>
+        </form>
     </div>
 
-    <!-- Dynamic Price ID Fields -->
-    <div id="price-fields">
-        <div class="mb-3 price-field">
-            <label for="price_0" class="form-label">Price ID</label>
-            <input type="text" id="price_0" name="items[0][price]" class="form-control" placeholder="Enter Price ID" required>
-        </div>
-    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let priceCount = 1;
 
-    <!-- Add More Prices Button -->
-    <button type="button" id="add-price" class="btn btn-secondary mb-3">Add Another Price</button>
-
-    <!-- Submit Button -->
-    <div class="d-grid">
-        <button type="submit" class="btn btn-primary">Create Subscription</button>
-    </div>
-</form>
-
-<!-- JavaScript to Dynamically Add Price Fields -->
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    let priceCount = 1;  // Counter for price input fields
-
-    // Add price input field dynamically
-    document.getElementById("add-price").addEventListener("click", function() {
-        const priceFields = document.getElementById("price-fields");
-
-        // Create a new div for the price field
-        const newPriceField = document.createElement("div");
-        newPriceField.className = "mb-3 price-field";
-
-        // Create the input field
-        newPriceField.innerHTML = `
-            <label for="price_${priceCount}" class="form-label">Price ID</label>
-            <input type="text" id="price_${priceCount}" name="items[${priceCount}][price]" class="form-control" placeholder="Enter Price ID" required>
-        `;
-
-        // Append the new field
-        priceFields.appendChild(newPriceField);
-        priceCount++;  // Increment the counter
-    });
-});
-</script>
+            document.getElementById("add-price").addEventListener("click", function() {
+                const priceFields = document.getElementById("price-fields");
+                const newPriceField = document.createElement("div");
+                newPriceField.className = "mb-3 price-field";
+                newPriceField.innerHTML = `
+                    <label for="price_${priceCount}" class="form-label">Price ID</label>
+                    <input type="text" id="price_${priceCount}" name="items[${priceCount}][price]" class="form-control" placeholder="Enter Price ID" required>
+                `;
+                priceFields.appendChild(newPriceField);
+                priceCount++;
+            });
+        });
+    </script>
+</body>
+</html>

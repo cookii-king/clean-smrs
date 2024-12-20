@@ -1,10 +1,111 @@
-<form method="POST" action="{% url 'verify-mfa' %}">
-   
-    {% csrf_token %}
-    <div class="mb-3">
-        <label for="otp" class="form-label">Verify OTP</label>
-        <input type="text" class="form-control" id="otp" name="otp" required>
-        <input type="hidden" id="account_id" name="account_id" value="{{ account_id }}" required>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify MFA</title>
+    <style>
+        :root {
+            --primary-color: #ECE6DB;
+            --secondary-color: #BABABA;
+            --background-color: #272727;
+            --text-color: #ECE6DB;
+            --highlight-color: #4CAF50;
+            --form-bg-color: #4A4A4A;
+            --button-bg-color: #4CAF50;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            font-family: 'Arial', sans-serif;
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 2rem;
+            background-color: #3E3E3E;
+            border-radius: 8px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            background-color: var(--form-bg-color);
+            border: none;
+            color: var(--text-color);
+            padding: 0.75rem;
+            border-radius: 4px;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .form-control::placeholder {
+            color: var(--secondary-color);
+        }
+
+        .btn {
+            background-color: var(--button-bg-color);
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 1.1rem;
+            text-align: center;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        .alert {
+            color: #ffcc00;
+            background-color: #3e3e3e;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-top: 1rem;
+            font-size: 1rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Verify MFA</h1>
+
+        
+        <form method="POST" action="{% url 'verify-mfa' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="otp" class="form-label">Enter OTP</label>
+                <input type="text" class="form-control" id="otp" name="otp" required placeholder="Enter your one-time password">
+                <input type="hidden" id="account_id" name="account_id" value="{{ account_id }}" required>
+            </div>
+            <button type="submit" class="btn">Verify OTP</button>
+        </form>
+
+        
+        {% if error_message %}
+            <div class="alert">
+                {{ error_message }}
+            </div>
+        {% endif %}
     </div>
-    <button type="submit" class="btn btn-primary">Verify OTP</button>
-</form>
+</body>
+</html>

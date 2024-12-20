@@ -1,6 +1,89 @@
-{% for product in products %}
-<h5 class="card-title">{{ product.name }}</h5>
-<p class="card-text">{{ product.description }}</p>
-<p class="card-text"><strong>£{{ product.price }}</strong></p>
-<a href="{% url 'product' product.id %}" class="btn btn-primary">View Details</a>
-{% endfor %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products</title>
+    <style>
+        :root {
+            --primary-color: #ECE6DB;
+            --secondary-color: #BABABA;
+            --background-color: #272727;
+            --text-color: #ECE6DB;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            font-family: 'Arial', sans-serif;
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 2rem;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background-color: #3E3E3E;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .card-text {
+            font-size: 1.1rem;
+            color: var(--text-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .product-price {
+            font-size: 1.2rem;
+            color: #FFFFFF;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 1.1rem;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Our Products</h1>
+
+        {% for product in products %}
+        <div class="card">
+            <h5 class="card-title">{{ product.name }}</h5>
+            <p class="card-text">{{ product.description }}</p>
+            <p class="card-text product-price"><strong>£{{ product.price }}</strong></p>
+            <a href="{% url 'product' product.id %}" class="btn">View Details</a>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

@@ -1,44 +1,129 @@
-<form method="POST" action="{% url 'price-create' %}">
-    {% csrf_token %}
-    <div class="mb-3">
-        <label for="currency" class="form-label">Currency</label>
-        <input type="text" id="currency" name="currency" class="form-control" placeholder="Enter price currency" required>
-    </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Price</title>
+    <style>
+        :root {
+            --primary-color: #ECE6DB;
+            --secondary-color: #BABABA;
+            --background-color: #272727;
+            --text-color: #ECE6DB;
+        }
 
-    <div class="mb-3">
-        <label for="product" class="form-label">Product</label>
-        <input type="text" id="product" name="product" class="form-control" placeholder="Enter price product" required>
-    </div>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            font-family: 'Arial', sans-serif;
+            color: var(--text-color);
+        }
 
-    <div class="mb-3">
-        <label for="unit_amount" class="form-label">Amount</label>
-        <input type="number" id="unit_amount" name="unit_amount" class="form-control" placeholder="Enter price amount" step="0.01" min="0.01" required>
-    </div>    
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 2rem;
+            background-color: var(--background-color);
+            border: 1px solid var(--secondary-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
 
-    <div class="mb-3">
-        <label for="recurring_interval" class="form-label">Recurring Interval</label>
-        <select id="recurring_interval" name="recurring[interval]" class="form-control">
-            <option value="" selected>-- Select Interval --</option>
-            <option value="day">Day</option>
-            <option value="week">Week</option>
-            <option value="month">Month</option>
-            <option value="year">Year</option>
-        </select>
-    </div>
-    
-    <div class="mb-3">
-        <label for="recurring_aggregate_usage" class="form-label">Aggregate Usage</label>
-        <select id="recurring_aggregate_usage" name="recurring[aggregate_usage]" class="form-control">
-            <option value="" selected>-- Select Aggregate Usage --</option>
-            <option value="sum">Sum (default)</option>
-            <option value="last_during_period">Last During Period</option>
-            <option value="last_ever">Last Ever</option>
-            <option value="max">Max</option>
-        </select>
-    </div>
-    
+        .container h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
 
-    <div class="d-grid">
-        <button type="submit" class="btn btn-primary">Create Price</button>
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .form-label {
+            font-size: 1rem;
+            color: var(--primary-color);
+        }
+
+        .form-control {
+            padding: 0.75rem;
+            border: 1px solid var(--secondary-color);
+            border-radius: 5px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px var(--primary-color);
+        }
+
+        select.form-control {
+            appearance: none;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            background-color: var(--primary-color);
+            color: var(--background-color);
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+            color: var(--background-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Create Price</h1>
+        <form method="POST" action="{% url 'price-create' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="currency" class="form-label">Currency</label>
+                <input type="text" id="currency" name="currency" class="form-control" placeholder="Enter price currency" required>
+            </div>
+            <div class="mb-3">
+                <label for="product" class="form-label">Product</label>
+                <input type="text" id="product" name="product" class="form-control" placeholder="Enter price product" required>
+            </div>
+            <div class="mb-3">
+                <label for="unit_amount" class="form-label">Amount</label>
+                <input type="number" id="unit_amount" name="unit_amount" class="form-control" placeholder="Enter price amount" step="0.01" min="0.01" required>
+            </div>
+            <div class="mb-3">
+                <label for="recurring_interval" class="form-label">Recurring Interval</label>
+                <select id="recurring_interval" name="recurring[interval]" class="form-control">
+                    <option value="" selected>-- Select Interval --</option>
+                    <option value="day">Day</option>
+                    <option value="week">Week</option>
+                    <option value="month">Month</option>
+                    <option value="year">Year</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="recurring_aggregate_usage" class="form-label">Aggregate Usage</label>
+                <select id="recurring_aggregate_usage" name="recurring[aggregate_usage]" class="form-control">
+                    <option value="" selected>-- Select Aggregate Usage --</option>
+                    <option value="sum">Sum (default)</option>
+                    <option value="last_during_period">Last During Period</option>
+                    <option value="last_ever">Last Ever</option>
+                    <option value="max">Max</option>
+                </select>
+            </div>
+            <div class="d-grid">
+                <button type="submit">Create Price</button>
+            </div>
+        </form>
     </div>
-</form>
+</body>
+</html>

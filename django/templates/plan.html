@@ -1,4 +1,82 @@
-<h5 class="card-title">{{ plan.nickname }}</h5>
-<p class="card-text">{{ plan.product }}</p>
-<p class="card-text"><strong>£{{ plan.amount }}</strong></p>
-<!-- <a href="{% url 'plan' plan.id %}" class="btn btn-primary">View Details</a> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan</title>
+    <style>
+        :root {
+            --primary-color: #ECE6DB;
+            --secondary-color: #BABABA;
+            --background-color: #272727;
+            --text-color: #ECE6DB;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            font-family: 'Arial', sans-serif;
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 2rem;
+            background-color: var(--background-color);
+            border: 1px solid var(--secondary-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .plan-title {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .plan-text {
+            font-size: 1.1rem;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        .plan-price {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            background-color: var(--primary-color);
+            color: var(--background-color);
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary-color);
+            color: var(--background-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h5 class="plan-title">{{ plan.nickname }}</h5>
+        <p class="plan-text">{{ plan.product }}</p>
+        <p class="plan-price">£{{ plan.amount }}</p>
+        
+        <!-- <a href="{% url 'plan' plan.id %}" class="btn">View Details</a> -->
+    </div>
+</body>
+</html>

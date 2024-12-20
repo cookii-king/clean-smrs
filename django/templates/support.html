@@ -4,70 +4,167 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Support - CleanSMRs</title>
+    <style>
+        :root {
+            --primary-color: #ECE6DB;
+            --secondary-color: #BABABA;
+            --background-color: #272727;
+            --text-color: #ECE6DB;
+            --highlight-color: #4CAF50;
+            --card-bg-color: #3E3E3E;
+            --form-bg-color: #4A4A4A;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            font-family: 'Arial', sans-serif;
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 2rem;
+            background-color: #3E3E3E;
+            border-radius: 8px;
+        }
+
+        h1, h2 {
+            color: var(--primary-color);
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        p, ul {
+            font-size: 1rem;
+            margin: 10px 0;
+        }
+
+        .card {
+            background-color: var(--card-bg-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .form-control {
+            background-color: var(--form-bg-color);
+            border: none;
+            color: var(--text-color);
+            padding: 0.75rem;
+            border-radius: 4px;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .form-control::placeholder {
+            color: var(--secondary-color);
+        }
+
+        .btn {
+            background-color: var(--highlight-color);
+            color: white;
+            border: none;
+            padding: 0.75rem;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 1.1rem;
+            text-align: center;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        .contact-info {
+            background-color: var(--card-bg-color);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .contact-info a {
+            color: var(--highlight-color);
+            text-decoration: none;
+        }
+
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        ul li {
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Support</h1>
-    <p>Welcome to the CleanSMRs Support Page. We are here to help you with any questions, concerns, or issues you may face while using our platform and services.</p>
+    <div class="container">
+        <h1>Support</h1>
+        <p>Welcome to the CleanSMRs Support Page. We are here to help you with any questions, concerns, or issues you may face while using our platform and services.</p>
 
-    <h2>How to Get Support</h2>
-    <p>We offer multiple channels to help you get the assistance you need as quickly as possible:</p>
-    <ul>
-        <li><strong>Email Support:</strong> Reach out to our support team at <a href="mailto:support@cleansmrs.com">support@cleansmrs.com</a> for assistance with technical issues, inquiries, or account-related questions.</li>
-        <li><strong>Phone Support:</strong> Call us at <strong>+1 (123) 456-7890</strong> during our business hours: Monday to Friday, 9:00 AM to 5:00 PM (UTC).</li>
-        <li><strong>FAQs:</strong> Visit our <a href="#">Frequently Asked Questions</a> to find answers to common questions about CleanSMRs and our services.</li>
-        <li><strong>Contact Form:</strong> Submit a query directly using the form below, and a member of our team will get back to you as soon as possible.</li>
-    </ul>
+        <h2>How to Get Support</h2>
+        <p>We offer multiple channels to help you get the assistance you need as quickly as possible:</p>
+        <div class="card">
+            <ul>
+                <li><strong>Email Support:</strong> Reach out to our support team at <a href="mailto:support@cleansmrs.com">support@cleansmrs.com</a> for assistance with technical issues, inquiries, or account-related questions.</li>
+                <li><strong>Phone Support:</strong> Call us at <strong>+1 (123) 456-7890</strong> during our business hours: Monday to Friday, 9:00 AM to 5:00 PM (UTC).</li>
+                <li><strong>FAQs:</strong> Visit our <a href="#">Frequently Asked Questions</a> to find answers to common questions about CleanSMRs and our services.</li>
+                <li><strong>Contact Form:</strong> Submit a query directly using the form below, and a member of our team will get back to you as soon as possible.</li>
+            </ul>
+        </div>
 
-    <h2>Contact Us</h2>
-    <form method="POST" action="{% url 'support-submit' %}">
-        {% csrf_token %}
-        <!-- Name Field -->
-        <div class="mb-3">
-            <label for="name" class="form-label">Name</label>
+        <h2>Contact Us</h2>
+        <form method="POST" action="{% url 'support-submit' %}">
+            {% csrf_token %}
+            <!-- Name Field -->
             <input type="text" id="name" name="name" class="form-control" placeholder="Enter your name" required>
-        </div>
-        
-        <!-- Email Field -->
-        <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
+
+            <!-- Email Field -->
             <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email address" required>
-        </div>
-        
-        <!-- Subject Field -->
-        <div class="mb-3">
-            <label for="subject" class="form-label">Subject</label>
+
+            <!-- Subject Field -->
             <input type="text" id="subject" name="subject" class="form-control" placeholder="Enter the subject" required>
-        </div>
-        
-        <!-- Message Field -->
-        <div class="mb-3">
-            <label for="message" class="form-label">Message</label>
+
+            <!-- Message Field -->
             <textarea id="message" name="message" class="form-control" rows="5" placeholder="Describe your issue or inquiry" required></textarea>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn">Send Message</button>
+        </form>
+
+        <h2>Business Hours</h2>
+        <p>Our support team is available during the following hours:</p>
+        <div class="card">
+            <ul>
+                <li><strong>Monday to Friday:</strong> 9:00 AM - 5:00 PM (UTC)</li>
+                <li><strong>Weekends & Holidays:</strong> Closed</li>
+            </ul>
         </div>
-        
-        <!-- Submit Button -->
-        <div class="d-grid">
-            <button type="submit" class="btn btn-primary">Send Message</button>
+
+        <h2>Our Address</h2>
+        <p>Feel free to visit or send us mail at:</p>
+        <div class="contact-info">
+            <p><strong>CleanSMRs</strong><br>
+            123 Clean Energy Road<br>
+            Green City, GC 12345<br>
+            Phone: +1 (123) 456-7890<br>
+            Email: <a href="mailto:support@cleansmrs.com">support@cleansmrs.com</a></p>
         </div>
-    </form>
 
-    <h2>Business Hours</h2>
-    <p>Our support team is available during the following hours:</p>
-    <ul>
-        <li><strong>Monday to Friday:</strong> 9:00 AM - 5:00 PM (UTC)</li>
-        <li><strong>Weekends & Holidays:</strong> Closed</li>
-    </ul>
-
-    <h2>Our Address</h2>
-    <p>Feel free to visit or send us mail at:</p>
-    <p>
-        <strong>CleanSMRs</strong><br>
-        123 Clean Energy Road<br>
-        Green City, GC 12345<br>
-        Phone: +1 (123) 456-7890<br>
-        Email: <a href="mailto:support@cleansmrs.com">support@cleansmrs.com</a>
-    </p>
-
-    <p>Thank you for choosing CleanSMRs. Your satisfaction and success are our priorities!</p>
+        <p>Thank you for choosing CleanSMRs. Your satisfaction and success are our priorities!</p>
+    </div>
 </body>
 </html>

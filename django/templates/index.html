@@ -13,7 +13,6 @@
             --text-color: #ECE6DB; 
         }
     
-        /* General Styles */
         body {
             margin: 0;
             padding: 0;
@@ -38,7 +37,6 @@
             font-size: 1rem;
         }
     
-        /* Navbar */
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -85,7 +83,6 @@
             color: var(--background-color);
         }
     
-        /* Hero Section */
         .hero {
             text-align: center;
             padding: 3rem 1rem;
@@ -103,7 +100,6 @@
             color: var(--secondary-color);
         }
     
-        /* Responsive Design */
         @media (max-width: 768px) {
             .navbar .nav-links {
                 flex-direction: column;
@@ -122,14 +118,15 @@
     
 </head>
 <body>
-    <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="brand">CleanSMRs</div>
         <div class="nav-links">
             {% if not user.is_authenticated %}
+                <!-- Links for non-authenticated users -->
                 <a class="nav-link" href="{% url 'login' %}">Login</a>
                 <a class="nav-link" href="{% url 'register' %}">Register</a>
             {% else %}
+                <!-- Links for authenticated users -->
                 <a class="nav-link" href="{% url 'index' %}">Home</a>
                 <a class="nav-link" href="{% url 'account' %}">Account</a>
                 {% if account.is_superuser %}
@@ -143,7 +140,6 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
     <section class="hero">
         <h1>Welcome to CleanSMRs</h1>
         <p>Your one-stop shop for sustainable products!</p>
