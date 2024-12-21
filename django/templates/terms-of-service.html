@@ -37,6 +37,59 @@
             color: var(--text-color);
         }
 
+        /* Navbar styles */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-bottom: 1px solid var(--secondary-color);
+            z-index: 1;
+        }
+
+        .navbar .brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .navbar .brand a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .navbar .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .navbar .nav-link {
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            color: var(--primary-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .navbar .nav-link:hover {
+            background-color: var(--primary-color);
+            color: var(--background-color);
+        }
+
+        .navbar .logout-form button {
+            background-color: transparent;
+            border: 1px solid var(--secondary-color);
+            padding: 0.5rem 1rem;
+            color: var(--primary-color);
+            border-radius: 5px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .navbar .logout-form button:hover {
+            background-color: var(--primary-color);
+            color: var(--background-color);
+        }
+
         .container {
             max-width: 900px;
             margin: 50px auto;
@@ -124,7 +177,6 @@
             margin-bottom: 10px;
         }
 
-
         /* Footer styles */
         footer {
             background-color: rgba(0, 0, 0, 0.7);
@@ -152,6 +204,33 @@
     <video class="background-video" autoplay muted loop>
         <source src="{% static 'Video.mp4' %}" type="video/mp4">
     </video>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="brand">
+            <a href="{% url 'index' %}">CleanSMRs</a>
+        </div>
+        <div class="nav-links">
+            {% if not user.is_authenticated %}
+                <!-- Links for non-authenticated users -->
+                <a class="nav-link" href="{% url 'login' %}">Login</a>
+                <a class="nav-link" href="{% url 'register' %}">Register</a>
+            {% else %}
+                <!-- Links for authenticated users -->
+                <a class="nav-link" href="{% url 'index' %}">Home</a>
+                <a class="nav-link" href="{% url 'account' %}">Account</a>
+                {% if account.is_superuser %}
+                    <a class="nav-link" href="{% url 'product-create' %}">Create Product</a>
+                {% endif %}
+                <form method="POST" action="{% url 'logout' %}" class="logout-form" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit">Logout</button>
+                </form>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- Terms of Service Content -->
     <div class="container">
         <h1>Terms of Service</h1>
         <p>Welcome to CleanSMRs! By accessing or using our website, services, or platform, you agree to comply with and be bound by the following Terms of Service. Please read them carefully before proceeding.</p>
@@ -223,12 +302,12 @@
         <p>Thank you for using CleanSMRs!</p>
     </div>
 
-
-</body>    <!-- Footer Section -->
+    <!-- Footer Section -->
     <footer>
         <a href="{% url 'contact' %}">Contact</a>
         <a href="{% url 'about' %}">About</a>
         <a href="{% url 'support' %}">Support</a>
         <a href="{% url 'terms-of-service' %}">Terms of Service</a>
     </footer>
+</body>
 </html>

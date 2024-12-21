@@ -69,6 +69,60 @@
             color: var(--primary-color);
         }
 
+        /* Navbar Styles */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+            border-bottom: 1px solid var(--secondary-color);
+            z-index: 1; /* Ensure it is above the video */
+        }
+
+        .navbar .brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .navbar .brand a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .navbar .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .navbar .nav-link {
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            color: var(--primary-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .navbar .nav-link:hover {
+            background-color: var(--primary-color);
+            color: var(--background-color);
+        }
+
+        /* Logout Button Styling from Provided Code */
+        .navbar .logout-form button {
+            background-color: transparent;
+            border: 1px solid var(--secondary-color);
+            padding: 0.5rem 1rem;
+            color: var(--primary-color);
+            border-radius: 5px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .navbar .logout-form button:hover {
+            background-color: var(--primary-color);
+            color: var(--background-color);
+        }
+
         /* Footer styles */
         footer {
             background-color: var(--background-color);
@@ -91,7 +145,34 @@
     </style>
 </head>
 <body>
+    {% load static %}
+    <video class="background-video" autoplay muted loop>
+        <source src="{% static 'Video.mp4' %}" type="video/mp4">
+    </video>
 
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="brand">
+            <a href="{% url 'index' %}">CleanSMRs</a>
+        </div>
+        <div class="nav-links">
+            {% if not user.is_authenticated %}
+                <a class="nav-link" href="{% url 'login' %}">Login</a>
+                <a class="nav-link" href="{% url 'register' %}">Register</a>
+            {% else %}
+                <a class="nav-link" href="{% url 'index' %}">Home</a>
+                <a class="nav-link" href="{% url 'account' %}">Account</a>
+                {% if account.is_superuser %}
+                    <a class="nav-link" href="{% url 'product-create' %}">Create Product</a>
+                {% endif %}
+                <!-- Logout Button Styled as per Given Code -->
+                <form method="POST" action="{% url 'logout' %}" class="logout-form" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit">Logout</button>
+                </form>
+            {% endif %}
+        </div>
+    </nav>
 
     <div class="content">
         <h1>About CleanSMRs</h1>
@@ -124,29 +205,12 @@
         <p>To facilitate this, we have developed an advanced eCommerce platform that combines energy solutions with seamless data access. Through our platform, customers can:</p>
         <ul>
             <li>Explore and purchase SMR-based solutions tailored to their needs.</li>
-            <li>Access subscription-based data services, including raw environmental data and processed insights.</li>
-            <li>Leverage advanced tools for environmental monitoring, predictive analytics, and reporting.</li>
+            <li>Access subscription-based data-driven insights.</li>
+            <li>Stay updated with real-time information and trends.</li>
         </ul>
-
-        <h2>Commitment to Sustainability</h2>
-        <p>At the heart of CleanSMRs lies a steadfast commitment to sustainability. We believe that energy innovation should not come at the expense of the environment. By leveraging SMR technology, we help organizations reduce their carbon footprint, achieve sustainability targets, and contribute to a cleaner, greener future.</p>
-        <p>We recognize the role that science and innovation play in tackling the world’s greatest challenges, including climate change. That’s why we empower scientific and academic institutions with the tools and data they need to understand the environmental impacts of emerging technologies and drive forward solutions.</p>
-
-        <h2>Why Choose CleanSMRs?</h2>
-        <ul>
-            <li><strong>Expertise:</strong> A team of engineers, developers, and environmental specialists dedicated to delivering clean energy solutions.</li>
-            <li><strong>Innovation:</strong> A focus on integrating cutting-edge technologies like IoT, APIs, and predictive analytics.</li>
-            <li><strong>Reliability:</strong> Continuous, uninterrupted power to meet growing energy demands.</li>
-            <li><strong>Sustainability:</strong> A clear commitment to reducing environmental impact through carbon-free solutions.</li>
-        </ul>
-
-        <h2>Join Us in Building the Future</h2>
-        <p>At CleanSMRs, we are redefining the way the world thinks about energy. Our solutions bridge the gap between innovation and sustainability, helping businesses thrive, data centers operate efficiently, and scientists uncover insights for a better world.</p>
-        <p>We invite you to join us on our journey to power the future, one reactor at a time.</p>
-
-        <p><strong>Clean Energy. Clean Data. Clean Future.</strong></p>
     </div>
 
+    <!-- Footer -->
     <footer>
         <a href="{% url 'contact' %}">Contact</a>
         <a href="{% url 'about' %}">About</a>

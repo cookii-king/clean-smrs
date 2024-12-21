@@ -40,6 +40,60 @@
             min-height: 100vh; /* Ensures the body takes full height */
         }
 
+        /* Navbar styles */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-bottom: 1px solid var(--secondary-color);
+            z-index: 1;
+        }
+
+        .navbar .brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .navbar .brand a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .navbar .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .navbar .nav-link {
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            color: var(--primary-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .navbar .nav-link:hover {
+            background-color: var(--primary-color);
+            color: var(--background-color);
+        }
+
+        .navbar .logout-form button {
+            background-color: transparent;
+            border: 1px solid var(--secondary-color);
+            padding: 0.5rem 1rem;
+            color: var(--primary-color);
+            border-radius: 5px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .navbar .logout-form button:hover {
+            background-color: var(--primary-color);
+            color: var(--background-color);
+        }
+
+        /* Container for support content */
         .container {
             max-width: 900px;
             margin: 50px auto;
@@ -155,6 +209,33 @@
     <video class="background-video" autoplay muted loop>
         <source src="{% static 'Video.mp4' %}" type="video/mp4">
     </video>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="brand">
+            <a href="{% url 'index' %}">CleanSMRs</a>
+        </div>
+        <div class="nav-links">
+            {% if not user.is_authenticated %}
+                <!-- Links for non-authenticated users -->
+                <a class="nav-link" href="{% url 'login' %}">Login</a>
+                <a class="nav-link" href="{% url 'register' %}">Register</a>
+            {% else %}
+                <!-- Links for authenticated users -->
+                <a class="nav-link" href="{% url 'index' %}">Home</a>
+                <a class="nav-link" href="{% url 'account' %}">Account</a>
+                {% if account.is_superuser %}
+                    <a class="nav-link" href="{% url 'product-create' %}">Create Product</a>
+                {% endif %}
+                <form method="POST" action="{% url 'logout' %}" class="logout-form" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit">Logout</button>
+                </form>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- Support Content Container -->
     <div class="container">
         <h1>Support</h1>
         <p>Welcome to the CleanSMRs Support Page. We are here to help you with any questions, concerns, or issues you may face while using our platform and services.</p>
@@ -177,41 +258,17 @@
             <input type="text" id="name" name="name" class="form-control" placeholder="Enter your name" required>
 
             <!-- Email Field -->
-            <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email address" required>
-
-            <!-- Subject Field -->
-            <input type="text" id="subject" name="subject" class="form-control" placeholder="Enter the subject" required>
+            <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email" required>
 
             <!-- Message Field -->
-            <textarea id="message" name="message" class="form-control" rows="5" placeholder="Describe your issue or inquiry" required></textarea>
+            <textarea id="message" name="message" class="form-control" rows="5" placeholder="Describe your issue or question" required></textarea>
 
             <!-- Submit Button -->
-            <button type="submit" class="btn">Send Message</button>
+            <button type="submit" class="btn">Submit</button>
         </form>
-
-        <h2>Business Hours</h2>
-        <p>Our support team is available during the following hours:</p>
-        <div class="card">
-            <ul>
-                <li><strong>Monday to Friday:</strong> 9:00 AM - 5:00 PM (UTC)</li>
-                <li><strong>Weekends & Holidays:</strong> Closed</li>
-            </ul>
-        </div>
-
-        <h2>Our Address</h2>
-        <p>Feel free to visit or send us mail at:</p>
-        <div class="contact-info">
-            <p><strong>CleanSMRs</strong><br>
-            123 Clean Energy Road<br>
-            Green City, GC 12345<br>
-            Phone: +1 (123) 456-7890<br>
-            Email: <a href="mailto:support@cleansmrs.com">support@cleansmrs.com</a></p>
-        </div>
-
-        <p>Thank you for choosing CleanSMRs. Your satisfaction and success are our priorities!</p>
     </div>
 
-    <!-- Footer Section -->
+    <!-- Footer -->
     <footer>
         <a href="{% url 'contact' %}">Contact</a>
         <a href="{% url 'about' %}">About</a>
