@@ -15,20 +15,39 @@
             --button-bg-color: #4CAF50;
         }
 
+        /* Full-screen video background */
+        .background-video {
+            position: fixed;  /* Fix the video in place */
+            top: 0;
+            left: 0;
+            width: 100%;  /* Full viewport width */
+            height: 100%;  /* Full viewport height */
+            object-fit: cover;  /* Ensure the video covers the screen while maintaining aspect ratio */
+            z-index: -1;  /* Place the video behind all content */
+            pointer-events: none;  /* Prevent interaction with the video */
+            margin: 0;  /* Remove any margins */
+            display: block;
+        }
+
         body {
             margin: 0;
             padding: 0;
             background-color: var(--background-color);
             font-family: 'Arial', sans-serif;
             color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;  /* Make body take full height of the viewport */
         }
 
         .container {
             max-width: 500px;
             margin: 50px auto;
             padding: 2rem;
-            background-color: #3E3E3E;
+            background-color: rgba(62, 62, 62, 0.8);  /* Semi-transparent background */
             border-radius: 8px;
+            z-index: 1;  /* Ensure content is above the video */
+            flex-grow: 1; /* Ensures that the container grows to take remaining space */
         }
 
         h1 {
@@ -83,13 +102,38 @@
             font-size: 1rem;
             text-align: center;
         }
+
+        /* Footer styles */
+        footer {
+            background-color: rgba(0, 0, 0, 0.7);
+            color: var(--primary-color);
+            padding: 1rem;
+            text-align: center;
+            border-top: 1px solid var(--secondary-color);
+            margin-top: auto; /* Ensures the footer stays at the bottom */
+        }
+
+        footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            margin: 0 15px;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+            color: var(--secondary-color);
+        }
     </style>
 </head>
 <body>
+    {% load static %}
+    <video class="background-video" autoplay muted loop>
+        <source src="{% static 'Video.mp4' %}" type="video/mp4">
+    </video>
+
     <div class="container">
         <h1>Verify MFA</h1>
 
-        
         <form method="POST" action="{% url 'verify-mfa' %}">
             {% csrf_token %}
             <div class="mb-3">
@@ -100,12 +144,18 @@
             <button type="submit" class="btn">Verify OTP</button>
         </form>
 
-        
         {% if error_message %}
             <div class="alert">
                 {{ error_message }}
             </div>
         {% endif %}
     </div>
+
+    <footer>
+        <a href="{% url 'contact' %}">Contact</a>
+        <a href="{% url 'about' %}">About</a>
+        <a href="{% url 'support' %}">Support</a>
+        <a href="{% url 'terms-of-service' %}">Terms of Service</a>
+    </footer>
 </body>
 </html>

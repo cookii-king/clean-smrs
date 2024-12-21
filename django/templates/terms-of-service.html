@@ -15,6 +15,20 @@
             --form-bg-color: #4A4A4A;
         }
 
+        /* Full-screen video background */
+        .background-video {
+            position: fixed;  /* Fix the video in place */
+            top: 0;
+            left: 0;
+            width: 100%;  /* Full viewport width */
+            height: 100%;  /* Full viewport height */
+            object-fit: cover;  /* Ensure the video covers the screen while maintaining aspect ratio */
+            z-index: -1;  /* Place the video behind all content */
+            pointer-events: none;  /* Prevent interaction with the video */
+            margin: 0;  /* Remove any margins */
+            display: block;
+        }
+
         body {
             margin: 0;
             padding: 0;
@@ -27,8 +41,9 @@
             max-width: 900px;
             margin: 50px auto;
             padding: 2rem;
-            background-color: #3E3E3E;
+            background-color: rgba(62, 62, 62, 0.8);  /* Semi-transparent background */
             border-radius: 8px;
+            z-index: 1;  /* Ensure content is above the video */
         }
 
         h1, h2 {
@@ -108,9 +123,35 @@
         ul li {
             margin-bottom: 10px;
         }
+
+
+        /* Footer styles */
+        footer {
+            background-color: rgba(0, 0, 0, 0.7);
+            color: var(--primary-color);
+            padding: 1rem;
+            text-align: center;
+            border-top: 1px solid var(--secondary-color);
+            margin-top: auto; /* Ensures the footer stays at the bottom */
+        }
+
+        footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            margin: 0 15px;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+            color: var(--secondary-color);
+        }
     </style>
 </head>
 <body>
+    {% load static %}
+    <video class="background-video" autoplay muted loop>
+        <source src="{% static 'Video.mp4' %}" type="video/mp4">
+    </video>
     <div class="container">
         <h1>Terms of Service</h1>
         <p>Welcome to CleanSMRs! By accessing or using our website, services, or platform, you agree to comply with and be bound by the following Terms of Service. Please read them carefully before proceeding.</p>
@@ -181,5 +222,13 @@
 
         <p>Thank you for using CleanSMRs!</p>
     </div>
-</body>
+
+
+</body>    <!-- Footer Section -->
+    <footer>
+        <a href="{% url 'contact' %}">Contact</a>
+        <a href="{% url 'about' %}">About</a>
+        <a href="{% url 'support' %}">Support</a>
+        <a href="{% url 'terms-of-service' %}">Terms of Service</a>
+    </footer>
 </html>

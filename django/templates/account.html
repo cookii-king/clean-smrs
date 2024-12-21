@@ -13,14 +13,34 @@
             --text-color: #ECE6DB; 
         }
 
-        
-        body {
-            margin: 0;
+        /* Full-screen video background */
+        .background-video {
+            position: fixed;  /* Fix the video in place */
+            top: 0;
+            left: 0;
+            width: 100%;  /* Ensure the video stretches across the full width */
+            height: 100vh;  /* Ensure the video initially covers the full viewport height */
+            object-fit: cover;  /* Ensure the video maintains aspect ratio and covers the screen */
+            z-index: -1;  /* Place the video behind all content */
+        }
+
+        /* Prevent scroll for the video, but allow scrolling for the content */
+        html, body {
+            margin: 0;  /* Remove default margin */
             padding: 0;
+            height: 100%;  /* Make sure the body and HTML element take up the full height of the viewport */
+            overflow-x: hidden;  /* Prevent horizontal scrolling */
+            overflow-y: auto;  /* Allow vertical scrolling */
+            display: flex;
+            flex-direction: column;
+        }
+
+        body {
             background-color: var(--background-color);
             font-family: 'Arial', sans-serif;
             color: var(--text-color);
             line-height: 1.6;
+            flex-grow: 1;
         }
 
         a {
@@ -47,6 +67,7 @@
             border: 1px solid var(--secondary-color);
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1;  /* Ensure it appears above the video */
         }
 
         .card-title {
@@ -73,7 +94,6 @@
             border-radius: 5px;
         }
 
-        
         form {
             text-align: center;
             margin-top: 1.5rem;
@@ -109,9 +129,35 @@
             background-color: var(--primary-color);
             color: var(--background-color);
         }
+
+        /* Footer styles */
+        footer {
+            background-color: rgba(0, 0, 0, 0.7);
+            color: var(--primary-color);
+            padding: 1rem;
+            text-align: center;
+            border-top: 1px solid var(--secondary-color);
+            margin-top: auto; /* Push footer to the bottom */
+        }
+
+        footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            margin: 0 15px;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+            color: var(--secondary-color);
+        }
+
     </style>
 </head>
 <body>
+    {% load static %}
+    <video class="background-video" autoplay muted loop>
+        <source src="{% static 'Video.mp4' %}" type="video/mp4">
+    </video>
     <div class="card">
         <h2 class="card-title">Account Details</h2>
         <p><strong>Name:</strong> {{ account.name }}</p>
@@ -142,5 +188,13 @@
         {% endif %}
         <a class="nav-link" href="{% url 'products' %}">Products</a>
     </div>
+
+    <!-- Footer -->
+    <footer>
+        <a href="{% url 'contact' %}">Contact</a>
+        <a href="{% url 'about' %}">About</a>
+        <a href="{% url 'support' %}">Support</a>
+        <a href="{% url 'terms-of-service' %}">Terms of Service</a>
+    </footer>
 </body>
 </html>

@@ -12,6 +12,20 @@
             --text-color: #ECE6DB;
         }
 
+        /* Full-screen video background */
+        .background-video {
+            position: fixed;  /* Fix the video in place */
+            top: 0;
+            left: 0;
+            width: 100%;  /* Full viewport width */
+            height: 100%;  /* Full viewport height */
+            object-fit: cover;  /* Ensure the video maintains aspect ratio and covers the screen */
+            z-index: -1;  /* Place the video behind all content */
+            pointer-events: none;  /* Prevent interaction with the video */
+            margin: 0;  /* Remove any margins */
+            display: block;
+        }
+
         body {
             margin: 0;
             padding: 0;
@@ -24,10 +38,11 @@
             max-width: 800px;
             margin: 50px auto;
             padding: 2rem;
-            background-color: var(--background-color);
+            background-color: rgba(39, 39, 39, 0.9);  /* Slight transparency for better visibility */
             border: 1px solid var(--secondary-color);
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1;  /* Ensure the cart container is above the video */
         }
 
         .container h1 {
@@ -97,6 +112,11 @@
     </style>
 </head>
 <body>
+    {% load static %}
+    <video class="background-video" autoplay muted loop>
+        <source src="{% static 'Video.mp4' %}" type="video/mp4">
+    </video>
+
     <div class="container">
         <h1>Shopping Cart</h1>
         {% if cart.items %}

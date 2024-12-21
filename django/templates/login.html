@@ -12,9 +12,30 @@
             --text-color: #ECE6DB;
         }
 
+        /* Full-screen video background */
+        .background-video {
+            position: fixed;  /* Fix the video in place */
+            top: 0;
+            left: 0;
+            width: 100%;  /* Ensure the video stretches across the full width */
+            height: 100%;  /* Ensure the video stretches across the full height */
+            object-fit: cover;  /* Ensure the video maintains aspect ratio and covers the screen */
+            z-index: -1;  /* Place the video behind all content */
+            margin: 0;  /* Remove any margins that could affect the video */
+        }
+
+        /* Prevent scrolling */
+        html, body {
+            height: 100%;  /* Make sure the body and HTML element take up the full height of the viewport */
+            margin: 0;  /* Remove default margin */
+            overflow: hidden;  /* Prevent scrolling */
+        }
+
         body {
-            margin: 0;
-            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            height: 100%;
             background-color: var(--background-color);
             font-family: 'Arial', sans-serif;
             color: var(--text-color);
@@ -28,6 +49,7 @@
             border: 1px solid var(--secondary-color);
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            flex: 1; /* This ensures the content can grow and take up available space */
         }
 
         .container h1 {
@@ -77,9 +99,34 @@
             background-color: var(--secondary-color);
             color: var(--background-color);
         }
+
+        /* Footer styles */
+        footer {
+            background-color: var(--background-color);
+            padding: 1rem 0;
+            text-align: center;
+            margin-top: auto;  /* Push footer to the bottom */
+            border-top: 1px solid var(--secondary-color);
+        }
+
+        footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 1rem;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
+    {% load static %}
+    <video class="background-video" autoplay muted loop playsinline>
+        <source src="{% static 'Video.mp4' %}" type="video/mp4">
+    </video>
+
     <div class="container">
         <h1>Login</h1>
         <form method="POST" action="{% url 'login' %}">
@@ -97,5 +144,13 @@
             </div>
         </form>
     </div>
+
+    <!-- Footer -->
+    <footer>
+        <a href="{% url 'contact' %}">Contact</a>
+        <a href="{% url 'about' %}">About</a>
+        <a href="{% url 'support' %}">Support</a>
+        <a href="{% url 'terms-of-service' %}">Terms of Service</a>
+    </footer>
 </body>
 </html>

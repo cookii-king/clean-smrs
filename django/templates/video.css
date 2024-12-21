@@ -1,0 +1,120 @@
+/* Full-screen video background */
+.background-video {
+    position: fixed;  /* Fix the video in place */
+    top: 0;
+    left: 0;
+    width: 100%;  /* Ensure the video stretches across the full width */
+    height: 100%;  /* Ensure the video stretches across the full height */
+    object-fit: cover;  /* Ensure the video maintains aspect ratio and covers the screen */
+    z-index: -1;  /* Place the video behind all content */
+    margin: 0;  /* Remove any margins that could affect the video */
+}
+
+/* Ensure no scrolling due to the video */
+html, body {
+    height: 100%;  /* Make sure the body and HTML element take up the full height of the viewport */
+    margin: 0;  /* Remove default margin */
+    overflow: hidden;  /* Prevent scrolling */
+}
+
+
+.container {
+    position: relative; /* Ensures content is on top of the video */
+    z-index: 1; /* Above the video */
+}
+
+a {
+    text-decoration: none;
+    color: var(--primary-color);
+}
+
+a:hover {
+    text-decoration: underline;
+    color: var(--secondary-color);
+}
+
+button {
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+    border-bottom: 1px solid var(--secondary-color);
+    z-index: 1; /* Ensure it is above the video */
+}
+
+.navbar .brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.navbar .nav-links {
+    display: flex;
+    gap: 1rem;
+}
+
+.navbar .nav-link {
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    color: var(--primary-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.navbar .nav-link:hover {
+    background-color: var(--primary-color);
+    color: var(--background-color);
+}
+
+.navbar .logout-form button {
+    background-color: transparent;
+    border: 1px solid var(--secondary-color);
+    padding: 0.5rem 1rem;
+    color: var(--primary-color);
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.navbar .logout-form button:hover {
+    background-color: var(--primary-color);
+    color: var(--background-color);
+}
+
+.hero {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--primary-color);
+    z-index: 1; /* Ensure it is above the video */
+    position: relative; /* For stacking context */
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay for better readability */
+}
+
+.hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.hero p {
+    font-size: 1.25rem;
+    color: var(--secondary-color);
+}
+
+@media (max-width: 768px) {
+    .navbar .nav-links {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    .hero p {
+        font-size: 1rem;
+    }
+}

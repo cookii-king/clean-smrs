@@ -12,18 +12,36 @@
             --text-color: #ECE6DB;
         }
 
+        /* Full-screen video background */
+        .background-video {
+            position: fixed;  /* Fix the video in place */
+            top: 0;
+            left: 0;
+            width: 100%;  /* Full viewport width */
+            height: 100%;  /* Full viewport height */
+            object-fit: cover;  /* Ensure the video covers the screen while maintaining aspect ratio */
+            z-index: -1;  /* Place the video behind all content */
+            pointer-events: none;  /* Prevent interaction with the video */
+            margin: 0;  /* Remove any margins */
+            display: block;
+        }
+
         body {
             margin: 0;
             padding: 0;
             background-color: var(--background-color);
             font-family: 'Arial', sans-serif;
             color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Ensure the body takes up the full height */
         }
 
         .container {
             max-width: 1200px;
             margin: 50px auto;
             padding: 2rem;
+            flex-grow: 1;  /* Allow the content to grow and take remaining space */
         }
 
         h1, h2, h5 {
@@ -101,9 +119,34 @@
             font-size: 1.1rem;
             color: var(--text-color);
         }
+
+        /* Footer styles */
+        footer {
+            background-color: rgba(0, 0, 0, 0.7);
+            color: var(--primary-color);
+            padding: 1rem;
+            text-align: center;
+            border-top: 1px solid var(--secondary-color);
+            margin-top: auto; /* Push footer to the bottom */
+        }
+
+        footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            margin: 0 15px;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+            color: var(--secondary-color);
+        }
     </style>
 </head>
 <body>
+    {% load static %}
+    <video class="background-video" autoplay muted loop>
+        <source src="{% static 'Video.mp4' %}" type="video/mp4">
+    </video>
     <div class="container">
         <div class="card">
             <h5 class="card-title">{{ product.id }}</h5>
@@ -136,5 +179,13 @@
             <button type="submit" class="btn">Buy Now</button>
         </form>
     </div>
+
+    <!-- Footer -->
+    <footer>
+        <a href="{% url 'contact' %}">Contact</a>
+        <a href="{% url 'about' %}">About</a>
+        <a href="{% url 'support' %}">Support</a>
+        <a href="{% url 'terms-of-service' %}">Terms of Service</a>
+    </footer>
 </body>
 </html>
