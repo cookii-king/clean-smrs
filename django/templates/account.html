@@ -130,6 +130,59 @@
             color: var(--background-color);
         }
 
+        /* Navbar Styles */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+            border-bottom: 1px solid var(--secondary-color);
+            z-index: 1; /* Ensure it is above the video */
+        }
+
+        .navbar .brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .navbar .brand a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .navbar .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .navbar .nav-link {
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            color: var(--primary-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .navbar .nav-link:hover {
+            background-color: var(--primary-color);
+            color: var(--background-color);
+        }
+
+        .navbar .logout-form button {
+            background-color: transparent;
+            border: 1px solid var(--secondary-color);
+            padding: 0.5rem 1rem;
+            color: var(--primary-color);
+            border-radius: 5px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .navbar .logout-form button:hover {
+            background-color: var(--primary-color);
+            color: var(--background-color);
+        }
+
         /* Footer styles */
         footer {
             background-color: rgba(0, 0, 0, 0.7);
@@ -155,9 +208,33 @@
 </head>
 <body>
     {% load static %}
-    <video class="background-video" autoplay muted loop>
-        <source src="{% static 'Video.mp4' %}" type="video/mp4">
+    <video class="background-video" autoplay muted loop playsinline>
+        <source src="{% static 'project2.mp4' %}" type="video/mp4">
     </video>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="brand">
+            <a href="{% url 'index' %}">CleanSMRs</a>
+        </div>
+        <div class="nav-links">
+            {% if not user.is_authenticated %}
+                <a class="nav-link" href="{% url 'login' %}">Login</a>
+                <a class="nav-link" href="{% url 'register' %}">Register</a>
+            {% else %}
+                <a class="nav-link" href="{% url 'index' %}">Home</a>
+                <a class="nav-link" href="{% url 'account' %}">Account</a>
+                {% if account.is_superuser %}
+                    <a class="nav-link" href="{% url 'product-create' %}">Create Product</a>
+                {% endif %}
+                <form method="POST" action="{% url 'logout' %}" class="logout-form" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit">Logout</button>
+                </form>
+            {% endif %}
+        </div>
+    </nav>
+
     <div class="card">
         <h2 class="card-title">Account Details</h2>
         <p><strong>Name:</strong> {{ account.name }}</p>
