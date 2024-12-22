@@ -208,7 +208,7 @@
 <body>
     {% load static %}
     <video class="background-video" autoplay muted loop playsinline>
-        <source src="{% static 'project.mp4' %}" type="video/mp4">
+        <source src="{% static 'ProjectIntro.mp4' %}" type="video/mp4">
     </video>
 
     <nav class="navbar">
@@ -225,6 +225,7 @@
                 <!-- Links for authenticated users -->
                 <a class="nav-link" href="{% url 'index' %}">Home</a>
                 <a class="nav-link" href="{% url 'account' %}">Account</a>
+                <a class="nav-link" href="{% url 'products' %}">Products</a> <!-- Added Products link -->
                 {% if account.is_superuser %}
                     <a class="nav-link" href="{% url 'product-create' %}">Create Product</a>
                 {% endif %}

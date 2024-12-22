@@ -22,8 +22,6 @@
             object-fit: cover;
             z-index: -1;
             pointer-events: none;
-            margin: 0;
-            display: block;
         }
 
         body {
@@ -76,7 +74,7 @@
             color: var(--background-color);
         }
 
-        /* Logout Button Styling from Provided Code */
+        /* Logout Button Styling */
         .navbar .logout-form button {
             background-color: transparent;
             border: 1px solid var(--secondary-color);
@@ -113,26 +111,39 @@
         form {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 1.5rem;
         }
 
-        .form-label {
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
             font-size: 1rem;
             color: var(--primary-color);
+            margin-bottom: 0.5rem;
         }
 
         .form-control {
             padding: 0.75rem;
+            font-size: 1rem;
             border: 1px solid var(--secondary-color);
             border-radius: 5px;
             background-color: var(--background-color);
             color: var(--text-color);
+            box-sizing: border-box;
+            width: 100%;
         }
 
         .form-control:focus {
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 5px var(--primary-color);
+        }
+
+        textarea.form-control {
+            resize: none;
         }
 
         button {
@@ -150,6 +161,12 @@
         button:hover {
             background-color: var(--secondary-color);
             color: var(--background-color);
+        }
+
+        .d-grid {
+            display: flex;
+            justify-content: center;
+            margin-top: 1rem;
         }
 
         /* Footer styles */
@@ -177,8 +194,9 @@
 <body>
     {% load static %}
     <video class="background-video" autoplay muted loop playsinline>
-        <source src="{% static 'project2.mp4' %}" type="video/mp4">
+        <source src="{% static 'projectN.mp4' %}" type="video/mp4">
     </video>
+
     <!-- Navbar -->
     <nav class="navbar">
         <div class="brand">
@@ -194,7 +212,6 @@
                 {% if account.is_superuser %}
                     <a class="nav-link" href="{% url 'product-create' %}">Create Product</a>
                 {% endif %}
-                <!-- Logout Button Styled as per Given Code -->
                 <form method="POST" action="{% url 'logout' %}" class="logout-form" style="display: inline;">
                     {% csrf_token %}
                     <button type="submit">Logout</button>
@@ -203,24 +220,25 @@
         </div>
     </nav>
 
+    <!-- Contact Form -->
     <div class="container">
         <h1>Contact Us</h1>
         <form method="POST" action="{% url 'contact-submit' %}">
             {% csrf_token %}
-            <div class="mb-3">
-                <label for="name" class="form-label">Name</label>
+            <div class="form-group">
+                <label for="name">Name</label>
                 <input type="text" id="name" name="name" class="form-control" placeholder="Enter your full name" required>
             </div>
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
+            <div class="form-group">
+                <label for="email">Email</label>
                 <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email address" required>
             </div>
-            <div class="mb-3">
-                <label for="subject" class="form-label">Subject</label>
+            <div class="form-group">
+                <label for="subject">Subject</label>
                 <input type="text" id="subject" name="subject" class="form-control" placeholder="Enter the subject" required>
             </div>
-            <div class="mb-3">
-                <label for="message" class="form-label">Message</label>
+            <div class="form-group">
+                <label for="message">Message</label>
                 <textarea id="message" name="message" class="form-control" rows="5" placeholder="Enter your message" required></textarea>
             </div>
             <div class="d-grid">

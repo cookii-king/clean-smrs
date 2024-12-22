@@ -142,11 +142,54 @@
         footer a:hover {
             text-decoration: underline;
         }
+
+        /* Cards layout */
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 4 cards per row */
+            gap: 2rem;
+            margin-top: 30px;
+            justify-items: center;
+        }
+
+        .card {
+            background-color: #333;
+            padding: 10px;  /* Reduced padding */
+            border-radius: 8px;
+            width: 100%;
+            max-width: 180px;  /* Reduced max-width */
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .card img {
+            width: 100%;
+            height: 400px;  /* Set a specific height if necessary */
+            object-fit: cover; /* Ensures the images fill the space without distortion */
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .card h3 {
+            color: var(--primary-color);
+            margin-bottom: 8px;  /* Reduced margin */
+            font-size: 1rem;  /* Reduced font size */
+        }
+
+        .card p {
+            font-size: 0.85rem;  /* Smaller text */
+            color: var(--secondary-color);
+        }
+
+        /* Responsive design for smaller screens */
+        @media (max-width: 768px) {
+            .cards-container {
+                grid-template-columns: 1fr;  /* Stack cards on top of each other */
+            }
+        }
     </style>
 </head>
 <body>
-
-
     <!-- Navbar -->
     <nav class="navbar">
         <div class="brand">
@@ -162,7 +205,6 @@
                 {% if account.is_superuser %}
                     <a class="nav-link" href="{% url 'product-create' %}">Create Product</a>
                 {% endif %}
-                <!-- Logout Button Styled as per Given Code -->
                 <form method="POST" action="{% url 'logout' %}" class="logout-form" style="display: inline;">
                     {% csrf_token %}
                     <button type="submit">Logout</button>
@@ -170,42 +212,50 @@
             {% endif %}
         </div>
     </nav>
-
+    {% load static %}
+    <!-- Content -->
     <div class="content">
-        <h1>About CleanSMRs</h1>
-        <p>At CleanSMRs, we are at the forefront of a new energy revolution, delivering sustainable, reliable, and carbon-free power for the data-driven world. In an era where digital transformation, Artificial Intelligence, and large-scale data processing are growing exponentially, the energy demands placed on data centers have never been higher. Traditional energy sources struggle to keep up, both in capacity and environmental impact. This is where CleanSMRs steps in.</p>
-
-        <h2>Our Vision</h2>
-        <p>Our mission is to transform the future of energy by providing Small Modular Reactors (SMRs) as a clean, stable, and scalable power solution. We envision a world where businesses can innovate freely without contributing to climate change, where data centers operate sustainably 24/7, and where scientific communities have access to reliable energy and actionable insights for a better tomorrow.</p>
-
-        <h2>Why SMRs?</h2>
-        <p>Small Modular Reactors (SMRs) are a groundbreaking technology designed to deliver consistent, carbon-free energy. Unlike renewable sources such as solar or wind, which are intermittent and weather-dependent, SMRs provide continuous power to meet the massive energy demands of today’s world. Our reactors are:</p>
-        <ul>
-            <li><strong>Reliable:</strong> Consistent, uninterrupted energy supply 24/7.</li>
-            <li><strong>Sustainable:</strong> Zero carbon emissions, supporting global climate goals.</li>
-            <li><strong>Scalable:</strong> Modular design allows for cost-efficient deployment and expansion.</li>
-            <li><strong>Safe:</strong> Built with modern safety protocols and redundancy systems, ensuring secure operations.</li>
-        </ul>
-
-        <h2>Who We Serve</h2>
-        <p>CleanSMRs works with businesses, scientific communities, and environmental institutions to deliver tailored energy and data solutions:</p>
-        <ul>
-            <li><strong>Data Centers:</strong> Our SMRs provide the power needed to sustain high-performance AI workloads and mission-critical digital operations without interruptions.</li>
-            <li><strong>Scientific Communities:</strong> Through our advanced API and data platforms, we enable scientists and researchers to access real-time environmental data. This includes IoT-driven measurements such as temperature, humidity, wind speed, and atmospheric conditions.</li>
-            <li><strong>Businesses:</strong> Companies looking to reduce their carbon footprint and achieve sustainability goals benefit from our clean and scalable power solutions.</li>
-        </ul>
-
-        <h2>Powering Innovation and Research</h2>
-        <p>At CleanSMRs, we don’t just provide energy – we deliver data and insights. Our bespoke API collects and processes environmental measurements from IoT-enabled sensors. Scientists, academic institutions, and environmental analysts can access both raw, unstructured data in data lakes and processed, cleaned data in data warehouses. This ensures they have the tools they need to analyze trends, perform predictive analytics, and make informed decisions about environmental and energy impacts.</p>
-
-        <h2>Our Platform</h2>
-        <p>To facilitate this, we have developed an advanced eCommerce platform that combines energy solutions with seamless data access. Through our platform, customers can:</p>
-        <ul>
-            <li>Explore and purchase SMR-based solutions tailored to their needs.</li>
-            <li>Access subscription-based data-driven insights.</li>
-            <li>Stay updated with real-time information and trends.</li>
-        </ul>
+        <!-- Our Team Section -->
+        <h2>Our Team</h2>
+        <div class="cards-container">
+            <div class="card">
+                <img src="{% static 'HassanAI.jpg' %}" alt="Hassan AI">
+                <h3>Hassan AI</h3>
+                <p>Founder & CEO</p>
+            </div>
+            <div class="card">
+                <img src="path_to_image_2.jpg" alt="Team Member 2">
+                <h3>Samuel Ngoma</h3>
+                <p>Founder & CEO</p>
+            </div>
+            <div class="card">
+                <img src="{% static 'MahidAI.jpeg' %}" alt="Team Member 3">
+                <h3>Mahid Niazi Sardar</h3>
+                <p>Basically The Founder & CEO</p>
+            </div>
+            <div class="card">
+                <img src="path_to_image_4.jpg" alt="Team Member 4">
+                <h3>Zaynab Mirza</h3>
+                <p>Founder & CEO</p>
+            </div>
+        </div>
     </div>
+
+    <!-- About CleanSMRs Content -->
+    <h1>About CleanSMRs</h1>
+    <p>At CleanSMRs, we are at the forefront of a new energy revolution, delivering sustainable, reliable, and carbon-free power for the data-driven world. In an era where digital transformation, Artificial Intelligence, and large-scale data processing are growing exponentially, the energy demands placed on data centers have never been higher. Traditional energy sources struggle to keep up, both in capacity and environmental impact. This is where CleanSMRs steps in.</p>
+
+    <h2>Our Vision</h2>
+    <p>Our mission is to transform the future of energy by providing Small Modular Reactors (SMRs) as a clean, stable, and scalable power solution. We envision a world where businesses can innovate freely without contributing to climate change, where data centers operate sustainably 24/7, and where scientific communities have access to reliable energy and actionable insights for a better tomorrow.</p>
+
+    <h2>Why SMRs?</h2>
+    <p>Small Modular Reactors (SMRs) are a groundbreaking technology designed to deliver consistent, carbon-free energy. Unlike renewable sources such as solar or wind, which are intermittent and weather-dependent, SMRs provide continuous power to meet the massive energy demands of today’s world. Our reactors are:</p>
+    <ul>
+        <li><strong>Reliable:</strong> Consistent, uninterrupted energy supply 24/7.</li>
+        <li><strong>Sustainable:</strong> Zero carbon emissions during operation.</li>
+        <li><strong>Scalable:</strong> Modular design allows for flexible and efficient power generation.</li>
+        <li><strong>Safe:</strong> State-of-the-art safety mechanisms that ensure secure operation.</li>
+    </ul>
 
     <!-- Footer -->
     <footer>

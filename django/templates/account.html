@@ -7,127 +7,38 @@
     
     <style>
         :root {
-            --primary-color: #ECE6DB; 
-            --secondary-color: #BABABA; 
+            --primary-color: #ECE6DB;
+            --secondary-color: #BABABA;
             --background-color: #272727;
-            --text-color: #ECE6DB; 
+            --text-color: #ECE6DB;
         }
 
         /* Full-screen video background */
         .background-video {
-            position: fixed;  /* Fix the video in place */
+            position: fixed;
             top: 0;
             left: 0;
-            width: 100%;  /* Ensure the video stretches across the full width */
-            height: 100vh;  /* Ensure the video initially covers the full viewport height */
-            object-fit: cover;  /* Ensure the video maintains aspect ratio and covers the screen */
-            z-index: -1;  /* Place the video behind all content */
-        }
-
-        /* Prevent scroll for the video, but allow scrolling for the content */
-        html, body {
-            margin: 0;  /* Remove default margin */
-            padding: 0;
-            height: 100%;  /* Make sure the body and HTML element take up the full height of the viewport */
-            overflow-x: hidden;  /* Prevent horizontal scrolling */
-            overflow-y: auto;  /* Allow vertical scrolling */
-            display: flex;
-            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            pointer-events: none;
+            margin: 0;
+            display: block;
         }
 
         body {
+            margin: 0;
+            padding: 0;
             background-color: var(--background-color);
             font-family: 'Arial', sans-serif;
             color: var(--text-color);
-            line-height: 1.6;
-            flex-grow: 1;
-        }
-
-        a {
-            text-decoration: none;
-            color: var(--primary-color);
-        }
-
-        a:hover {
-            text-decoration: underline;
-            color: var(--secondary-color);
-        }
-
-        button {
-            cursor: pointer;
-            font-size: 1rem;
-        }
-
-        /* Card Container */
-        .card {
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 2rem;
-            background-color: var(--background-color);
-            border: 1px solid var(--secondary-color);
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            z-index: 1;  /* Ensure it appears above the video */
-        }
-
-        .card-title {
-            font-size: 2rem;
-            color: var(--primary-color);
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }
-
-        .card p {
-            margin: 0.5rem 0;
-            color: var(--text-color);
-        }
-
-        .card strong {
-            color: var(--primary-color);
-        }
-
-        .card img {
-            display: block;
-            margin: 1rem auto;
-            max-width: 100%;
-            border: 1px solid var(--secondary-color);
-            border-radius: 5px;
-        }
-
-        form {
-            text-align: center;
-            margin-top: 1.5rem;
-        }
-
-        form button {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 5px;
-            background-color: var(--primary-color);
-            color: var(--background-color);
-            font-size: 1rem;
-            font-weight: bold;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        form button:hover {
-            background-color: var(--secondary-color);
-            color: var(--background-color);
-        }
-
-        .nav-link {
-            display: inline-block;
-            margin-top: 1rem;
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            background-color: transparent;
-            color: var(--primary-color);
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .nav-link:hover {
-            background-color: var(--primary-color);
-            color: var(--background-color);
+            display: flex;
+            justify-content: center;  /* Horizontally center the container */
+            align-items: center;  /* Vertically center the container */
+            min-height: 100vh;  /* Ensure full height for vertical centering */
+            overflow-x: hidden;  /* Prevent horizontal scrolling */
+            flex-direction: column;
         }
 
         /* Navbar Styles */
@@ -136,9 +47,10 @@
             justify-content: space-between;
             align-items: center;
             padding: 1rem 2rem;
-            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+            background-color: rgba(0, 0, 0, 0.7);
             border-bottom: 1px solid var(--secondary-color);
-            z-index: 1; /* Ensure it is above the video */
+            z-index: 1;
+            width: 100%;
         }
 
         .navbar .brand {
@@ -169,6 +81,7 @@
             color: var(--background-color);
         }
 
+        /* Logout Button Styling */
         .navbar .logout-form button {
             background-color: transparent;
             border: 1px solid var(--secondary-color);
@@ -183,6 +96,99 @@
             color: var(--background-color);
         }
 
+        /* Card container for content */
+        .card-container {
+            width: 100%;
+            max-width: 800px;  /* Control maximum width of the card */
+            padding: 2rem;
+            overflow-y: auto;  /* Allow scrolling if content overflows */
+            text-align: center;
+        }
+
+        /* Card styling */
+        .card {
+            background-color: rgba(39, 39, 39, 0.95);
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5), 0 6px 6px rgba(0, 0, 0, 0.3);
+            padding: 2rem;
+            color: var(--text-color);
+            border: 2px solid var(--secondary-color);
+            margin-bottom: 1rem;
+            word-wrap: break-word;  /* Prevent text overflow */
+        }
+
+        /* Header inside card */
+        .card h2 {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            font-weight: bold;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+        }
+
+        /* Form styling */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Form labels */
+        .form-label {
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            font-weight: 600;
+            text-align: left;
+        }
+
+        /* Form controls (input, textarea) */
+        .form-control {
+            padding: 0.8rem 1rem;
+            border: 2px solid var(--secondary-color);
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            word-wrap: break-word;  /* Ensure text breaks if too long */
+            overflow-wrap: break-word;  /* Ensure long words break and don't overflow */
+        }
+
+        /* Focus state for inputs */
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 8px var(--primary-color);
+        }
+
+        /* Submit button */
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--primary-color);
+            color: var(--background-color);
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Hover effect for button */
+        button:hover {
+            transform: translateY(-3px);
+            background-color: var(--secondary-color);
+            color: var(--background-color);
+        }
+
+        /* Add slight margin around the card for mobile screens */
+        @media (max-width: 768px) {
+            .card {
+                margin: 1rem;
+            }
+        }
+
         /* Footer styles */
         footer {
             background-color: rgba(0, 0, 0, 0.7);
@@ -190,7 +196,8 @@
             padding: 1rem;
             text-align: center;
             border-top: 1px solid var(--secondary-color);
-            margin-top: auto; /* Push footer to the bottom */
+            margin-top: auto;
+            width: 100%;
         }
 
         footer a {
@@ -203,13 +210,13 @@
             text-decoration: underline;
             color: var(--secondary-color);
         }
-
     </style>
+
 </head>
 <body>
     {% load static %}
     <video class="background-video" autoplay muted loop playsinline>
-        <source src="{% static 'project2.mp4' %}" type="video/mp4">
+        <source src="{% static 'projectN.mp4' %}" type="video/mp4">
     </video>
 
     <!-- Navbar -->
@@ -235,43 +242,32 @@
         </div>
     </nav>
 
-    <div class="card">
-        <h2 class="card-title">Account Details</h2>
-        <p><strong>Name:</strong> {{ account.name }}</p>
-        <p><strong>Email:</strong> {{ account.email }}</p>
-        <p><strong>Subscription Status:</strong> {{ subscription_status }}</p>
-        <p><strong>JWT Token:</strong> {{ token }}</p>
-        <p><strong>Email Confirmed:</strong> {{ account.email_confirmed }}</p>
-        <p><strong>2FA Enabled:</strong> {{ account.mfa_enabled }}</p>
+    <!-- Card container centered in the page -->
+    <div class="card-container">
+        <div class="card">
+            <h2 class="card-title">Account Details</h2>
+            <p><strong>Name:</strong> {{ account.name }}</p>
+            <p><strong>Email:</strong> {{ account.email }}</p>
+            <p><strong>Subscription Status:</strong> {{ subscription_status }}</p>
+            <p><strong>JWT Token:</strong> <span class="jwt-token">{{ token }}</span></p>
+            <p><strong>Email Confirmed:</strong> {{ account.email_confirmed }}</p>
+            <p><strong>2FA Enabled:</strong> {{ account.mfa_enabled }}</p>
 
-        {% if not account.mfa_enabled %}
-        <img src="{{ qrcode }}" alt="QR Code">
-        <form method="GET" action="{% url 'enable-mfa' %}">
-            {% csrf_token %}
-            <button type="submit">Enable 2FA</button>
-        </form>
-        {% else %}
-        <form method="POST" action="{% url 'disable-mfa' %}">
-            {% csrf_token %}
-            <button type="submit">Disable 2FA</button>
-        </form>
-        {% endif %}
-
-        {% if user.is_authenticated %}
-        <form method="POST" action="{% url 'logout' %}">
-            {% csrf_token %}
-            <button type="submit">Logout</button>
-        </form>
-        {% endif %}
-        <a class="nav-link" href="{% url 'products' %}">Products</a>
+            {% if not account.mfa_enabled %}
+            <img src="{{ qrcode }}" alt="QR Code">
+            <form method="GET" action="{% url 'enable-mfa' %}">
+                <button type="submit">Enable MFA</button>
+            </form>
+            {% endif %}
+        </div>
     </div>
 
     <!-- Footer -->
     <footer>
-        <a href="{% url 'contact' %}">Contact</a>
-        <a href="{% url 'about' %}">About</a>
-        <a href="{% url 'support' %}">Support</a>
-        <a href="{% url 'terms-of-service' %}">Terms of Service</a>
+        <p>© 2024 CleanSMRs. All rights reserved.</p>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
     </footer>
+
 </body>
 </html>
