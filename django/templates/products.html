@@ -75,12 +75,24 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             overflow: hidden;
             text-align: center;
+            position: relative;
         }
 
         .product-card img {
             width: 100%;
             height: 200px;
             object-fit: cover;
+            display: block;
+        }
+
+        .product-card img:empty {
+            background-color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            font-size: 1.2rem;
+            text-align: center;
         }
 
         .product-card h3 {
@@ -140,40 +152,38 @@
         <source src="{% static 'projectN.mp4' %}" type="video/mp4">
     </video>
 
-    <!-- Product Listing Section -->
-    <div class="product-container">
-        <!-- Example Product Card 1 -->
+     <!-- Product Listing Section -->
+     <div class="product-container">
+        <!-- Product Card 1 -->
         <div class="product-card">
-            <img src="{% static 'product1.jpg' %}" alt="Product 1">
-            <h3>Product Name 1</h3>
-            <p>This is a brief description of the product. It's an amazing product that you'll love.</p>
+            <img src="{% static 'smart_radiation1.png' %}" alt="Smart Radiation Detector">
+            <h3>Smart Radiation Detector</h3>
+            <p>Portable device for detecting and monitoring radiation levels with real-time data alerts.</p>
             <button>Buy Now</button>
         </div>
 
-        <!-- Example Product Card 2 -->
+        <!-- Product Card 2 -->
         <div class="product-card">
-            <img src="{% static 'product2.jpg' %}" alt="Product 2">
-            <h3>Product Name 2</h3>
-            <p>This is a brief description of the product. It's an amazing product that you'll love.</p>
+            <img src="{% static 'iot_device.png' %}" alt="IoT-Connected Environmental Sensor">
+            <h3>IoT-Connected Environmental Sensor</h3>
+            <p>Advanced IoT sensor to measure and track environmental factors such as temperature and radiation.</p>
             <button>Buy Now</button>
         </div>
 
-        <!-- Example Product Card 3 -->
+        <!-- Product Card 3 -->
         <div class="product-card">
-            <img src="{% static 'product3.jpg' %}" alt="Product 3">
-            <h3>Product Name 3</h3>
-            <p>This is a brief description of the product. It's an amazing product that you'll love.</p>
+            <img src="{% static 'nuclear.png' %}" alt="Nuclear Energy Training Module">
+            <h3>Nuclear Energy Training Module</h3>
+            <p>Interactive learning tool designed to educate professionals about nuclear energy and safety.</p>
             <button>Buy Now</button>
         </div>
 
-        <!-- Example Product Card 4 -->
+        <!-- Product Card 4 -->
         <div class="product-card">
-            <img src="{% static 'product4.jpg' %}" alt="Product 4">
-            <h3>Product Name 4</h3>
-            <p>This is a brief description of the product. It's an amazing product that you'll love.</p>
+            <img src="{% static 'suit.png' %}" alt="Radiation Protective Suit">
+            <h3>Radiation Protective Suit</h3>
+            <p>High-performance suit designed for maximum protection in radiation-intensive environments.</p>
             <button>Buy Now</button>
-        </div>
-    </div>
 
     <!-- Footer Section -->
     <footer>
