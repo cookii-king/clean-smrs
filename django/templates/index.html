@@ -5,15 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CleanSMRs</title>
 
-    
     <style>
         :root {
             --primary-color: #ECE6DB;
-            --secondary-color: #BABABA; 
-            --background-color: #272727; 
-            --text-color: #ECE6DB; 
+            --secondary-color: #BABABA;
+            --background-color: #272727;
+            --text-color: #ECE6DB;
         }
-    
+
         body {
             margin: 0;
             padding: 0;
@@ -23,13 +22,12 @@
             line-height: 1.6;
             display: flex;
             flex-direction: column;
-            min-height: 100vh; /* Ensure the body takes up at least the full height */
-            overflow-x: hidden; /* Prevent horizontal scrolling */
-            justify-content: center; /* Center content vertically */
-            text-align: center; /* Center text horizontally */
+            min-height: 100vh;
+            overflow-x: hidden;
+            justify-content: center;
+            text-align: center;
         }
 
-        /* Full-screen video background */
         .background-video {
             position: fixed;
             top: 0;
@@ -37,10 +35,9 @@
             width: 100vw;
             height: 100vh;
             object-fit: cover;
-            z-index: -1; /* Place behind all content */
+            z-index: -1;
         }
 
-        /* General anchor styles */
         a {
             text-decoration: none;
             color: var(--primary-color);
@@ -56,14 +53,15 @@
             font-size: 1rem;
         }
 
+        /* Navbar Styles */
         .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 1rem 2rem;
-            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+            background-color: rgba(0, 0, 0, 0.7);
             border-bottom: 1px solid var(--secondary-color);
-            z-index: 1; /* Ensure it is above the video */
+            z-index: 1;
         }
 
         .navbar .brand {
@@ -82,100 +80,64 @@
             gap: 1rem;
         }
 
-        .navbar .nav-link {
+        .navbar .nav-link,
+        .navbar .cart-info a,
+        .navbar .home-link a,
+        .navbar .logout-form button,
+        .navbar .products-link a {
             padding: 0.5rem 1rem;
             border-radius: 5px;
             color: var(--primary-color);
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .navbar .nav-link:hover {
-            background-color: var(--primary-color);
-            color: var(--background-color);
-        }
-
-        .navbar .logout-form button {
-            background-color: transparent;
             border: 1px solid var(--secondary-color);
-            padding: 0.5rem 1rem;
-            color: var(--primary-color);
-            border-radius: 5px;
             transition: background-color 0.3s ease, color 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            font-size: 1rem; /* Ensure consistent font size */
         }
 
+        .navbar .nav-link:hover,
+        .navbar .cart-info a:hover,
+        .navbar .home-link a:hover,
+        .navbar .products-link a:hover,
         .navbar .logout-form button:hover {
             background-color: var(--primary-color);
             color: var(--background-color);
         }
 
-        .hero {
-            z-index: 1; /* Ensure it is above the video */
-            position: relative; /* For stacking context */
-            background-color: transparent; /* Remove the semi-transparent background */
-            padding-top: 100px; /* Adjust padding if needed for better alignment */
+        /* Special styling for Logout button */
+        .navbar .logout-form {
+            display: inline; /* Avoid affecting button size */
+            margin: 0; /* Ensure no additional margin */
         }
 
-        /* Typing effect and cursor */
-        .hero h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            white-space: nowrap;
-            overflow: hidden;
-            display: inline-block; /* Ensures the text stays centered */
-            opacity: 0; /* Initially invisible */
-            text-align: center; /* Center the text */
-            width: 0; /* Start with width 0 */
-            border-right: 4px solid var(--primary-color); /* Simulate the typing cursor */
+        .navbar .logout-form button {
+            background-color: transparent; /* Ensure it's not white */
+            border-color: var(--secondary-color); /* Keep the border color */
+            color: var(--primary-color); /* Keep text color */
+            padding: 0.5rem 1rem; /* Consistent padding */
+            font-size: 1rem; /* Consistent font size */
+            border-radius: 5px; /* Same radius */
         }
 
-        .hero h1.typing {
-            animation: typing 3s steps(40) forwards, blink 0.75s step-end infinite; /* Typing animation */
+        .navbar .logout-form button:hover {
+            background-color: var(--primary-color);
+            color: var(--background-color); /* Match hover state with others */
         }
 
-        .hero p {
-            font-size: 1.25rem;
-            color: var(--secondary-color);
-            opacity: 0;
-            animation: fadeIn 1.5s 3s forwards; /* Fade in after the first line is typed */
+        .navbar .cart-info span,
+        .navbar .home-link span,
+        .navbar .products-link span {
+            margin-left: 8px;
         }
 
-        /* Typing effect animation */
-        @keyframes typing {
-            0% {
-                width: 0;
-                opacity: 1;
-            }
-            100% {
-                width: 100%;
-                opacity: 1;
-            }
-        }
-
-        /* Blinking cursor effect */
-        @keyframes blink {
-            50% {
-                border-color: transparent;
-            }
-        }
-
-        /* Fade in animation for second line */
-        @keyframes fadeIn {
-            0% {
-                opacity: 0;
-            }
-            100% {
-                opacity: 1;
-            }
-        }
-
-        /* Footer styles */
         footer {
             background-color: rgba(0, 0, 0, 0.7);
             color: var(--primary-color);
             padding: 1rem;
             text-align: center;
             border-top: 1px solid var(--secondary-color);
-            margin-top: auto; /* Push footer to the bottom */
+            margin-top: auto;
         }
 
         footer a {
@@ -211,6 +173,7 @@
         <source src="{% static 'ProjectIntro.mp4' %}" type="video/mp4">
     </video>
 
+    <!-- Navbar -->
     <nav class="navbar">
         <div class="brand">
             <!-- Make the brand text a clickable link to the homepage -->
@@ -223,12 +186,27 @@
                 <a class="nav-link" href="{% url 'register' %}">Register</a>
             {% else %}
                 <!-- Links for authenticated users -->
-                <a class="nav-link" href="{% url 'index' %}">Home</a>
+                <a class="nav-link home-link" href="{% url 'index' %}">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
                 <a class="nav-link" href="{% url 'account' %}">Account</a>
-                <a class="nav-link" href="{% url 'products' %}">Products</a> <!-- Added Products link -->
+                <a class="nav-link products-link" href="{% url 'products' %}">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </a>
                 {% if account.is_superuser %}
                     <a class="nav-link" href="{% url 'product-create' %}">Create Product</a>
                 {% endif %}
+
+                <!-- Cart Information -->
+                <div class="cart-info">
+                    <a href="{% url 'cart' %}">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>My Cart</span> <!-- Renamed to 'My Cart' -->
+                    </a>
+                </div>
+
                 <form method="POST" action="{% url 'logout' %}" class="logout-form" style="display: inline;">
                     {% csrf_token %}
                     <button type="submit">Logout</button>
@@ -236,8 +214,6 @@
             {% endif %}
         </div>
     </nav>
-
-
 
     <!-- Footer -->
     <footer>

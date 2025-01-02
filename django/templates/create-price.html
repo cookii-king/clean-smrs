@@ -37,6 +37,84 @@
             min-height: 100vh; /* Ensure the page takes up the full height */
         }
 
+        /* Navbar Styles */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 2rem;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-bottom: 1px solid var(--secondary-color);
+            z-index: 1;
+        }
+
+        .navbar .brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .navbar .brand a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .navbar .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .navbar .nav-link,
+        .navbar .cart-info a,
+        .navbar .home-link a,
+        .navbar .logout-form button,
+        .navbar .products-link a {
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            color: var(--primary-color);
+            border: 1px solid var(--secondary-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            font-size: 1rem; /* Ensure consistent font size */
+        }
+
+        .navbar .nav-link:hover,
+        .navbar .cart-info a:hover,
+        .navbar .home-link a:hover,
+        .navbar .products-link a:hover,
+        .navbar .logout-form button:hover {
+            background-color: var(--primary-color);
+            color: var(--background-color);
+        }
+
+        /* Special styling for Logout button */
+        .navbar .logout-form {
+            display: inline; /* Avoid affecting button size */
+            margin: 0; /* Ensure no additional margin */
+        }
+
+        .navbar .logout-form button {
+            background-color: transparent; /* Ensure it's not white */
+            border-color: var(--secondary-color); /* Keep the border color */
+            color: var(--primary-color); /* Keep text color */
+            padding: 0.5rem 1rem; /* Consistent padding */
+            font-size: 1rem; /* Consistent font size */
+            border-radius: 5px; /* Same radius */
+        }
+
+        .navbar .logout-form button:hover {
+            background-color: var(--primary-color);
+            color: var(--background-color); /* Match hover state with others */
+        }
+
+        .navbar .cart-info span,
+        .navbar .home-link span,
+        .navbar .products-link span {
+            margin-left: 8px;
+        }
+
+        /* Full-screen form container */
         .container {
             max-width: 600px;
             margin: 50px auto;
@@ -130,6 +208,32 @@
         <source src="{% static 'projectN.mp4' %}" type="video/mp4">
     </video>
 
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="brand">
+            <a href="{% url 'index' %}">CleanSMRs</a>
+        </div>
+        <div class="nav-links">
+            {% if not user.is_authenticated %}
+                <a class="nav-link" href="{% url 'login' %}">Login</a>
+                <a class="nav-link" href="{% url 'register' %}">Register</a>
+            {% else %}
+                <a class="nav-link" href="{% url 'index' %}">Home</a>
+                <a class="nav-link" href="{% url 'account' %}">Account</a>
+                <a class="nav-link" href="{% url 'products' %}">Products</a> <!-- Add Products link -->
+                <a class="nav-link" href="{% url 'cart' %}">Cart</a> <!-- Add Cart link -->
+                {% if account.is_superuser %}
+                    <a class="nav-link" href="{% url 'product-create' %}">Create Product</a>
+                {% endif %}
+                <form method="POST" action="{% url 'logout' %}" class="logout-form" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit">Logout</button>
+                </form>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- Form for Creating a Price -->
     <div class="container">
         <h1>Create Price</h1>
         <form method="POST" action="{% url 'price-create' %}">

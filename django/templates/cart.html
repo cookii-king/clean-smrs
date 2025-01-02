@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shopping Cart</title>
+    <title>My Cart</title>
     <style>
         :root {
             --primary-color: #ECE6DB;
@@ -14,16 +14,14 @@
 
         /* Full-screen video background */
         .background-video {
-            position: fixed;  /* Fix the video in place */
+            position: fixed;
             top: 0;
             left: 0;
-            width: 100%;  /* Full viewport width */
-            height: 100%;  /* Full viewport height */
-            object-fit: cover;  /* Ensure the video maintains aspect ratio and covers the screen */
-            z-index: -1;  /* Place the video behind all content */
-            pointer-events: none;  /* Prevent interaction with the video */
-            margin: 0;  /* Remove any margins */
-            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            pointer-events: none;
         }
 
         body {
@@ -32,81 +30,106 @@
             background-color: var(--background-color);
             font-family: 'Arial', sans-serif;
             color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
-        .container {
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 2rem;
-            background-color: rgba(39, 39, 39, 0.9);  /* Slight transparency for better visibility */
-            border: 1px solid var(--secondary-color);
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            z-index: 1;  /* Ensure the cart container is above the video */
-        }
-
-        .container h1 {
-            text-align: center;
-            color: var(--primary-color);
-            margin-bottom: 1.5rem;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 1.5rem;
-        }
-
-        table th, table td {
-            padding: 0.75rem;
-            text-align: left;
-            border-bottom: 1px solid var(--secondary-color);
-            color: var(--text-color);
-        }
-
-        table th {
-            color: var(--primary-color);
-        }
-
-        table td img {
-            width: 50px;
-            height: 50px;
-            border-radius: 5px;
-        }
-
-        .total {
-            font-size: 1.5rem;
-            text-align: right;
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-        }
-
-        .buttons {
+        /* Navbar Styles */
+        .navbar {
             display: flex;
             justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-bottom: 1px solid var(--secondary-color);
+            z-index: 1;
         }
 
-        .buttons button, .buttons a {
-            padding: 0.75rem 1.5rem;
-            border: none;
+        .navbar .brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .navbar .brand a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .navbar .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .navbar .nav-link,
+        .navbar .cart-info a,
+        .navbar .home-link a,
+        .navbar .logout-form button,
+        .navbar .products-link a {
+            padding: 0.5rem 1rem;
             border-radius: 5px;
+            color: var(--primary-color);
+            border: 1px solid var(--secondary-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            font-size: 1rem; /* Ensure consistent font size */
+        }
+
+        .navbar .nav-link:hover,
+        .navbar .cart-info a:hover,
+        .navbar .home-link a:hover,
+        .navbar .products-link a:hover,
+        .navbar .logout-form button:hover {
             background-color: var(--primary-color);
             color: var(--background-color);
-            font-size: 1rem;
-            font-weight: bold;
+        }
+
+        /* Special styling for Logout button */
+        .navbar .logout-form {
+            display: inline; /* Avoid affecting button size */
+            margin: 0; /* Ensure no additional margin */
+        }
+
+        .navbar .logout-form button {
+            background-color: transparent; /* Ensure it's not white */
+            border-color: var(--secondary-color); /* Keep the border color */
+            color: var(--primary-color); /* Keep text color */
+            padding: 0.5rem 1rem; /* Consistent padding */
+            font-size: 1rem; /* Consistent font size */
+            border-radius: 5px; /* Same radius */
+        }
+
+        .navbar .logout-form button:hover {
+            background-color: var(--primary-color);
+            color: var(--background-color); /* Match hover state with others */
+        }
+
+        .navbar .cart-info span,
+        .navbar .home-link span,
+        .navbar .products-link span {
+            margin-left: 8px;
+        }
+
+        footer {
+            background-color: rgba(0, 0, 0, 0.7);
+            color: var(--primary-color);
+            padding: 1rem;
+            text-align: center;
+            border-top: 1px solid var(--secondary-color);
+            margin-top: auto;
+        }
+
+        footer a {
+            color: var(--primary-color);
             text-decoration: none;
-            text-align: center;
-            cursor: pointer;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            margin: 0 15px;
         }
 
-        .buttons button:hover, .buttons a:hover {
-            background-color: var(--secondary-color);
-            color: var(--background-color);
-        }
-
-        .empty-cart {
-            text-align: center;
+        footer a:hover {
+            text-decoration: underline;
             color: var(--secondary-color);
         }
     </style>
@@ -117,51 +140,55 @@
         <source src="{% static 'projectN.mp4' %}" type="video/mp4">
     </video>
 
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="brand">
+            <a href="{% url 'index' %}">CleanSMRs</a>
+        </div>
+        <div class="nav-links">
+            {% if not user.is_authenticated %}
+                <a class="nav-link" href="{% url 'login' %}">Login</a>
+                <a class="nav-link" href="{% url 'register' %}">Register</a>
+            {% else %}
+                <a class="nav-link home-link" href="{% url 'index' %}">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a class="nav-link" href="{% url 'account' %}">Account</a>
+                <a class="nav-link products-link" href="{% url 'products' %}">
+                    <i class="fas fa-box"></i>
+                    <span>Products</span>
+                </a>
+                {% if account.is_superuser %}
+                    <a class="nav-link" href="{% url 'product-create' %}">Create Product</a>
+                {% endif %}
+                <div class="cart-info">
+                    <a href="{% url 'cart' %}">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>My Cart</span>
+                    </a>
+                </div>
+
+                <form method="POST" action="{% url 'logout' %}" class="logout-form" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit">Logout</button>
+                </form>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- Cart Page Content -->
     <div class="container">
-        <h1>Shopping Cart</h1>
-        {% if cart.items %}
-        <table>
-            <thead>
-                <tr>
-                    <th>Product</th>
-                    <th>Quantity</th>
-                    <th>Price</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in cart.items %}
-                <tr>
-                    <td>
-                        <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}">
-                        {{ item.product.name }}
-                    </td>
-                    <td>
-                        <form method="POST" action="{% url 'update-cart' item.product.id %}">
-                            {% csrf_token %}
-                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" style="width: 50px;">
-                            <button type="submit">Update</button>
-                        </form>
-                    </td>
-                    <td>${{ item.product.price }}</td>
-                    <td>${{ item.total_price }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <div class="total">
-            <strong>Total: ${{ cart.total_price }}</strong>
-        </div>
-        <div class="buttons">
-            <form method="POST" action="{% url 'clear-cart' %}">
-                {% csrf_token %}
-                <button type="submit">Clear Cart</button>
-            </form>
-            <a href="{% url 'checkout' %}">Checkout</a>
-        </div>
-        {% else %}
-        <p class="empty-cart">Your cart is empty.</p>
-        {% endif %}
+        <h1>Your Cart</h1>
+        <!-- Add cart content here -->
     </div>
+
+    <!-- Footer -->
+    <footer>
+        <a href="{% url 'contact' %}">Contact</a>
+        <a href="{% url 'about' %}">About</a>
+        <a href="{% url 'support' %}">Support</a>
+        <a href="{% url 'terms-of-service' %}">Terms of Service</a>
+    </footer>
 </body>
 </html>

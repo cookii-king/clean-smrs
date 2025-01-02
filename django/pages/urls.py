@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import IndexView, AboutView, ContactView, SupportView, TermsOfServiceView, PrivacyPolicyView, ProductView, ProductsView, PriceView, PricesView, PlanView, PlansView, SubscriptionView, SubscriptionsView, PaymentLinksView, AccountView, ConfirmEmailView, VerifyMfaView, EnableMfaView, DisableMfaView, LoginView, LogoutView, RegisterView
-
+from pages.classes.cart.view import CartView
 urlpatterns = [
     # # system start
     path('', IndexView.as_view(), name="index"),
@@ -69,4 +69,7 @@ urlpatterns = [
     # # authentication end
     # # ========================================================================== #
     # # ========================================================================== #
+    path('cart/', CartView.as_view(), name='cart'),  # Template-based view
+
+    
 ]

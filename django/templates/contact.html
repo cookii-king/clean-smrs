@@ -44,6 +44,8 @@
             background-color: rgba(0, 0, 0, 0.7);
             border-bottom: 1px solid var(--secondary-color);
             z-index: 1;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .navbar .brand {
@@ -184,7 +186,9 @@
             text-decoration: none;
             margin: 0 15px;
         }
-
+        a {
+        text-decoration: none !important;
+        }
         footer a:hover {
             text-decoration: underline;
             color: var(--secondary-color);
@@ -197,7 +201,6 @@
         <source src="{% static 'projectN.mp4' %}" type="video/mp4">
     </video>
 
-    <!-- Navbar -->
     <nav class="navbar">
         <div class="brand">
             <a href="{% url 'index' %}">CleanSMRs</a>
@@ -209,6 +212,8 @@
             {% else %}
                 <a class="nav-link" href="{% url 'index' %}">Home</a>
                 <a class="nav-link" href="{% url 'account' %}">Account</a>
+                <a class="nav-link" href="{% url 'products' %}">Products</a> <!-- Add Products link -->
+                <a class="nav-link" href="{% url 'cart' %}">Cart</a> <!-- Add Cart link -->
                 {% if account.is_superuser %}
                     <a class="nav-link" href="{% url 'product-create' %}">Create Product</a>
                 {% endif %}
@@ -219,6 +224,7 @@
             {% endif %}
         </div>
     </nav>
+    
 
     <!-- Contact Form -->
     <div class="container">

@@ -1,36 +1,35 @@
-from django.db import model
-from django.conf import settings
-from product.model import Product  # Adjust this import to match your project structure
+# django/pages/classes/cart/model.py
 
-class Cart(model.Model):
+from django.db import models
+from pages.classes.account.model import Account
+from pages.classes.product.model import Product
+
+class Cart(models.Model):
     """
-    Represents a shopping cart associated with a user.
+    Represents a user's shopping cart.
+    Each user can have only one cart.
     """
-    user = model.OneToOneField(
-        settings.AUTH_USER_MODEL,
-        on_delete=model.CASCADE,
-        related_name='cart'
-    )
-    created_at = model.DateTimeField(auto_now_add=True)
+    user = models.OneToOneField(Account, on_delete=models.CASCADE, related_name="cart")
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Cart of {self.user.username}"
+        return f"Cart for {self.user.username}"
 
-class CartItem(model.Model):
+class CartItem(models.Model):
     """
     Represents an item in the shopping cart.
+    A cart can have many cart items, each pointing to a product.
     """
-    cart = model.ForeignKey(Cart, on_delete=model.CASCADE, related_name='items')
-    product = model.ForeignKey(Product, on_delete=model.CASCADE)
-    quantity = model.PositiveIntegerField(default=1)
-    added_at = model.DateTimeField(auto_now_add=True)
+    cart = models.ForeignKey(Cart, related_name="items", on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, related_name="cart_items", on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.quantity} of {self.product.name} in cart of {self.cart.user.username}"
+        return f"{self.product.name} in cart for {self.cart.user.username}"
 
     @property
     def total_price(self):
-        """
-        Calculates the total price for this cart item.
-        """
         return self.product.price * self.quantity
