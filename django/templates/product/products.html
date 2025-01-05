@@ -1,0 +1,112 @@
+{% include '../widgets/navbar.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Products</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* Popup Notification Styles */
+        #popup-notification {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Products</h1>
+    <div>
+        {% for product in products %}
+        <div style="border: 1px solid #ccc; margin: 10px; padding: 10px;">
+            <h2>{{ product.name }}</h2>
+            <p>{{ product.description }}</p>
+            <div>
+                <h3>Images:</h3>
+                {% for image in product.images.all %}
+                {% if image.image %}
+                <img src="{{ image.image.url }}" alt="Uploaded Image" style="width: 150px; height: auto;">
+                {% elif image.image_url %}
+                <img src="{{ image.image_url }}" alt="External Image" style="width: 150px; height: auto;">
+                {% endif %}
+                {% if image.stripe_file_url %}
+                <p>Stripe File: <a href="{{ image.stripe_file_url }}" target="_blank">View on Stripe</a></p>
+                {% endif %}
+                {% endfor %}
+            </div>
+            <div>
+                <h3>Price:</h3>
+                {% for price in product.prices.all %}
+                <p>${{ price.unit_amount }}</p>
+                {% empty %}
+                <p>No price available.</p>
+                {% endfor %}
+            </div>
+            <!-- View Details Button -->
+            <div>
+                <a href="{% url 'product' product.id %}" class="btn btn-primary" style="margin-top: 10px;">View
+                    Details</a>
+            </div>
+            <!-- Add to Cart Button -->
+            <form class="add-to-cart-form" data-product-id="{{ product.id }}">
+                {% csrf_token %}
+                <input type="number" name="quantity" value="1" min="1" style="width: 50px;">
+                <button type="button" class="add-to-cart-button" style="margin-top: 10px;">Add to Cart</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Popup Notification -->
+    <div id="popup-notification"></div>
+
+    <script>
+        $(document).ready(function () {
+            $('.add-to-cart-button').on('click', function () {
+                const form = $(this).closest('.add-to-cart-form');
+                const productId = form.data('product-id');
+                const quantity = form.find('input[name="quantity"]').val();
+                const csrfToken = form.find('input[name="csrfmiddlewaretoken"]').val();
+
+                $.ajax({
+                    url: "{% url 'add_to_cart' %}",
+                    method: "POST",
+                    data: {
+                        product_id: productId,
+                        quantity: quantity,
+                        csrfmiddlewaretoken: csrfToken
+                    },
+                    success: function (response) {
+                        showNotification('Item added to cart!');
+                    },
+                    error: function (xhr) {
+                        showNotification('Failed to add item to cart.', true);
+                    }
+                });
+            });
+
+            function showNotification(message, isError = false) {
+                const notification = $('#popup-notification');
+                notification.text(message);
+                notification.css('background-color', isError ? '#f44336' : '#4CAF50');
+                notification.fadeIn(300);
+
+                setTimeout(function () {
+                    notification.fadeOut(300);
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+
+</html>
+{% endblock %}
+{% include '../widgets/footer.html' %}

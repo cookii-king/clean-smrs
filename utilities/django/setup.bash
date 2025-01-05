@@ -18,3 +18,7 @@ python3 manage.py createsuperuser
 # Password: 123456@Aa
 python3 manage.py spectacular --file schema.yaml
 # python3 manage.py spectacular --file schema.json
+
+stripe login
+stripe listen --forward-to localhost:8000/webhook
+stripe trigger customer.created

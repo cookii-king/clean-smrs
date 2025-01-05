@@ -1,0 +1,147 @@
+{% include '../widgets/navbar.html' %}
+{% load custom_filters %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Your Cart</h2>
+    {% if cart_items %}
+        <div id="cart-content" class="table-responsive">
+            <table class="table table-bordered mt-3">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                    <tr id="cart-item-{{ item.id }}">
+                        <td>{{ item.product.name }}</td>
+                        <td>
+                            <input type="number" class="update-quantity form-control d-inline" 
+                                   style="width: 70px;" 
+                                   value="{{ item.quantity }}" 
+                                   data-url="{% url 'update_cart_item' item.id %}">
+                        </td>                       
+                        <td>
+                            {% if item.product.prices.all %}
+                                {% with item.product.prices.all.0 as price %}
+                                    ${{ price.unit_amount|floatformat:2 }}
+                                {% endwith %}
+                            {% else %}
+                                <span class="text-danger">Price Not Available</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if item.product.prices.all %}
+                                {% with item.product.prices.all.0 as price %}
+                                    ${{ item.quantity|multiply:price.unit_amount|floatformat:2 }}
+                                {% endwith %}
+                            {% else %}
+                                --
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="btn btn-danger btn-sm remove-cart-item" data-url="{% url 'remove_cart_item' item.id %}">Remove</button>
+                        </td>
+                        
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="text-end mt-3">
+            <h4 id="cart-total">Total: ${{ cart_items|cart_total|floatformat:2 }}</h4>
+        </div>    
+        <form method="POST" action="{% url 'checkout-create' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success">Proceed to Checkout</button>
+        </form>
+    {% else %}
+        <p>Your cart is empty!</p>
+    {% endif %}
+</div>
+
+<!-- Popup Notification -->
+<div id="popup-notification"></div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Remove item
+// Remove item
+$('.remove-cart-item').on('click', function () {
+    const url = $(this).data('url');
+    const csrfToken = '{{ csrf_token }}';
+
+    $.ajax({
+        url: url,
+        type: 'POST',
+        headers: { 'X-CSRFToken': csrfToken },
+        success: function (response) {
+            $(`#cart-item-${response.item_id}`).remove();
+            updateCartTotal(response.cart_total);
+            showNotification('Item removed from cart!');
+        },
+        error: function () {
+            showNotification('Failed to remove item.', true);
+        }
+    });
+});
+
+
+// Update quantity
+$('.update-quantity').on('change', function () {
+    const url = $(this).data('url');
+    const quantity = $(this).val();
+    const csrfToken = '{{ csrf_token }}';
+
+    if (quantity < 1) {
+        alert('Quantity must be at least 1.');
+        $(this).val(1);
+        return;
+    }
+
+    $.ajax({
+        url: url,
+        type: 'POST',
+        headers: { 'X-CSRFToken': csrfToken },
+        data: { quantity: quantity },
+        success: function (response) {
+            updateCartTotal(response.cart_total);
+            showNotification('Quantity updated!');
+        },
+        error: function () {
+            showNotification('Failed to update quantity.', true);
+        }
+    });
+});
+
+
+        // Helper to update cart total
+        function updateCartTotal(total) {
+            $('#cart-total').text(`Total: $${total.toFixed(2)}`);
+            if (total === 0) {
+                $('#cart-content').html('<p>Your cart is empty!</p>');
+            }
+        }
+
+        // Popup Notification
+        function showNotification(message, isError = false) {
+            const notification = $('#popup-notification');
+            notification.text(message);
+            notification.css('background-color', isError ? '#f44336' : '#4CAF50');
+            notification.fadeIn(300);
+
+            setTimeout(function () {
+                notification.fadeOut(300);
+            }, 3000);
+        }
+    });
+</script>
+{% endblock %}
+
+{% include '../widgets/footer.html' %}

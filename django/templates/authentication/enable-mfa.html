@@ -1,0 +1,22 @@
+{% include '../widgets/navbar.html'%}
+{% block content %}
+<div class="container">
+    <h1>Enable 2FA</h1>
+    {% if not account.mfa_enabled %}
+    <form method="POST" action="{% url 'enable-mfa' %}">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="otp" class="form-label">One-Time Password (OTP)</label>
+            <input type="text" class="form-control" id="otp" name="otp" placeholder="Enter OTP" required>
+            <input type="hidden" id="account_id" name="account_id" value="{{ account.id }}" required>
+        </div>
+        <div class="d-grid">
+            <button type="submit">Enable 2FA</button>
+        </div>
+    </form>
+    {% else %}
+    <p style="text-align: center; color: var(--primary-color); font-size: 1.2rem;">2FA Enabled Already!</p>
+    {% endif %}
+</div>
+{% endblock %}
+{% include '../widgets/footer.html'%}

@@ -1,0 +1,21 @@
+{% include '../widgets/navbar.html'%}
+{% block content %}
+<div class="form-container">
+    <h1>Create Product</h1>
+    <form method="POST" action="{% url 'product-create' %}">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" id="name" name="name" placeholder="Enter product name" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <input type="text" id="description" name="description" placeholder="Enter product description" required>
+        </div>
+
+        <button type="submit" class="btn">Create Product</button>
+    </form>
+</div>
+{% endblock %}
+{% include '../widgets/footer.html'%}

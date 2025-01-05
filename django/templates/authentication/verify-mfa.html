@@ -1,0 +1,23 @@
+{% include '../widgets/navbar.html'%}
+{% block content %}
+<div class="container">
+    <h1>Verify MFA</h1>
+
+    <form method="POST" action="{% url 'verify-mfa' %}">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="otp" class="form-label">Enter OTP</label>
+            <input type="text" class="form-control" id="otp" name="otp" required placeholder="Enter your one-time password">
+            <input type="hidden" id="account_id" name="account_id" value="{{ account_id }}" required>
+        </div>
+        <button type="submit" class="btn">Verify OTP</button>
+    </form>
+
+    {% if error_message %}
+        <div class="alert">
+            {{ error_message }}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+{% include '../widgets/footer.html'%}

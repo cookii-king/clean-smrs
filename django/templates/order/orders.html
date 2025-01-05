@@ -1,0 +1,51 @@
+{% include '../widgets/navbar.html' %}
+{% load custom_filters %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Your Orders</h2>
+    {% if orders %}
+        <div class="table-responsive mt-4">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Items</th>
+                        <th>Order Date</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{ order.id }}</td>
+                        <td>
+                            <ul>
+                                {% for item in order.order_items.all %}
+                                <li>
+                                    {% if item.product %}
+                                        {{ item.product.name }}
+                                    {% elif item.price %}
+                                        {{ item.price.name }}
+                                    {% elif item.plan %}
+                                        {{ item.plan.name }}
+                                    {% endif %}
+                                    (Quantity: {{ item.quantity }})
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        <td>{{ order.created|date:"M d, Y" }}</td>
+                        <td>
+                            ${{ order.order_items.all|sum_prices }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>No orders found.</p>
+    {% endif %}
+</div>
+{% endblock %}
+{% include '../widgets/footer.html' %}

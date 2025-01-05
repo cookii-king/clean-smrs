@@ -1,0 +1,19 @@
+{% include '../widgets/navbar.html'%}
+{% block content %}
+<div class="container">
+    <h1>Confirm Email</h1>
+    {% if not account.email_confirmed %}
+    <form method="POST" action="{% url 'confirm-email' %}">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="confirmation_secret" class="form-label">Confirmation Code</label>
+            <input type="text" class="form-control" id="confirmation_secret" name="confirmation_secret" required>
+        </div>
+        <button type="submit">Confirm Email</button>
+    </form>
+    {% else %}
+    <p class="message">Email Confirmed Already!</p>
+    {% endif %}
+</div>
+{% endblock %}
+{% include '../widgets/footer.html'%}

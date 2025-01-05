@@ -1,67 +1,145 @@
-from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.shortcuts import render, redirect
+from ...models import Product, Cart, CartItem
 from ...serializers import ProductSerializer
-from ...models import Product, Price
 
 class ProductView(APIView):
     def post(self, request):
         try:
-            # Check if the request path is for product creation
             if request.path == '/product/create':
-                try:
-                    serializer = ProductSerializer(data=request.data)
-                    if serializer.is_valid():
-                        product = serializer.save()
-                        stripe_product = product.create_in_stripe()
-                except Exception as e:
-                    raise Exception(f"Failed to create product: {str(e)}") from e
+                serializer = ProductSerializer(data=request.data)
+                if serializer.is_valid():
+                    product = serializer.save()
+                    product.create_or_get_stripe_product()  # Sync with Stripe
+                    return redirect(f'/product/{product.id}')  # Redirect to the product detail page
+                else:
+                    return Response({"errors": serializer.errors}, status=400)
+
+            elif request.path == '/product/edit':
+                product_id = request.data.get("product_id")
+                product = Product.objects.filter(id=product_id).first()
+                if not product:
+                    return Response({"error": "Product not found."}, status=404)
+
+                serializer = ProductSerializer(product, data=request.data, partial=True)
+                if serializer.is_valid():
+                    updated_product = serializer.save()
+                    updated_product.create_or_get_stripe_product()  # Sync updates with Stripe
+                    return Response({"message": "Product updated successfully."}, status=200)
+                else:
+                    return Response({"errors": serializer.errors}, status=400)
+
             else:
-                raise Exception("Invalid URL for POST request")
-            # Return a success response
-            return Response(data={"message": "Product created successfully!", "product_id": stripe_product["id"]}, status=201)
+                return Response({"error": "Unsupported path."}, status=404)
+
         except Exception as e:
-            # Push the exception to the response
-            return Response(data={"error": f"'POST' Method Failed for ProductView: {str(e)}"}, status=400)
-    
+            return Response(data={"error": f"'POST' Method Failed for ProductView: {e}"}, status=500)
+
     def get(self, request, product_id=None):
         try:
-            account = request.user
             if request.path == '/product/create':
-                return render(request, 'create-product.html', {'account': account})
-            else:
-                if product_id is None:  # Handle /product
-                    raise Exception("Product not found")
-
-                # Handle /product/<uuid:product_id>
-                account = request.user
-                try:
-                    product = Product.objects.get(id=product_id)
-                    prices = Price.objects.filter(product=product.stripe_product_id).all() 
-
-                    # Add formatted price to each price object
-                    for price in prices:
-                        price.formatted_unit_amount = price.unit_amount / 100  # Divide by 100 to convert to pounds
-
-                except Product.DoesNotExist as e:
-                    raise Exception("Product not found") from e  # Chain exceptions
-                
-                return render(request, 'product.html', {'account': account, "product": product, 'prices': prices})
+                return render(request, 'product/create.html')
+            if request.path == '/product/edit':
+                return render(request, 'product/edit.html')
+            if product_id:  # Check if product_id is provided
+                product = Product.objects.prefetch_related('images', 'prices').filter(id=product_id).first()
+                if not product:
+                    return Response({"error": "Product not found."}, status=404)
+                return render(request, 'product/product.html', {"product": product})
+            # Handle GET requests
+            return render(request, 'product/product.html')
         except Exception as e:
-            # Push the exception to the response
-            return Response(data={"error": f"'GET' Method Failed for ProductView: {str(e)}"}, status=400)
+                    return Response(data={"error": f"'GET' Method Failed for ProductView: {e}"}, status=400)
+
+    def put(self, request):
+        try:
+            # Handle PUT requests
+            return Response({"message": "PUT request received"}, status=201)
+        except Exception as e:
+            return Response(data={"error": f"'PUT' Method Failed for ProductView: {e}"}, status=400)
+
+    def patch(self, request):
+        try:
+            # Handle PATCH requests
+            return Response({"message": "PATCH request received"}, status=200)
+        except Exception as e:
+            return Response(data={"error": f"'PATCH' Method Failed for ProductView: {e}"}, status=400)
+
+    def delete(self, request):
+        try:
+            # Handle DELETE requests
+            return Response({"message": "DELETE request received"}, status=200)
+        except Exception as e:
+            return Response(data={"error": f"'DELETE' Method Failed for ProductView: {e}"}, status=400)
+
+    def options(self, request, *args, **kwargs):
+        try:
+            # Handle OPTIONS requests
+            return Response({"message": "OPTIONS request received"}, status=204)
+        except Exception as e:
+            return Response(data={"error": f"'OPTIONS' Method Failed for ProductView: {e}"}, status=400)
+
+    def head(self, request, *args, **kwargs):
+        try:
+            # Handle HEAD requests
+            # Since Django automatically handles HEAD, no implementation is required
+            # The HEAD response will be the same as GET but without the body
+            return Response({"message": "HEAD request received"}, status=200)
+        except Exception as e:
+            return Response(data={"error": f"'HEAD' Method Failed for ProductView: {e}"}, status=400)
+    
 
 class ProductsView(APIView):
     def post(self, request):
         try:
-            return Response()
+            # Handle POST requests
+            return Response({"message": "POST request received"}, status=201)
         except Exception as e:
             return Response(data={"error": f"'POST' Method Failed for ProductsView: {e}"}, status=400)
-    
+
     def get(self, request):
         try:
-            account = request.user
-            products = Product.objects.all()
-            return render(request, 'products.html', {'account':account, "products": products})
+            # Handle GET requests
+            # products = Product.objects.prefetch_related('images').all()
+            products = Product.objects.filter(type='product', reoccurrence='one-time').prefetch_related('images', 'prices').all()
+            return render(request, 'product/products.html', {"products": products})
         except Exception as e:
-            return Response(data={"error": f"'GET' Method Failed for ProductsView: {e}"}, status=400)
+                    return Response(data={"error": f"'GET' Method Failed for ProductsView: {e}"}, status=400)
+
+    def put(self, request):
+        try:
+            # Handle PUT requests
+            return Response({"message": "PUT request received"}, status=201)
+        except Exception as e:
+            return Response(data={"error": f"'PUT' Method Failed for ProductsView: {e}"}, status=400)
+
+    def patch(self, request):
+        try:
+            # Handle PATCH requests
+            return Response({"message": "PATCH request received"}, status=200)
+        except Exception as e:
+            return Response(data={"error": f"'PATCH' Method Failed for ProductsView: {e}"}, status=400)
+
+    def delete(self, request):
+        try:
+            # Handle DELETE requests
+            return Response({"message": "DELETE request received"}, status=200)
+        except Exception as e:
+            return Response(data={"error": f"'DELETE' Method Failed for ProductsView: {e}"}, status=400)
+
+    def options(self, request, *args, **kwargs):
+        try:
+            # Handle OPTIONS requests
+            return Response({"message": "OPTIONS request received"}, status=204)
+        except Exception as e:
+            return Response(data={"error": f"'OPTIONS' Method Failed for ProductsView: {e}"}, status=400)
+
+    def head(self, request, *args, **kwargs):
+        try:
+            # Handle HEAD requests
+            # Since Django automatically handles HEAD, no implementation is required
+            # The HEAD response will be the same as GET but without the body
+            return Response({"message": "HEAD request received"}, status=200)
+        except Exception as e:
+            return Response(data={"error": f"'HEAD' Method Failed for ProductsView: {e}"}, status=400)

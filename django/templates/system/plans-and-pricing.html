@@ -1,0 +1,147 @@
+{% include '../widgets/navbar.html' %}
+{% load custom_filters %}
+{% block content %}
+<div class="container mt-5">
+    <h1>Plans and Pricing</h1>
+    <div class="toggle-buttons text-center mt-4">
+        <button class="btn btn-primary" id="monthly-btn" onclick="showPlans('monthly')">Monthly</button>
+        <button class="btn btn-secondary" id="yearly-btn" onclick="showPlans('yearly')">Yearly</button>
+    </div>
+
+    <div class="plans mt-5">
+        <!-- Monthly Plans -->
+        <div id="monthly-plans" style="display: none;">
+            <h2>Monthly Plans</h2>
+            <div class="row">
+                {% for plan in monthly_plans %}
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="card-title">{{ plan.product.name }}</h3>
+                            <p class="card-text">${{ plan.amount }} / month</p>
+                            {% with monthly_plans_subscription_data|get_item:plan.stripe_plan_id as subscription_data %}
+                                {% if subscription_data %}
+                                    <p>Subscribed: x{{ subscription_data.count }}</p>
+                                    <p>Duration: {{ subscription_data.durations|join:", " }} days</p>
+                                {% endif %}
+                            {% endwith %}
+                            <form method="POST" action="{% url 'checkout-subscribe' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="plan_id" value="{{ plan.stripe_plan_id }}">
+                                <input type="hidden" name="mode" value="subscription">
+                                <button 
+                                    type="submit" 
+                                    class="btn btn-success"
+                                    {% if active_subscription %} disabled {% endif %}
+                                >
+                                    {% if active_subscription %}
+                                        Already Subscribed
+                                    {% else %}
+                                        Subscribe
+                                    {% endif %}
+                                </button>
+                            </form>
+                            {% if active_subscription and active_subscription.plan.stripe_plan_id != plan.stripe_plan_id %}
+<form method="POST" action="{% url 'checkout-upgrade' %}">
+    {% csrf_token %}
+    <input type="hidden" name="plan_id" value="{{ plan.stripe_plan_id }}">
+    <button type="submit" class="btn btn-primary">
+        Upgrade to {{ plan.product.name }}
+    </button>
+</form>
+{% endif %}
+
+                            
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Yearly Plans -->
+        <div id="yearly-plans" style="display: none;">
+            <h2>(-30% off) Yearly Plans</h2>
+            <div class="row">
+                {% for plan in yearly_plans %}
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="card-title">{{ plan.product.name }}</h3>
+                            <p class="card-text">${{ plan.amount }} / year</p>
+                            {% with yearly_plans_subscription_data|get_item:plan.stripe_plan_id as subscription_data %}
+                                {% if subscription_data %}
+                                    <p>Subscribed: x{{ subscription_data.count }}</p>
+                                    <p>Duration: {{ subscription_data.durations|join:", " }} days</p>
+                                {% endif %}
+                            {% endwith %}
+                            <form method="POST" action="{% url 'checkout-subscribe' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="plan_id" value="{{ plan.stripe_plan_id }}">
+                                <input type="hidden" name="mode" value="subscription">
+                                <button 
+                                    type="submit" 
+                                    class="btn btn-success"
+                                    {% if active_subscription %} disabled {% endif %}
+                                >
+                                    {% if active_subscription %}
+                                        Already Subscribed
+                                    {% else %}
+                                        Subscribe
+                                    {% endif %}
+                                </button>
+                            </form>
+                            {% if active_subscription and active_subscription.plan.stripe_plan_id != plan.stripe_plan_id %}
+<form method="POST" action="{% url 'checkout-upgrade' %}">
+    {% csrf_token %}
+    <input type="hidden" name="plan_id" value="{{ plan.stripe_plan_id }}">
+    <button type="submit" class="btn btn-primary">
+        Upgrade to {{ plan.product.name }}
+    </button>
+</form>
+{% endif %}
+
+                            
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // Show the appropriate plans based on the toggle
+    function showPlans(type) {
+        const monthlyPlans = document.getElementById('monthly-plans');
+        const yearlyPlans = document.getElementById('yearly-plans');
+        const monthlyBtn = document.getElementById('monthly-btn');
+        const yearlyBtn = document.getElementById('yearly-btn');
+
+        if (type === 'monthly') {
+            monthlyPlans.style.display = 'block';
+            yearlyPlans.style.display = 'none';
+            monthlyBtn.classList.add('btn-primary');
+            monthlyBtn.classList.remove('btn-secondary');
+            yearlyBtn.classList.add('btn-secondary');
+            yearlyBtn.classList.remove('btn-primary');
+        } else {
+            monthlyPlans.style.display = 'none';
+            yearlyPlans.style.display = 'block';
+            yearlyBtn.classList.add('btn-primary');
+            yearlyBtn.classList.remove('btn-secondary');
+            monthlyBtn.classList.add('btn-secondary');
+            monthlyBtn.classList.remove('btn-primary');
+        }
+    }
+
+    // Default to showing monthly plans on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        showPlans('monthly');
+    });
+</script>
+{% endblock %}
+
+{% include '../widgets/footer.html' %}

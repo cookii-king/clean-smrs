@@ -1,5 +1,5 @@
 from config.config import app, db
-import endpoints.endpoints
+from pages import endpoints
 
 with app.app_context():
     db.create_all()

@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-5kt64bx$9&kgm6!7z_$#gv+(sw6n33p5e@vx$im7kc7h^(1bg)'
+SECRET_KEY = 'django-insecure-6)dnooj^#fo4yz#50xc@q8w(t1ba3h5ydjfk@sh6b!)-%j!z%t'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -87,6 +87,13 @@ DATABASES = {
     }
 }
 
+AUTH_EMAIL_VALIDATORS = [
+    {
+        'NAME': 'pages.validators.CustomEmailValidator',  # Path to the custom email validator
+    },
+]
+
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -104,6 +111,9 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
+    {
+        'NAME': 'pages.validators.CustomPasswordValidator',  # Path to your custom validator
+    },
 ]
 
 STATICFILES_DIRS = [
@@ -117,6 +127,7 @@ STATICFILES_DIRS = [
 LANGUAGE_CODE = 'en-gb'
 
 TIME_ZONE = 'Europe/London'
+
 USE_I18N = True
 
 USE_TZ = True
@@ -128,7 +139,6 @@ USE_TZ = True
 STATIC_URL = 'static/'
 MEDIA_URL = '/media/'  # URL to access media files
 MEDIA_ROOT = BASE_DIR / 'media'  # Directory where uploaded media files are stored
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -143,6 +153,10 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+STRIPE_PUBLISHABLE_KEY=os.getenv('STRIPE_PUBLISHABLE_KEY')
+STRIPE_SECRET_KEY=os.getenv('STRIPE_SECRET_KEY')
+STRIPE_WEBHOOK_SECRET=os.getenv('STRIPE_WEBHOOK_SECRET')
 
 AUTH_USER_MODEL = 'pages.Account'
 

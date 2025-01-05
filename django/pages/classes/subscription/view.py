@@ -1,88 +1,123 @@
-from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from ...serializers import SubscriptionSerializer
-from ...models import Subscription
+from django.shortcuts import render, redirect
+from ...models import Plan, Subscription, Account
 
 class SubscriptionView(APIView):
     def post(self, request):
-        stripe_subscription = None
+            try:
+                if request.path == '/subscription/cancel':
+                    subscription_id = request.data.get('subscription_id')
+                    subscription = Subscription.objects.filter(id=subscription_id).first()
+
+                    if not subscription:
+                        return Response({"error": "Subscription not found."}, status=404)
+
+                    subscription.cancel_subscription()
+                    return redirect('subscriptions')
+
+                return Response({"error": "Invalid action."}, status=400)
+            except Exception as e:
+                return Response({"error": f"Failed to cancel subscription: {e}"}, status=400)
+            
+    def get(self, request):
         try:
-            # Check if the request path is for subscription creation
-            if request.path == '/subscription/create':
-                try:
-                    data = request.data.dict()
-
-                    # Extract and reconstruct 'items' list
-                    items = []
-                    for key, value in data.items():
-                        if key.startswith("items[") and key.endswith("][price]"):
-                            index = int(key.split('[')[1].split(']')[0])
-                            while len(items) <= index:
-                                items.append({})
-                            items[index]["price"] = value
-
-                    data["items"] = items  # Add items back into the payload
-
-                    print(f"Reconstructed data: {data}")  # Debugging: Verify payload structure
-
-                    # Serialize and save subscription
-                    serializer = SubscriptionSerializer(data=data)
-                    if serializer.is_valid():
-                        subscription = serializer.save()
-                        stripe_subscription = subscription.create_in_stripe()
-                    else:
-                        raise Exception(serializer.errors)
-                except Exception as e:
-                    raise Exception(f"Failed to create subscription: {str(e)}") from e
-            else:
-                raise Exception("Invalid URL for POST request")
-
-            # Return a success response
-            return Response(
-                data={
-                    "message": "Subscription created successfully!",
-                    "subscription_id": stripe_subscription["id"]
-                },
-                status=201
-            )
+            # Handle GET requests
+            return render(request, 'subscription/subscription.html')
         except Exception as e:
-            return Response(
-                data={"error": f"'POST' Method Failed for SubscriptionView: {str(e)}"},
-                status=400
-            )
-    def get(self, request, subscription_id=None):
+                    return Response(data={"error": f"'GET' Method Failed for SubscriptionView: {e}"}, status=400)
+
+    def put(self, request):
         try:
-            account = request.user
-            if request.path == '/subscription/create':
-                return render(request, 'create-subscription.html', {'account': account})
-            else:
-                if subscription_id is None:  # Handle /subscription
-                    raise Exception("Subscription not found")
-
-                # Handle /subscription/<uuid:subscription_id>
-                account = request.user
-                try:
-                    subscription = Subscription.objects.get(id=subscription_id)
-                except Subscription.DoesNotExist as e:
-                    raise Exception("Subscription not found") from e  # Chain exceptions
-                
-                return render(request, 'subscription.html', {'account': account, "subscription": subscription})
+            # Handle PUT requests
+            return Response({"message": "PUT request received"}, status=201)
         except Exception as e:
-            # Push the exception to the response
-            return Response(data={"error": f"'GET' Method Failed for SubscriptionView: {str(e)}"}, status=400)
+            return Response(data={"error": f"'PUT' Method Failed for SubscriptionView: {e}"}, status=400)
+
+    def patch(self, request):
+        try:
+            # Handle PATCH requests
+            return Response({"message": "PATCH request received"}, status=200)
+        except Exception as e:
+            return Response(data={"error": f"'PATCH' Method Failed for SubscriptionView: {e}"}, status=400)
+
+    def delete(self, request):
+        try:
+            # Handle DELETE requests
+            return Response({"message": "DELETE request received"}, status=200)
+        except Exception as e:
+            return Response(data={"error": f"'DELETE' Method Failed for SubscriptionView: {e}"}, status=400)
+
+    def options(self, request, *args, **kwargs):
+        try:
+            # Handle OPTIONS requests
+            return Response({"message": "OPTIONS request received"}, status=204)
+        except Exception as e:
+            return Response(data={"error": f"'OPTIONS' Method Failed for SubscriptionView: {e}"}, status=400)
+
+    def head(self, request, *args, **kwargs):
+        try:
+            # Handle HEAD requests
+            # Since Django automatically handles HEAD, no implementation is required
+            # The HEAD response will be the same as GET but without the body
+            return Response({"message": "HEAD request received"}, status=200)
+        except Exception as e:
+            return Response(data={"error": f"'HEAD' Method Failed for SubscriptionView: {e}"}, status=400)
 
 class SubscriptionsView(APIView):
     def post(self, request):
         try:
-            return Response()
+            # Handle POST requests
+            return Response({"message": "POST request received"}, status=201)
         except Exception as e:
             return Response(data={"error": f"'POST' Method Failed for SubscriptionsView: {e}"}, status=400)
-    
+
     def get(self, request):
         try:
-            account = request.user
-            subscriptions = Subscription.objects.all()
-            return render(request, 'subscriptions.html', {'account':account, "subscriptions": subscriptions})
+            user = request.user
+            account = Account.objects.filter(id=user.id).first()
+            # Fetch all subscriptions (active and inactive) for the user
+            # subscriptions = Subscription.objects.all()
+            subscriptions = Subscription.objects.filter(customer=account.stripe_customer_id).select_related('customer').prefetch_related('subscription_items__price', 'subscription_items__plan')
+            # subscriptions = Subscription.objects.filter(
+            #        customer=account.stripe_customer_id, deleted__isnull=True, status='active' 
+            #     ).all()
+            return render(request, 'subscription/subscriptions.html', {"subscriptions": subscriptions})
         except Exception as e:
-            return Response(data={"error": f"'GET' Method Failed for SubscriptionsView: {e}"}, status=400)
+            return render(request, 'subscription/subscriptions.html', {"error": f"Error fetching subscriptions: {e}"})
+    def put(self, request):
+        try:
+            # Handle PUT requests
+            return Response({"message": "PUT request received"}, status=201)
+        except Exception as e:
+            return Response(data={"error": f"'PUT' Method Failed for SubscriptionsView: {e}"}, status=400)
+
+    def patch(self, request):
+        try:
+            # Handle PATCH requests
+            return Response({"message": "PATCH request received"}, status=200)
+        except Exception as e:
+            return Response(data={"error": f"'PATCH' Method Failed for SubscriptionsView: {e}"}, status=400)
+
+    def delete(self, request):
+        try:
+            # Handle DELETE requests
+            return Response({"message": "DELETE request received"}, status=200)
+        except Exception as e:
+            return Response(data={"error": f"'DELETE' Method Failed for SubscriptionsView: {e}"}, status=400)
+
+    def options(self, request, *args, **kwargs):
+        try:
+            # Handle OPTIONS requests
+            return Response({"message": "OPTIONS request received"}, status=204)
+        except Exception as e:
+            return Response(data={"error": f"'OPTIONS' Method Failed for SubscriptionsView: {e}"}, status=400)
+
+    def head(self, request, *args, **kwargs):
+        try:
+            # Handle HEAD requests
+            # Since Django automatically handles HEAD, no implementation is required
+            # The HEAD response will be the same as GET but without the body
+            return Response({"message": "HEAD request received"}, status=200)
+        except Exception as e:
+            return Response(data={"error": f"'HEAD' Method Failed for SubscriptionsView: {e}"}, status=400)

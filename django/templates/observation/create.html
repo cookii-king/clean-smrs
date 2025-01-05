@@ -1,0 +1,76 @@
+{% include '../widgets/navbar.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Create Observation</h2>
+    {% if message %}
+    <div class="alert alert-success">
+        {{ message }}
+    </div>
+    {% elif error %}
+    <div class="alert alert-danger">
+        {{ error }}
+    </div>
+    {% endif %}
+    <form action="{% url 'observation-create' %}" method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="date" class="form-label">Date</label>
+            <input type="date" id="date" name="date" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="time" class="form-label">Time</label>
+            <input type="time" id="time" name="time" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="time_zone_offset" class="form-label">Time Zone Offset</label>
+            <input type="text" id="time_zone_offset" name="time_zone_offset" class="form-control" placeholder="UTC-05:00" required>
+        </div>
+        <div class="mb-3">
+            <label for="latitude" class="form-label">Latitude</label>
+            <input type="number" step="any" id="latitude" name="latitude" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="longitude" class="form-label">Longitude</label>
+            <input type="number" step="any" id="longitude" name="longitude" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="temperature_water" class="form-label">Water Temperature (°C)</label>
+            <input type="number" step="any" id="temperature_water" name="temperature_water" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label for="temperature_air" class="form-label">Air Temperature (°C)</label>
+            <input type="number" step="any" id="temperature_air" name="temperature_air" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label for="humidity" class="form-label">Humidity (%)</label>
+            <input type="number" step="any" id="humidity" name="humidity" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label for="wind_speed" class="form-label">Wind Speed (m/s)</label>
+            <input type="number" step="any" id="wind_speed" name="wind_speed" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label for="wind_direction" class="form-label">Wind Direction (°)</label>
+            <input type="number" step="any" id="wind_direction" name="wind_direction" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label for="precipitation" class="form-label">Precipitation (mm)</label>
+            <input type="number" step="any" id="precipitation" name="precipitation" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label for="haze" class="form-label">Haze</label>
+            <input type="number" step="any" id="haze" name="haze" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label for="becquerel" class="form-label">Becquerel</label>
+            <input type="number" step="any" id="becquerel" name="becquerel" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label for="notes" class="form-label">Notes</label>
+            <textarea id="notes" name="notes" class="form-control" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+{% endblock %}
+{% include '../widgets/footer.html'%}
