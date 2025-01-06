@@ -39,5 +39,5 @@ else:
 
 # Catch-all pattern for 404 errors
 urlpatterns += [
-    path('<path:dummy>/', Error404View.as_view(), name="Error-404"),
+    path('<path:dummy>/', Error404View.as_view(), name="error"),
 ]

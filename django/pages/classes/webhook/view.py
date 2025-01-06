@@ -50,7 +50,8 @@ class WebhookView(APIView):
             # Handle GET requests
             return render(request, 'webhook/webhook.html')
         except Exception as e:
-                    return Response(data={"error": f"'GET' Method Failed for WebhookView: {e}"}, status=400)
+            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for WebhookView: {e}", "is_error": True}, status=400)
+                    # return Response(data={"error": f"'GET' Method Failed for WebhookView: {e}"}, status=400)
 
     def put(self, request):
         try:

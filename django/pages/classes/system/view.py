@@ -16,7 +16,8 @@ class IndexView(APIView):
             # Handle GET requests
             return render(request, 'system/index.html')
         except Exception as e:
-                    return Response(data={"error": f"'GET' Method Failed for IndexView: {e}"}, status=400)
+            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for IndexView: {e}", "is_error": True}, status=400)
+                    # return Response(data={"error": f"'GET' Method Failed for IndexView: {e}"}, status=400)
 
     def put(self, request):
         try:
@@ -68,7 +69,8 @@ class Error404View(APIView):
             # Handle GET requests
             return render(request, 'system/404.html')
         except Exception as e:
-                    return Response(data={"error": f"'GET' Method Failed for Error404View: {e}"}, status=400)
+            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for Error404View: {e}", "is_error": True}, status=400)
+                    # return Response(data={"error": f"'GET' Method Failed for Error404View: {e}"}, status=400)
 
     def put(self, request, dummy=None, *args, **kwargs):
         try:
@@ -107,6 +109,81 @@ class Error404View(APIView):
         except Exception as e:
             return Response(data={"error": f"'HEAD' Method Failed for Error404View: {e}"}, status=400)
 
+class ResponseView(APIView):
+    def post(self, request, dummy=None, *args, **kwargs):
+        try:
+            # Extract the message and type from the request data
+            message = request.data.get("message", "Operation completed.")
+            is_error = request.data.get("is_error", False)
+            # Render the response page
+            return render(request, 'system/response.html', {'message': message, 'is_error': is_error})
+        except Exception as e:
+            return Response(data={"error": f"'POST' Method Failed for ResponseView: {e}"}, status=400)
+
+    def get(self, request, dummy=None, *args, **kwargs):
+        try:
+            # Extract the message and type from the request data
+            message = request.data.get("message", "Operation completed.")
+            is_error = request.data.get("is_error", False)
+            # Render the response page
+            return render(request, 'system/response.html', {'message': message, 'is_error': is_error})
+        except Exception as e:
+            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for ResponseView: {e}", "is_error": True}, status=400)
+                    # return Response(data={"error": f"'GET' Method Failed for ResponseView: {e}"}, status=400)
+
+    def put(self, request, dummy=None, *args, **kwargs):
+        try:
+            # Extract the message and type from the request data
+            message = request.data.get("message", "Operation completed.")
+            is_error = request.data.get("is_error", False)
+            # Render the response page
+            return render(request, 'system/response.html', {'message': message, 'is_error': is_error})
+        except Exception as e:
+            return Response(data={"error": f"'PUT' Method Failed for ResponseView: {e}"}, status=400)
+
+    def patch(self, request, dummy=None, *args, **kwargs):
+        try:
+            # Extract the message and type from the request data
+            message = request.data.get("message", "Operation completed.")
+            is_error = request.data.get("is_error", False)
+            # Render the response page
+            return render(request, 'system/response.html', {'message': message, 'is_error': is_error})
+        except Exception as e:
+            return Response(data={"error": f"'PATCH' Method Failed for ResponseView: {e}"}, status=400)
+
+    def delete(self, request, dummy=None, *args, **kwargs):
+        try:
+            # Extract the message and type from the request data
+            message = request.data.get("message", "Operation completed.")
+            is_error = request.data.get("is_error", False)
+            # Render the response page
+            return render(request, 'system/response.html', {'message': message, 'is_error': is_error})
+        except Exception as e:
+            return Response(data={"error": f"'DELETE' Method Failed for ResponseView: {e}"}, status=400)
+
+    def options(self, request, dummy=None, *args, **kwargs):
+        try:
+            # Extract the message and type from the request data
+            message = request.data.get("message", "Operation completed.")
+            is_error = request.data.get("is_error", False)
+            # Render the response page
+            return render(request, 'system/response.html', {'message': message, 'is_error': is_error})
+        except Exception as e:
+            return Response(data={"error": f"'OPTIONS' Method Failed for ResponseView: {e}"}, status=400)
+
+    def head(self, request, dummy=None, *args, **kwargs):
+        try:
+            # Handle HEAD requests
+            # Since Django automatically handles HEAD, no implementation is required
+            # The HEAD response will be the same as GET but without the body
+            # Extract the message and type from the request data
+            message = request.data.get("message", "Operation completed.")
+            is_error = request.data.get("is_error", False)
+            # Render the response page
+            return render(request, 'system/response.html', {'message': message, 'is_error': is_error})
+        except Exception as e:
+            return Response(data={"error": f"'HEAD' Method Failed for ResponseView: {e}"}, status=400)
+
 
 class AboutView(APIView):
     def post(self, request):
@@ -121,7 +198,8 @@ class AboutView(APIView):
             # Handle GET requests
             return render(request, 'system/about.html')
         except Exception as e:
-                    return Response(data={"error": f"'GET' Method Failed for AboutView: {e}"}, status=400)
+            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for AboutView: {e}", "is_error": True}, status=400)
+                    # return Response(data={"error": f"'GET' Method Failed for AboutView: {e}"}, status=400)
 
     def put(self, request):
         try:
@@ -173,7 +251,8 @@ class ContactView(APIView):
             # Handle GET requests
             return render(request, 'system/contact.html')
         except Exception as e:
-                    return Response(data={"error": f"'GET' Method Failed for ContactView: {e}"}, status=400)
+            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for ContactView: {e}", "is_error": True}, status=400)
+                    # return Response(data={"error": f"'GET' Method Failed for ContactView: {e}"}, status=400)
 
     def put(self, request):
         try:
@@ -225,7 +304,8 @@ class SupportView(APIView):
             # Handle GET requests
             return render(request, 'system/support.html')
         except Exception as e:
-                    return Response(data={"error": f"'GET' Method Failed for SupportView: {e}"}, status=400)
+            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for SupportView: {e}", "is_error": True}, status=400)
+                    # return Response(data={"error": f"'GET' Method Failed for SupportView: {e}"}, status=400)
 
     def put(self, request):
         try:
@@ -277,7 +357,8 @@ class TermsOfServiceView(APIView):
             # Handle GET requests
             return render(request, 'system/terms-of-service.html')
         except Exception as e:
-                    return Response(data={"error": f"'GET' Method Failed for TermsOfServiceView: {e}"}, status=400)
+            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for TermsOfServiceView: {e}", "is_error": True}, status=400)
+                    # return Response(data={"error": f"'GET' Method Failed for TermsOfServiceView: {e}"}, status=400)
 
     def put(self, request):
         try:
@@ -330,7 +411,8 @@ class PrivacyPolicyView(APIView):
             # Handle GET requests
             return render(request, 'system/privacy-policy.html')
         except Exception as e:
-                    return Response(data={"error": f"'GET' Method Failed for PrivacyPolicyView: {e}"}, status=400)
+            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for PrivacyPolicyView: {e}", "is_error": True}, status=400)
+                    # return Response(data={"error": f"'GET' Method Failed for PrivacyPolicyView: {e}"}, status=400)
 
     def put(self, request):
         try:
@@ -410,32 +492,39 @@ class PlansAndPricingView(APIView):
 
     def get(self, request):
         try:
-            account = request.user
-            subscriptions = Subscription.objects.filter(customer=account.stripe_customer_id).all()
+            # Fetch plans available for all users
             monthly_plans = Plan.objects.filter(interval='month').all()
             yearly_plans = Plan.objects.filter(interval='year').all()
 
-            # Add subscription counts and durations
+            # Initialize variables for subscription data
+            subscriptions = None
             monthly_plans_subscription_data = {}
             yearly_plans_subscription_data = {}
+            active_subscription = None
 
-            for subscription in subscriptions:
-                for item in subscription.get_items():
-                    plan_id = item.price.stripe_price_id
-                    duration = subscription.subscription_duration()
+            # Check if the user is authenticated
+            if request.user.is_authenticated:
+                account = request.user
+                subscriptions = Subscription.objects.filter(customer=account.stripe_customer_id).all()
 
-                    if plan_id in monthly_plans_subscription_data:
-                        monthly_plans_subscription_data[plan_id]['count'] += 1
-                        monthly_plans_subscription_data[plan_id]['durations'].append(duration)
-                    elif plan_id in yearly_plans_subscription_data:
-                        yearly_plans_subscription_data[plan_id]['count'] += 1
-                        yearly_plans_subscription_data[plan_id]['durations'].append(duration)
+                # Add subscription counts and durations
+                for subscription in subscriptions:
+                    for item in subscription.get_items():
+                        plan_id = item.price.stripe_price_id
+                        duration = subscription.subscription_duration()
+                        if plan_id in monthly_plans_subscription_data:
+                            monthly_plans_subscription_data[plan_id]['count'] += 1
+                            monthly_plans_subscription_data[plan_id]['durations'].append(duration)
+                        elif plan_id in yearly_plans_subscription_data:
+                            yearly_plans_subscription_data[plan_id]['count'] += 1
+                            yearly_plans_subscription_data[plan_id]['durations'].append(duration)
 
-            active_subscription = Subscription.objects.filter(
-                customer=account,
-                status__in=['active', 'trialing']
-            ).first()
+                active_subscription = Subscription.objects.filter(
+                    customer=account,
+                    status__in=['active', 'trialing']
+                ).first()
 
+            # Render the template with plans and subscription data
             return render(request, 'system/plans-and-pricing.html', {
                 'monthly_plans': monthly_plans,
                 'yearly_plans': yearly_plans,
@@ -445,7 +534,51 @@ class PlansAndPricingView(APIView):
                 'active_subscription': active_subscription,
             })
         except Exception as e:
-            return Response(data={"error": f"'GET' Method Failed for PlansAndPricingView: {e}"}, status=400)
+            return render(request, 'system/response.html', {
+                'message': f"'GET' Method Failed for PlansAndPricingView: {e}",
+                "is_error": True
+            }, status=400)
+
+    # def get(self, request):
+    #     try:
+    #         account = request.user
+    #         if account != None:
+    #             subscriptions = Subscription.objects.filter(customer=account.stripe_customer_id).all()
+    #             monthly_plans = Plan.objects.filter(interval='month').all()
+    #             yearly_plans = Plan.objects.filter(interval='year').all()
+
+    #             # Add subscription counts and durations
+    #             monthly_plans_subscription_data = {}
+    #             yearly_plans_subscription_data = {}
+
+    #             for subscription in subscriptions:
+    #                 for item in subscription.get_items():
+    #                     plan_id = item.price.stripe_price_id
+    #                     duration = subscription.subscription_duration()
+
+    #                     if plan_id in monthly_plans_subscription_data:
+    #                         monthly_plans_subscription_data[plan_id]['count'] += 1
+    #                         monthly_plans_subscription_data[plan_id]['durations'].append(duration)
+    #                     elif plan_id in yearly_plans_subscription_data:
+    #                         yearly_plans_subscription_data[plan_id]['count'] += 1
+    #                         yearly_plans_subscription_data[plan_id]['durations'].append(duration)
+
+    #             active_subscription = Subscription.objects.filter(
+    #                 customer=account,
+    #                 status__in=['active', 'trialing']
+    #             ).first()
+
+    #         return render(request, 'system/plans-and-pricing.html', {
+    #             'monthly_plans': monthly_plans,
+    #             'yearly_plans': yearly_plans,
+    #             "subscriptions": subscriptions,
+    #             'monthly_plans_subscription_data': monthly_plans_subscription_data,
+    #             'yearly_plans_subscription_data': yearly_plans_subscription_data,
+    #             'active_subscription': active_subscription,
+    #         })
+    #     except Exception as e:
+    #         return render(request, 'system/response.html', {'message': f"'GET' Method Failed for PlansAndPricingView: {e}", "is_error": True}, status=400)
+    #         # return Response(data={"error": f"'GET' Method Failed for PlansAndPricingView: {e}"}, status=400)
 
     def put(self, request):
         try:

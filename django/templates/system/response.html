@@ -1,0 +1,15 @@
+{% include '../widgets/navbar.html' %}
+{% block content %}
+<div style="text-align: center; padding: 50px 0;">
+    {% if is_error %}
+        <h1 id="response-title" style="font-size: 72px; font-weight: bold; color: red;">Error</h1>
+    {% else %}
+        <h1 id="response-title" style="font-size: 72px; font-weight: bold; color: green;">Success</h1>
+    {% endif %}
+    <p id="response-message" style="font-size: 18px; color: #555;">{{ message }}</p>
+    <a href="{% url 'index' %}" style="text-decoration: none; font-size: 18px; color: #007bff;">
+        Go back to Home
+    </a>
+</div>
+{% endblock %}
+{% include '../widgets/footer.html' %}

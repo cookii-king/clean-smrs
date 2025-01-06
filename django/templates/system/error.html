@@ -1,0 +1,12 @@
+{% include '../widgets/navbar.html' %}
+{% block content %}
+<div style="text-align: center; padding: 50px 0;">
+    <h1 style="font-size: 72px; font-weight: bold; color: #ff0000;">Error</h1>
+    <h2 style="font-size: 36px;">An Error Occurred</h2>
+    <p style="font-size: 18px; color: #555;">{{ error_message }}</p>
+    <a href="{% url 'index' %}" style="text-decoration: none; font-size: 18px; color: #007bff;">
+        Go back to Home
+    </a>
+</div>
+{% endblock %}
+{% include '../widgets/footer.html' %}

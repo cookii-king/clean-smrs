@@ -1,5 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import render
 from ...models import Cart, CartItem, Product, Account
 from ...serializers import AccountSerializer
@@ -8,9 +9,11 @@ from django.contrib.auth import login, logout
 from django.core.mail import send_mail
 import jwt, pyotp, datetime
 from system.settings import DEFAULT_FROM_EMAIL, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD
-
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
 
 class ConfirmEmailView(APIView):
+    @method_decorator(login_required)
     def post(self, request):
         try:
             account = request.user
@@ -21,7 +24,7 @@ class ConfirmEmailView(APIView):
             return Response({"message": "POST request received"}, status=201)
         except Exception as e:
             return Response(data={"error": f"'POST' Method Failed for ConfirmEmailView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def get(self, request):
         try:
             account = request.user
@@ -53,35 +56,35 @@ class ConfirmEmailView(APIView):
             return render(request, 'authentication/confirm-email.html')
         except Exception as e:
                     return Response(data={"error": f"'GET' Method Failed for ConfirmEmailView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def put(self, request):
         try:
             # Handle PUT requests
             return Response({"message": "PUT request received"}, status=201)
         except Exception as e:
             return Response(data={"error": f"'PUT' Method Failed for ConfirmEmailView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def patch(self, request):
         try:
             # Handle PATCH requests
             return Response({"message": "PATCH request received"}, status=200)
         except Exception as e:
             return Response(data={"error": f"'PATCH' Method Failed for ConfirmEmailView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def delete(self, request):
         try:
             # Handle DELETE requests
             return Response({"message": "DELETE request received"}, status=200)
         except Exception as e:
             return Response(data={"error": f"'DELETE' Method Failed for ConfirmEmailView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def options(self, request, *args, **kwargs):
         try:
             # Handle OPTIONS requests
             return Response({"message": "OPTIONS request received"}, status=204)
         except Exception as e:
             return Response(data={"error": f"'OPTIONS' Method Failed for ConfirmEmailView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def head(self, request, *args, **kwargs):
         try:
             # Handle HEAD requests
@@ -92,6 +95,7 @@ class ConfirmEmailView(APIView):
             return Response(data={"error": f"'HEAD' Method Failed for ConfirmEmailView: {e}"}, status=400)
 
 class VerifyMfaView(APIView):
+    @method_decorator(login_required)
     def post(self, request):
         try:
             account_id = request.data["account_id"]
@@ -119,45 +123,45 @@ class VerifyMfaView(APIView):
             return Response({"message": "POST request received"}, status=201)
         except Exception as e:
             return Response(data={"error": f"'POST' Method Failed for VerifyMfaView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def get(self, request):
         try:
             account = request.user
             if(account.mfa_secret == None):
                 account.generate_mfa_secret_secret()
             # Handle GET requests
-            return render(request, 'authentication/verify-mfa.html')
+            return render(request, 'authentication/verify-mfa.html', {"account_id": account.id})
         except Exception as e:
                     return Response(data={"error": f"'GET' Method Failed for VerifyMfaView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def put(self, request):
         try:
             # Handle PUT requests
             return Response({"message": "PUT request received"}, status=201)
         except Exception as e:
             return Response(data={"error": f"'PUT' Method Failed for VerifyMfaView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def patch(self, request):
         try:
             # Handle PATCH requests
             return Response({"message": "PATCH request received"}, status=200)
         except Exception as e:
             return Response(data={"error": f"'PATCH' Method Failed for VerifyMfaView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def delete(self, request):
         try:
             # Handle DELETE requests
             return Response({"message": "DELETE request received"}, status=200)
         except Exception as e:
             return Response(data={"error": f"'DELETE' Method Failed for VerifyMfaView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def options(self, request, *args, **kwargs):
         try:
             # Handle OPTIONS requests
             return Response({"message": "OPTIONS request received"}, status=204)
         except Exception as e:
             return Response(data={"error": f"'OPTIONS' Method Failed for VerifyMfaView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def head(self, request, *args, **kwargs):
         try:
             # Handle HEAD requests
@@ -168,6 +172,7 @@ class VerifyMfaView(APIView):
             return Response(data={"error": f"'HEAD' Method Failed for VerifyMfaView: {e}"}, status=400)
 
 class EnableMfaView(APIView):
+    @method_decorator(login_required)
     def post(self, request):
         try:
             account = request.user
@@ -182,7 +187,7 @@ class EnableMfaView(APIView):
             return Response({"message": "POST request received"}, status=201)
         except Exception as e:
             return Response(data={"error": f"'POST' Method Failed for EnableMfaView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def get(self, request):
         try:
             account = request.user
@@ -192,35 +197,35 @@ class EnableMfaView(APIView):
             return render(request, 'authentication/enable-mfa.html', {'account':account})
         except Exception as e:
                     return Response(data={"error": f"'GET' Method Failed for EnableMfaView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def put(self, request):
         try:
             # Handle PUT requests
             return Response({"message": "PUT request received"}, status=201)
         except Exception as e:
             return Response(data={"error": f"'PUT' Method Failed for EnableMfaView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def patch(self, request):
         try:
             # Handle PATCH requests
             return Response({"message": "PATCH request received"}, status=200)
         except Exception as e:
             return Response(data={"error": f"'PATCH' Method Failed for EnableMfaView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def delete(self, request):
         try:
             # Handle DELETE requests
             return Response({"message": "DELETE request received"}, status=200)
         except Exception as e:
             return Response(data={"error": f"'DELETE' Method Failed for EnableMfaView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def options(self, request, *args, **kwargs):
         try:
             # Handle OPTIONS requests
             return Response({"message": "OPTIONS request received"}, status=204)
         except Exception as e:
             return Response(data={"error": f"'OPTIONS' Method Failed for EnableMfaView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def head(self, request, *args, **kwargs):
         try:
             # Handle HEAD requests
@@ -231,6 +236,7 @@ class EnableMfaView(APIView):
             return Response(data={"error": f"'HEAD' Method Failed for EnableMfaView: {e}"}, status=400)
 
 class DisableMfaView(APIView):
+    @method_decorator(login_required)
     def post(self, request):
         try:
             account = request.user
@@ -239,42 +245,42 @@ class DisableMfaView(APIView):
             return Response({"message": "POST request received"}, status=201)
         except Exception as e:
             return Response(data={"error": f"'POST' Method Failed for DisableMfaView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def get(self, request):
         try:
             # Handle GET requests
             return render(request, 'authentication/disable-mfa.html')
         except Exception as e:
                     return Response(data={"error": f"'GET' Method Failed for DisableMfaView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def put(self, request):
         try:
             # Handle PUT requests
             return Response({"message": "PUT request received"}, status=201)
         except Exception as e:
             return Response(data={"error": f"'PUT' Method Failed for DisableMfaView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def patch(self, request):
         try:
             # Handle PATCH requests
             return Response({"message": "PATCH request received"}, status=200)
         except Exception as e:
             return Response(data={"error": f"'PATCH' Method Failed for DisableMfaView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def delete(self, request):
         try:
             # Handle DELETE requests
             return Response({"message": "DELETE request received"}, status=200)
         except Exception as e:
             return Response(data={"error": f"'DELETE' Method Failed for DisableMfaView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def options(self, request, *args, **kwargs):
         try:
             # Handle OPTIONS requests
             return Response({"message": "OPTIONS request received"}, status=204)
         except Exception as e:
             return Response(data={"error": f"'OPTIONS' Method Failed for DisableMfaView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def head(self, request, *args, **kwargs):
         try:
             # Handle HEAD requests
@@ -296,8 +302,9 @@ class LoginView(APIView):
                 raise 'Incorrect email or password!'
             if account is not None:
                 if account.mfa_enabled:
+                    login(request, account)
                     # Redirect to the verify MFA page
-                    return render(request, 'verify-mfa.html', {'account_id': account.id})
+                    return redirect('verify-mfa')
                 else:
                     login(request, account)
                     
@@ -362,6 +369,7 @@ class LoginView(APIView):
             return Response(data={"error": f"'HEAD' Method Failed for LoginView: {e}"}, status=400)
 
 class LogoutView(APIView):
+    @method_decorator(login_required)
     def post(self, request):
         try:
             logout(request)
@@ -372,7 +380,7 @@ class LogoutView(APIView):
             return Response({"message": "POST request received"}, status=201)
         except Exception as e:
             return Response(data={"error": f"'POST' Method Failed for LogoutView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def get(self, request):
         try:
             # Handle GET requests
@@ -380,35 +388,35 @@ class LogoutView(APIView):
             return Response({"message": "GET request received"}, status=201)
         except Exception as e:
                     return Response(data={"error": f"'GET' Method Failed for LogoutView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def put(self, request):
         try:
             # Handle PUT requests
             return Response({"message": "PUT request received"}, status=201)
         except Exception as e:
             return Response(data={"error": f"'PUT' Method Failed for LogoutView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def patch(self, request):
         try:
             # Handle PATCH requests
             return Response({"message": "PATCH request received"}, status=200)
         except Exception as e:
             return Response(data={"error": f"'PATCH' Method Failed for LogoutView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def delete(self, request):
         try:
             # Handle DELETE requests
             return Response({"message": "DELETE request received"}, status=200)
         except Exception as e:
             return Response(data={"error": f"'DELETE' Method Failed for LogoutView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def options(self, request, *args, **kwargs):
         try:
             # Handle OPTIONS requests
             return Response({"message": "OPTIONS request received"}, status=204)
         except Exception as e:
             return Response(data={"error": f"'OPTIONS' Method Failed for LogoutView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def head(self, request, *args, **kwargs):
         try:
             # Handle HEAD requests

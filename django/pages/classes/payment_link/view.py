@@ -40,7 +40,8 @@ class PaymentLinkView(APIView):
             # Handle GET requests
             return render(request, 'payment-link/payment-link.html')
         except Exception as e:
-                    return Response(data={"error": f"'GET' Method Failed for PaymentLinkView: {e}"}, status=400)
+            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for PaymentLinkView: {e}", "is_error": True}, status=400)
+                    # return Response(data={"error": f"'GET' Method Failed for PaymentLinkView: {e}"}, status=400)
 
     def put(self, request):
         try:
@@ -94,7 +95,8 @@ class PaymentLinksView(APIView):
             payment_links = PaymentLink.objects.all()
             return render(request, 'payment-link/payment-links.html', {"payment-links": payment_links})
         except Exception as e:
-                    return Response(data={"error": f"'GET' Method Failed for PaymentLinksView: {e}"}, status=400)
+            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for PaymentLinksView: {e}", "is_error": True}, status=400)
+                    # return Response(data={"error": f"'GET' Method Failed for PaymentLinksView: {e}"}, status=400)
 
     def put(self, request):
         try:

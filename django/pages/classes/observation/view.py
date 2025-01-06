@@ -5,6 +5,9 @@ from ...models import Plan, Subscription, ApiKey
 import requests, os
 from django.conf import settings
 
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
+
 FLASK_URL = os.getenv('FLASK_URL')
 FLASK_LOCAL_HOST_URL = os.getenv('FLASK_LOCAL_HOST_URL')
 
@@ -13,6 +16,7 @@ if settings.DEBUG:
 
 
 class ObservationView(APIView):
+    @method_decorator(login_required)
     def post(self, request):
         try:
             # Get the user's primary API key
@@ -69,8 +73,10 @@ class ObservationView(APIView):
                     {"error": f"Failed to create observation: {response.text}"}
                 )
         except Exception as e:
-            return Response(data={"error": f"'POST' Method Failed for ObservationView: {e}"}, status=500)
-        
+            # return render(request, 'system/response.html', {'message': f"'POST' Method Failed for ObservationView: {e}", "is_error": True}, status=500)
+            return Response(data={"error": f"'POST' Method Failed for ObservationView: {e}", "is_error": True}, status=500)
+            
+    @method_decorator(login_required)
     def get(self, request):
         try:
             if request.path == '/observation/create':
@@ -78,36 +84,43 @@ class ObservationView(APIView):
             # Handle GET requests
             return render(request, 'observation/observation.html')
         except Exception as e:
-                    return Response(data={"error": f"'GET' Method Failed for ObservationView: {e}"}, status=400)
-
+            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for ObservationView: {e}", "is_error": True}, status=400)
+            # return Response(data={"error": f"'GET' Method Failed for ObservationView: {e}", "is_error": True}, status=500)
+            
+    @method_decorator(login_required)
     def put(self, request):
         try:
             # Handle PUT requests
             return Response({"message": "PUT request received"}, status=201)
         except Exception as e:
-            return Response(data={"error": f"'PUT' Method Failed for ObservationView: {e}"}, status=400)
-
+            # return render(request, 'system/response.html', {'message': f"'PUT' Method Failed for ObservationView: {e}", "is_error": True}, status=500)
+            return Response(data={"error": f"'PUT' Method Failed for ObservationView: {e}", "is_error": True}, status=400)
+            
+    @method_decorator(login_required)
     def patch(self, request):
         try:
             # Handle PATCH requests
             return Response({"message": "PATCH request received"}, status=200)
         except Exception as e:
-            return Response(data={"error": f"'PATCH' Method Failed for ObservationView: {e}"}, status=400)
-
+            # return render(request, 'system/response.html', {'message': f"'PATCH' Method Failed for ObservationView: {e}", "is_error": True}, status=400)
+            return Response(data={"error": f"'PATCH' Method Failed for ObservationView: {e}", "is_error": True}, status=400)
+    @method_decorator(login_required)
     def delete(self, request):
         try:
             # Handle DELETE requests
             return Response({"message": "DELETE request received"}, status=200)
         except Exception as e:
-            return Response(data={"error": f"'DELETE' Method Failed for ObservationView: {e}"}, status=400)
-
+            # return render(request, 'system/response.html', {'message': f"'DELETE' Method Failed for ObservationView: {e}", "is_error": True}, status=400)
+            return Response(data={"error": f"'DELETE' Method Failed for ObservationView: {e}", "is_error": True}, status=400)
+    @method_decorator(login_required)
     def options(self, request, *args, **kwargs):
         try:
             # Handle OPTIONS requests
             return Response({"message": "OPTIONS request received"}, status=204)
         except Exception as e:
-            return Response(data={"error": f"'OPTIONS' Method Failed for ObservationView: {e}"}, status=400)
-
+            # return render(request, 'system/response.html', {'message': f"'OPTIONS' Method Failed for ObservationView: {e}", "is_error": True}, status=400)
+            return Response(data={"error": f"'OPTIONS' Method Failed for ObservationView: {e}", "is_error": True}, status=400)
+    @method_decorator(login_required)
     def head(self, request, *args, **kwargs):
         try:
             # Handle HEAD requests
@@ -115,16 +128,19 @@ class ObservationView(APIView):
             # The HEAD response will be the same as GET but without the body
             return Response({"message": "HEAD request received"}, status=200)
         except Exception as e:
-            return Response(data={"error": f"'HEAD' Method Failed for ObservationView: {e}"}, status=400)
+            # return render(request, 'system/response.html', {'message': f"'HEAD' Method Failed for ObservationView: {e}", "is_error": True}, status=400)
+            return Response(data={"error": f"'HEAD' Method Failed for ObservationView: {e}", "is_error": True}, status=400)
 
 class ObservationsView(APIView):
+    @method_decorator(login_required)
     def post(self, request):
         try:
             # Handle POST requests
             return Response({"message": "POST request received"}, status=201)
         except Exception as e:
-            return Response(data={"error": f"'POST' Method Failed for ObservationsView: {e}"}, status=400)
-
+            # return render(request, 'system/response.html', {'message': f"'POST' Method Failed for ObservationsView: {e}", "is_error": True}, status=400)
+            return Response(data={"error": f"'POST' Method Failed for ObservationsView: {e}", "is_error": True}, status=400)
+    @method_decorator(login_required)
     def get(self, request):
         try:
             # Get the user's primary API key
@@ -152,36 +168,40 @@ class ObservationsView(APIView):
                 return render(request, 'observation/observations.html', {"observations": []})
 
         except Exception as e:
-            return Response(data={"error": f"'GET' Method Failed for ObservationsView: {e}"}, status=400)
-
+            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for ObservationsView: {e}", "is_error": True}, status=400)
+            # return Response(data={"error": f"'GET' Method Failed for ObservationsView: {e}", "is_error": True}, status=400)
+    @method_decorator(login_required)
     def put(self, request):
         try:
             # Handle PUT requests
             return Response({"message": "PUT request received"}, status=201)
         except Exception as e:
-            return Response(data={"error": f"'PUT' Method Failed for ObservationsView: {e}"}, status=400)
-
+            # return render(request, 'system/response.html', {'message': f"'PUT' Method Failed for ObservationsView: {e}", "is_error": True}, status=400)
+            return Response(data={"error": f"'PUT' Method Failed for ObservationsView: {e}", "is_error": True}, status=400)
+    @method_decorator(login_required)
     def patch(self, request):
         try:
             # Handle PATCH requests
             return Response({"message": "PATCH request received"}, status=200)
         except Exception as e:
-            return Response(data={"error": f"'PATCH' Method Failed for ObservationsView: {e}"}, status=400)
-
+            # return render(request, 'system/response.html', {'message': f"'PATCH' Method Failed for ObservationsView: {e}", "is_error": True}, status=400)
+            return Response(data={"error": f"'PATCH' Method Failed for ObservationsView: {e}", "is_error": True}, status=400)
+    @method_decorator(login_required)
     def delete(self, request):
         try:
             # Handle DELETE requests
             return Response({"message": "DELETE request received"}, status=200)
         except Exception as e:
-            return Response(data={"error": f"'DELETE' Method Failed for ObservationsView: {e}"}, status=400)
-
+            # return render(request, 'system/response.html', {'message': f"'PATCH' Method Failed for ObservationsView: {e}", "is_error": True}, status=400)
+            return Response(data={"error": f"'DELETE' Method Failed for ObservationsView: {e}", "is_error": True}, status=400)
+    @method_decorator(login_required)
     def options(self, request, *args, **kwargs):
         try:
             # Handle OPTIONS requests
             return Response({"message": "OPTIONS request received"}, status=204)
         except Exception as e:
-            return Response(data={"error": f"'OPTIONS' Method Failed for ObservationsView: {e}"}, status=400)
-
+            return Response(data={"error": f"'OPTIONS' Method Failed for ObservationsView: {e}", "is_error": True}, status=400)
+    @method_decorator(login_required)
     def head(self, request, *args, **kwargs):
         try:
             # Handle HEAD requests
@@ -189,4 +209,4 @@ class ObservationsView(APIView):
             # The HEAD response will be the same as GET but without the body
             return Response({"message": "HEAD request received"}, status=200)
         except Exception as e:
-            return Response(data={"error": f"'HEAD' Method Failed for ObservationsView: {e}"}, status=400)
+            return Response(data={"error": f"'HEAD' Method Failed for ObservationsView: {e}", "is_error": True}, status=400)

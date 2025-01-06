@@ -5,7 +5,10 @@ from django.shortcuts import render, redirect
 from ...models import ApiKey, Account, Subscription
 from django.contrib import messages
 from django.contrib.auth.hashers import check_password
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
 class AccountView(APIView):
+    @method_decorator(login_required)
     def post(self, request):
         try:
             account = request.user
@@ -47,8 +50,8 @@ class AccountView(APIView):
             # Handle POST requests
             return Response({"message": "POST request received"}, status=201)
         except Exception as e:
-            return Response(data={"error": f"'POST' Method Failed for AccountView: {e}"}, status=400)
-
+            return Response(data={"error": f"'POST' Method Failed for AccountView: {e}", "is_error": True}, status=400)
+    @method_decorator(login_required)
     def get(self, request):
         try:
             user = request.user
@@ -94,36 +97,37 @@ class AccountView(APIView):
                     }
             return render(request, 'account/account.html', {"api_keys": api_keys, "account": account,   'current_plan': current_plan, 'current_subscription': current_subscription, 'token': token, 'qrcode': qr_code_data_uri})
         except Exception as e:
-                    return Response(data={"error": f"'GET' Method Failed for AccountView: {e}"}, status=400)
-
+            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for AccountView: {e}", "is_error": True}, status=400)
+                    # return Response(data={"error": f"'GET' Method Failed for AccountView: {e}", "is_error": True}, status=400)
+    @method_decorator(login_required)
     def put(self, request):
         try:
             # Handle PUT requests
             return Response({"message": "PUT request received"}, status=201)
         except Exception as e:
-            return Response(data={"error": f"'PUT' Method Failed for AccountView: {e}"}, status=400)
-
+            return Response(data={"error": f"'PUT' Method Failed for AccountView: {e}", "is_error": True}, status=400)
+    @method_decorator(login_required)
     def patch(self, request):
         try:
             # Handle PATCH requests
             return Response({"message": "PATCH request received"}, status=200)
         except Exception as e:
-            return Response(data={"error": f"'PATCH' Method Failed for AccountView: {e}"}, status=400)
-
+            return Response(data={"error": f"'PATCH' Method Failed for AccountView: {e}", "is_error": True}, status=400)
+    @method_decorator(login_required)
     def delete(self, request):
         try:
             # Handle DELETE requests
             return Response({"message": "DELETE request received"}, status=200)
         except Exception as e:
-            return Response(data={"error": f"'DELETE' Method Failed for AccountView: {e}"}, status=400)
-
+            return Response(data={"error": f"'DELETE' Method Failed for AccountView: {e}", "is_error": True}, status=400)
+    @method_decorator(login_required)
     def options(self, request, *args, **kwargs):
         try:
             # Handle OPTIONS requests
             return Response({"message": "OPTIONS request received"}, status=204)
         except Exception as e:
-            return Response(data={"error": f"'OPTIONS' Method Failed for AccountView: {e}"}, status=400)
-
+            return Response(data={"error": f"'OPTIONS' Method Failed for AccountView: {e}", "is_error": True}, status=400)
+    @method_decorator(login_required)
     def head(self, request, *args, **kwargs):
         try:
             # Handle HEAD requests
@@ -131,4 +135,4 @@ class AccountView(APIView):
             # The HEAD response will be the same as GET but without the body
             return Response({"message": "HEAD request received"}, status=200)
         except Exception as e:
-            return Response(data={"error": f"'HEAD' Method Failed for AccountView: {e}"}, status=400)
+            return Response(data={"error": f"'HEAD' Method Failed for AccountView: {e}", "is_error": True}, status=400)

@@ -4,8 +4,11 @@ from django.shortcuts import render
 from ...models import ApiKey
 from django.utils.timezone import now
 from ...models import Account, Subscription
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
 
 class ApiKeyView(APIView):
+    @method_decorator(login_required)
     def post(self, request):
         try:
             user = request.user
@@ -115,42 +118,43 @@ class ApiKeyView(APIView):
         except Exception as e:
             # Catch unexpected errors and return a 500 response
             return Response({"error": f"'POST' Method Failed for ApiKeyView: {str(e)}"}, status=500)
- 
+    @method_decorator(login_required)
     def get(self, request):
         try:
             # Handle GET requests
            return Response({"message": "GET request received"}, status=200)
         except Exception as e:
-                    return Response(data={"error": f"'GET' Method Failed for ApiKeyView: {e}"}, status=400)
-
+            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for ApiKeyView: {e}", "is_error": True}, status=400)
+                    # return Response(data={"error": f"'GET' Method Failed for ApiKeyView: {e}"}, status=400)
+    @method_decorator(login_required)
     def put(self, request):
         try:
             # Handle PUT requests
             return Response({"message": "PUT request received"}, status=201)
         except Exception as e:
             return Response(data={"error": f"'PUT' Method Failed for ApiKeyView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def patch(self, request):
         try:
             # Handle PATCH requests
             return Response({"message": "PATCH request received"}, status=200)
         except Exception as e:
             return Response(data={"error": f"'PATCH' Method Failed for ApiKeyView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def delete(self, request):
         try:
             # Handle DELETE requests
             return Response({"message": "DELETE request received"}, status=200)
         except Exception as e:
             return Response(data={"error": f"'DELETE' Method Failed for ApiKeyView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def options(self, request, *args, **kwargs):
         try:
             # Handle OPTIONS requests
             return Response({"message": "OPTIONS request received"}, status=204)
         except Exception as e:
             return Response(data={"error": f"'OPTIONS' Method Failed for ApiKeyView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def head(self, request, *args, **kwargs):
         try:
             # Handle HEAD requests

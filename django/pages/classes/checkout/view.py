@@ -3,9 +3,11 @@ from rest_framework.response import Response
 from django.shortcuts import render, redirect, get_object_or_404
 from ...models import Checkout, CheckoutLineItem, Plan, Price, Cart, Subscription, Order
 from ...config.config import stripe
- 
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
 
 class CheckoutView(APIView):
+    @method_decorator(login_required)
     def post(self, request):
         try:
             account = request.user
@@ -136,7 +138,7 @@ class CheckoutView(APIView):
             return Response({"error": "Cart not found for the user."}, status=404)
         except Exception as e:
             return Response({"error": f"Failed to create checkout session: {str(e)}"}, status=500)
-
+    @method_decorator(login_required)
     def get(self, request):
         try:
             if request.path in ['/checkout/success', '/checkout/success/']:
@@ -156,37 +158,38 @@ class CheckoutView(APIView):
 
             return Response({"message": "GET request received"}, status=201)
         except Exception as e:
-            return Response(data={"error": f"'GET' Method Failed for CheckoutView: {e}"}, status=400)
+            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for CheckoutView: {e}", "is_error": True}, status=400)
+            # return Response(data={"error": f"'GET' Method Failed for CheckoutView: {e}"}, status=400)
 
-
+    @method_decorator(login_required)
     def put(self, request):
         try:
             # Handle PUT requests
             return Response({"message": "PUT request received"}, status=201)
         except Exception as e:
             return Response(data={"error": f"'PUT' Method Failed for CheckoutView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def patch(self, request):
         try:
             # Handle PATCH requests
             return Response({"message": "PATCH request received"}, status=200)
         except Exception as e:
             return Response(data={"error": f"'PATCH' Method Failed for CheckoutView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def delete(self, request):
         try:
             # Handle DELETE requests
             return Response({"message": "DELETE request received"}, status=200)
         except Exception as e:
             return Response(data={"error": f"'DELETE' Method Failed for CheckoutView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def options(self, request, *args, **kwargs):
         try:
             # Handle OPTIONS requests
             return Response({"message": "OPTIONS request received"}, status=204)
         except Exception as e:
             return Response(data={"error": f"'OPTIONS' Method Failed for CheckoutView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def head(self, request, *args, **kwargs):
         try:
             # Handle HEAD requests
@@ -197,49 +200,51 @@ class CheckoutView(APIView):
             return Response(data={"error": f"'HEAD' Method Failed for CheckoutView: {e}"}, status=400)
     
 class CheckoutsView(APIView):
+    @method_decorator(login_required)
     def post(self, request):
         try:
             # Handle POST requests
             return Response({"message": "POST request received"}, status=201)
         except Exception as e:
             return Response(data={"error": f"'POST' Method Failed for CheckoutsView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def get(self, request):
         try:
             # Handle GET requests
             checkouts = Checkout.objects.all()
             return render(request, 'checkout/checkouts.html', {"checkouts": checkouts})
         except Exception as e:
-                    return Response(data={"error": f"'GET' Method Failed for CheckoutsView: {e}"}, status=400)
-
+            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for CheckoutsView: {e}", "is_error": True}, status=400)
+                    # return Response(data={"error": f"'GET' Method Failed for CheckoutsView: {e}"}, status=400)
+    @method_decorator(login_required)
     def put(self, request):
         try:
             # Handle PUT requests
             return Response({"message": "PUT request received"}, status=201)
         except Exception as e:
             return Response(data={"error": f"'PUT' Method Failed for CheckoutsView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def patch(self, request):
         try:
             # Handle PATCH requests
             return Response({"message": "PATCH request received"}, status=200)
         except Exception as e:
             return Response(data={"error": f"'PATCH' Method Failed for CheckoutsView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def delete(self, request):
         try:
             # Handle DELETE requests
             return Response({"message": "DELETE request received"}, status=200)
         except Exception as e:
             return Response(data={"error": f"'DELETE' Method Failed for CheckoutsView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def options(self, request, *args, **kwargs):
         try:
             # Handle OPTIONS requests
             return Response({"message": "OPTIONS request received"}, status=204)
         except Exception as e:
             return Response(data={"error": f"'OPTIONS' Method Failed for CheckoutsView: {e}"}, status=400)
-
+    @method_decorator(login_required)
     def head(self, request, *args, **kwargs):
         try:
             # Handle HEAD requests
