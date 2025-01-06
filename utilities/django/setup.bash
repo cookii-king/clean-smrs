@@ -85,3 +85,12 @@ sudo apt-get install python3-certbot-nginx -y
 # we can't use the servers public ip address to generate the ssl certificate with certbot we need a domain name like (cleansmrs.com, or cleansmrs.org)...
 # sudo certbot --nginx -d 35.165.93.124 --config /etc/nginx/sites-available/django.conf
 # sudo certbot --nginx -d cleansmrs.com --config /etc/nginx/sites-available/django.conf
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+git reset --hard HEAD
+git clean -fd
+git pull origin main
+sudo supervisorctl restart guni:gunicorn
+sudo supervisorctl status
+sudo systemctl restart nginx

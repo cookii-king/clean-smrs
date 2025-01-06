@@ -27,7 +27,7 @@ urlpatterns = [
     path('terms-of-service', TermsOfServiceView.as_view(), name="terms-of-service"),
     path('privacy-policy', PrivacyPolicyView.as_view(), name="privacy-policy"),
     path('plans-and-pricing', PlansAndPricingView.as_view(), name="plans-and-pricing"),
-    path('<path:dummy>/', Error404View.as_view(), name="Error-404"),
+    # path('<path:dummy>/', Error404View.as_view(), name="Error-404"),
     # # system end
     # # ========================================================================== #
     # # ========================================================================== #
