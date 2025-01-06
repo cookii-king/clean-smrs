@@ -14,7 +14,7 @@ ma = Marshmallow(app)
 DEBUG = False
 
 DJANGO_URL = os.getenv('DJANGO_URL')
-DJANGO_LOCAL_HOST_URL = os.getenv('DJANGO_LOCAL_HOST_URL')
+DJANGO_LOCAL_HOST_URL = os.getenv('DJANGO_URL')
 
 if DEBUG:
     DJANGO_URL = DJANGO_LOCAL_HOST_URL
