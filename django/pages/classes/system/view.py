@@ -55,6 +55,59 @@ class IndexView(APIView):
         except Exception as e:
             return Response(data={"error": f"'HEAD' Method Failed for IndexView: {e}"}, status=400)
 
+class Error404View(APIView):
+    def post(self, request, dummy=None, *args, **kwargs):
+        try:
+            # Handle POST requests
+            return render(request, 'system/404.html')
+        except Exception as e:
+            return Response(data={"error": f"'POST' Method Failed for Error404View: {e}"}, status=400)
+
+    def get(self, request, dummy=None, *args, **kwargs):
+        try:
+            # Handle GET requests
+            return render(request, 'system/404.html')
+        except Exception as e:
+                    return Response(data={"error": f"'GET' Method Failed for Error404View: {e}"}, status=400)
+
+    def put(self, request, dummy=None, *args, **kwargs):
+        try:
+            # Handle PUT requests
+            return render(request, 'system/404.html')
+        except Exception as e:
+            return Response(data={"error": f"'PUT' Method Failed for Error404View: {e}"}, status=400)
+
+    def patch(self, request, dummy=None, *args, **kwargs):
+        try:
+            # Handle PATCH requests
+            return render(request, 'system/404.html')
+        except Exception as e:
+            return Response(data={"error": f"'PATCH' Method Failed for Error404View: {e}"}, status=400)
+
+    def delete(self, request, dummy=None, *args, **kwargs):
+        try:
+            # Handle DELETE requests
+            return render(request, 'system/404.html')
+        except Exception as e:
+            return Response(data={"error": f"'DELETE' Method Failed for Error404View: {e}"}, status=400)
+
+    def options(self, request, dummy=None, *args, **kwargs):
+        try:
+            # Handle OPTIONS requests
+            return render(request, 'system/404.html')
+        except Exception as e:
+            return Response(data={"error": f"'OPTIONS' Method Failed for Error404View: {e}"}, status=400)
+
+    def head(self, request, dummy=None, *args, **kwargs):
+        try:
+            # Handle HEAD requests
+            # Since Django automatically handles HEAD, no implementation is required
+            # The HEAD response will be the same as GET but without the body
+            return render(request, 'system/404.html')
+        except Exception as e:
+            return Response(data={"error": f"'HEAD' Method Failed for Error404View: {e}"}, status=400)
+
+
 class AboutView(APIView):
     def post(self, request):
         try:

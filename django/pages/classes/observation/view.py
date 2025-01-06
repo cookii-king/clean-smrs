@@ -2,7 +2,15 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.shortcuts import render
 from ...models import Plan, Subscription, ApiKey
-import requests
+import requests, os
+from django.conf import settings
+
+FLASK_URL = os.getenv('FLASK_URL')
+FLASK_LOCAL_HOST_URL = os.getenv('FLASK_LOCAL_HOST_URL')
+
+if settings.DEBUG:
+    FLASK_URL = FLASK_LOCAL_HOST_URL
+
 
 class ObservationView(APIView):
     def post(self, request):
@@ -37,7 +45,7 @@ class ObservationView(APIView):
             }
 
             # API endpoint
-            url = "http://127.0.0.1:5000/observation/create"
+            url = f"f{FLASK_URL}/observation/create"
             headers = {
                 "Content-Type": "application/json",
                 "X-API-KEY": api_key.key,
@@ -124,7 +132,13 @@ class ObservationsView(APIView):
             if not api_key:
                 return Response({"error": "No primary API key found"}, status=400)
 
-            url = "http://127.0.0.1:5000/observations"
+            # Check if the user has an active subscription
+            subscription = Subscription.objects.filter(customer=request.user,                     status='active',
+                    deleted__isnull=True).first()
+            # if not subscription:
+            #     return Response({"error": "You need to subscribe to access this feature"}, status=403)
+
+            url = f"{FLASK_URL}/observations"
             headers = {
                 "X-API-KEY": api_key.key,
             }
@@ -139,35 +153,7 @@ class ObservationsView(APIView):
 
         except Exception as e:
             return Response(data={"error": f"'GET' Method Failed for ObservationsView: {e}"}, status=400)
-    # def get(self, request):
-    #     try:
-    #         # Prepare the POST request data and headers
-    #         url = "http://127.0.0.1:5000/observations"
-    #         headers = {
-    #             "X-API-KEY": "e6cpr0zjg-2YgvUA9zMxEeqPz8JLL38up5QW9fsSY14",
-    #             "Content-Type": "application/json"
-    #         }
-    #         payload = {
-    #             # "observation_type": "temperature",
-    #             # "value": 22.5,
-    #             # "unit": "Celsius"
-    #         }
 
-    #         # Make the POST request
-    #         response = requests.post(url, json=payload, headers=headers)
-
-    #         # Check if the request was successful
-    #         if response.status_code == 200:
-    #             # Pass data to the template
-    #             observations = response.json()  # Assuming the response returns JSON
-    #             return render(request, 'observation/observations.html', {"observations": observations})
-    #         else:
-    #             # Handle errors
-    #             return Response({"error": f"Failed to fetch observations: {response.status_code}"}, status=response.status_code)
-
-    #     except Exception as e:
-    #         return Response(data={"error": f"'GET' Method Failed for ObservationsView: {e}"}, status=400)
-    
     def put(self, request):
         try:
             # Handle PUT requests

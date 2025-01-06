@@ -11,14 +11,23 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
+DEBUG = True
 
-DJANGO_URL = os.getenv('DJANGO_URL', 'http://127.0.0.1:8000')  # Use environment variable for flexibility
+DJANGO_URL = os.getenv('DJANGO_URL')
+DJANGO_LOCAL_HOST_URL = os.getenv('DJANGO_LOCAL_HOST_URL')
+
+if DEBUG:
+    DJANGO_URL = DJANGO_LOCAL_HOST_URL
+
+
+DJANGO_URL = os.getenv('DJANGO_URL')  # Use environment variable for flexibility
 # # Django server URL
 # DJANGO_URL = "http://127.0.0.1:8000"  # Replace with your Django server's URL
 
 def validate_api_key(func):
     def wrapper(*args, **kwargs):
         try:
+            print(f"DJANGO_URL: {DJANGO_URL}")
             # Payload to send to Django
             api_key = request.headers.get('X-API-KEY')
             payload = {

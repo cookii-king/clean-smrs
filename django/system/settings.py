@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-6)dnooj^#fo4yz#50xc@q8w(t1ba3h5ydjfk@sh6b!)-%j!z%t
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [os.getenv('LOCAL_HOST_IP'), os.getenv('DJANGO_SERVER_IP') ]
 
 
 # Application definition
@@ -116,11 +116,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-STATICFILES_DIRS = [
-    BASE_DIR / "static",  # Adjust this based on your project structure
-]
-
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -139,6 +134,11 @@ USE_TZ = True
 STATIC_URL = 'static/'
 MEDIA_URL = '/media/'  # URL to access media files
 MEDIA_ROOT = BASE_DIR / 'media'  # Directory where uploaded media files are stored
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # This is where collectstatic will gather all static files
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

@@ -32,6 +32,8 @@ class ApiKeyView(APIView):
                     deleted__isnull=True
                 ).first()
 
+                print(f"has subscription: ${subscription}")
+
                 if not subscription:
                     return Response({"error": "No active subscription found. Please subscribe to use the API."}, status=403)
 
