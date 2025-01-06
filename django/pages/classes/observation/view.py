@@ -45,7 +45,7 @@ class ObservationView(APIView):
             }
 
             # API endpoint
-            url = f"f{FLASK_URL}/observation/create"
+            url = f"{FLASK_URL}/observation/create"
             headers = {
                 "Content-Type": "application/json",
                 "X-API-KEY": api_key.key,
