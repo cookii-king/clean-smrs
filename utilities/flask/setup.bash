@@ -1,49 +1,90 @@
+#!/bin/bash
+
+# Check Python version
+echo "Checking Python version..."
 python3 --version
+
+# Set up a virtual environment for Flask
+echo "Setting up virtual environment for Flask..."
 python3 -m venv .venv
 source .venv/bin/activate
-touch main.py
+
+# Create a main.py file if it doesn't exist
+if [ ! -f main.py ]; then
+    touch main.py
+fi
+
+# Run Flask in debug mode (for development only)
+echo "Running Flask in debug mode..."
 flask --app main.py run --debug
-#windows python -m flask --app main.py run --debug
 
-
-# to enable https
+# Update package lists and install necessary packages
+echo "Updating package lists and installing necessary packages..."
 sudo apt-get update -y
 sudo apt install tree -y
 sudo apt install nginx -y
+
+# Clone the repository
+echo "Cloning the repository..."
 git clone https://github.com/cookii-king/clean-smrs.git
-ls -lrt
+
+# Navigate to the project directory
 cd clean-smrs
-ls -lrt
+
+# Install Python and virtual environment for Django
+echo "Installing Python and setting up virtual environment for Django..."
 sudo apt install python3 python3-venv python3-pip -y
 python3 --version
 python3 -m venv venv
-ls -lrt
 source venv/bin/activate
+
+# Install project dependencies
+echo "Installing project dependencies..."
 pip install -r requirements.txt
 
-sudo apt-get install supervisor
-cd /etc/supervisor/conf.d/
-sudo touch gunicorn.conf
-sudo nano gunicorn.conf
-sudo mkdir /var/log/gunicorn
+# Install and configure Supervisor for process management
+echo "Installing Supervisor..."
+sudo apt-get install supervisor -y
+
+# Create and edit Gunicorn configuration
+echo "Configuring Gunicorn with Supervisor..."
+sudo nano /etc/supervisor/conf.d/gunicorn.conf
+
+# Create log directory for Gunicorn
+sudo mkdir -p /var/log/gunicorn
+
+# Reload Supervisor configuration
 sudo supervisorctl reread
-# guni: available
 sudo supervisorctl update
-# guni: added process group
 sudo supervisorctl status
-# guni:gunicorn                    RUNNING   pid 18950, uptime 0:00:33
-sudo nano nginx.conf
-cd sites-available
-sudo touch django.conf
+
+# Configure Nginx
+echo "Configuring Nginx..."
+sudo nano /etc/nginx/nginx.conf
+cd /etc/nginx/sites-available
 sudo nano django.conf
+
+# Test Nginx configuration
 sudo nginx -t
-# nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
-# nginx: configuration file /etc/nginx/nginx.conf test is successful
-sudo ln django.conf /etc/nginx/sites-enabled
+
+# Enable the Nginx site configuration
+sudo ln -s /etc/nginx/sites-available/django.conf /etc/nginx/sites-enabled
+
+# Restart Nginx
 sudo service nginx restart
+
+# Install Certbot for SSL
+echo "Installing Certbot for SSL..."
 sudo apt-get install certbot -y
 sudo apt-get install python3-certbot-nginx -y
-# we can't use the servers public ip address to generate the ssl certificate with certbot we need a domain name like (cleansmrs.com, or cleansmrs.org)...
-# sudo certbot --nginx -d 35.165.93.124 --config /etc/nginx/sites-available/django.conf
-# sudo certbot --nginx -d cleansmrs.com --config /etc/nginx/sites-available/django.conf
+
+# Note: SSL certificate generation requires a domain name
+# sudo certbot --nginx -d yourdomain.com --config /etc/nginx/sites-available/django.conf
+
+# Pull the latest changes from the repository
+echo "Pulling latest changes from the repository..."
 git pull origin main
+
+# Start Gunicorn
+echo "Starting Gunicorn..."
+gunicorn -w 4 -b 0.0.0.0:8000 main:app

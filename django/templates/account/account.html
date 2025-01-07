@@ -162,14 +162,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 });});
 function showNotification(message, isError = false) {
-        const notification = document.getElementById('popup-notification');
-        notification.textContent = message;
-        notification.style.backgroundColor = isError ? '#f44336' : '#4CAF50';
-        notification.style.display = 'block';
-        setTimeout(() => {
-            notification.style.display = 'none';
-        }, 3000);
-    }
+    const notification = document.getElementById('popup-notification');
+    console.log(message); // Debugging: Log the message to ensure it's not empty
+    notification.textContent = message;
+    notification.style.backgroundColor = isError ? '#f44336' : '#4CAF50';
+    notification.style.display = 'block';
+    notification.style.padding = '15px'; // Ensure padding is set
+    notification.style.minWidth = '200px'; // Set a minimum width
+    setTimeout(() => {
+        notification.style.display = 'none';
+    }, 3000);
+}
 
     document.addEventListener('DOMContentLoaded', function() {
         const regenerateButtons = document.querySelectorAll('.regenerate-button');
