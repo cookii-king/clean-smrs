@@ -1,12 +1,10 @@
-{% include '../widgets/navbar.html' %}
+{% extends 'widgets/base.html' %}
 {% load custom_filters %}
-
 {% block content %}
 <div class="container mt-5">
-
     <!-- Account Details Section -->
-    <div class="card-container mb-5">
-        <div class="card">
+    <div class="card mb-5 shadow-sm">
+        <div class="card-body">
             <h2 class="card-title">Account Details</h2>
             <p><strong>Name:</strong> {{ account.name }}</p>
             <p><strong>Email:</strong> {{ account.email }}</p>
@@ -14,7 +12,6 @@
             <p><strong>JWT Token:</strong> <span class="jwt-token">{{ token }}</span></p>
             <p><strong>Email Confirmed:</strong> {{ account.email_confirmed }}</p>
             <p><strong>2FA Enabled:</strong> {{ account.mfa_enabled }}</p>
-
             {% if not account.email_confirmed %}
             <form method="GET" action="{% url 'confirm-email' %}">
                 <button type="submit" class="btn btn-warning mt-2">Confirm Email</button>
@@ -29,107 +26,89 @@
             </div>
             {% else %}
             <div class="mfa-section">
-                <img src="{{ qrcode }}" alt="QR Code" class="mt-3">
+                <img src="{{ qrcode }}" alt="QR Code" class="mt-3 img-fluid">
                 <form method="GET" action="{% url 'enable-mfa' %}">
                     <button type="submit" class="btn btn-warning mt-2">Enable MFA</button>
                 </form>
             </div>
             {% endif %}
-            
             <form method="GET" action="{% url 'account-edit' %}">
                 <button type="submit" class="btn btn-primary mt-3">Edit Details</button>
             </form>
         </div>
     </div>
-
     <!-- API Key Management Section -->
-    <h2 class="card-title">API Key Management</h2>
+    <h2 class="mb-4">API Key Management</h2>
     <p>Manage your API keys and current subscription plan here.</p>
-
-<!-- API Keys Section -->
-<div class="mt-4">
-    <h4 class="card-title">Your API Keys</h4>
-    {% if api_keys %}
-    <div class="table-responsive mt-3">
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Key ID</th>
-                    <th>API Key</th>
-                    <th>Primary</th>
-                    <th>Credit Limit</th>
-                    <th>Credits Used</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for key in api_keys %}
-                {% if account.id == key.account.id %}
-                <tr>
-                    <td>{{ key.id }}</td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <span id="api-key-{{ key.id }}" style="display: none;"></span>
-                            <span id="api-key-masked-{{ key.id }}">••••••••••••</span>
-                            <button
-                                type="button"
-                                class="btn btn-sm btn-secondary ms-2 reveal-button"
-                                data-key-id="{{ key.id }}"
-                                data-revealed="{{ key.revealed|yesno:'true,false' }}"
-                            >
-                                Reveal
-                            </button>
-                        </div>
-                    </td>
-                    <td>
-                        <button
-                            type="button"
-                            class="btn btn-warning btn-sm set-primary-button"
-                            data-key-id="{{ key.id }}"
-                        >
-                            {% if key.primary %}
-                            Primary
-                            {% else %}
-                            Set as Primary
-                            {% endif %}
-                        </button>
-                    </td>
-                    <td>{{ key.credit_limit }}</td>
-                    <td>{{ key.credits_used }}</td>
-                    <td>
-                        <button
-                            type="button"
-                            class="btn btn-primary btn-sm regenerate-button"
-                            data-key-id="{{ key.id }}"
-                        >
-                            Regenerate
-                        </button>
-                    </td>
-                </tr>
-                {% endif %}
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    {% else %}
-    <p>No API keys found for your account.</p>
-    {% endif %}
-</div>
-
-
-    <!-- Generate New API Key -->
+    <!-- API Keys Section -->
     <div class="mt-4">
-        <form method="POST" action="{% url 'api-key-generate' %}">
-            {% csrf_token %}
-            <input type="hidden" name="account_id" value="{{ account.id }}">
-            <button type="submit" class="btn btn-success">Generate New API Key</button>
-        </form>
+        <h4>Your API Keys</h4>
+        {% if api_keys %}
+        <div class="table-responsive mt-3">
+            <table class="table table-bordered table-hover">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Key ID</th>
+                        <th>API Key</th>
+                        <th>Primary</th>
+                        <th>Credit Limit</th>
+                        <th>Credits Used</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for key in api_keys %}
+                    {% if account.id == key.account.id %}
+                    <tr>
+                        <td>{{ key.id }}</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <span id="api-key-{{ key.id }}" style="display: none;"></span>
+                                <span id="api-key-masked-{{ key.id }}">••••••••••••</span>
+                                <button type="button" class="btn btn-sm btn-secondary ms-2 reveal-button" data-key-id="{{ key.id }}" data-revealed="{{ key.revealed|yesno:'true,false' }}">
+                                    Reveal
+                                </button>
+                            </div>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-warning btn-sm set-primary-button" data-key-id="{{ key.id }}">
+                                {% if key.primary %}
+                                Primary
+                                {% else %}
+                                Set as Primary
+                                {% endif %}
+                            </button>
+                        </td>
+                        <td>{{ key.credit_limit }}</td>
+                        <td>{{ key.credits_used }}</td>
+                        <td>
+                            <button type="button" class="btn btn-primary btn-sm regenerate-button" data-key-id="{{ key.id }}">
+                                Regenerate
+                            </button>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p>No API keys found for your account.</p>
+        {% endif %}
     </div>
-
+<!-- Generate New API Key -->
+<div class="mt-4">
+    <form id="generate-api-key-form" method="POST" action="{% url 'api-key-generate' %}">
+        {% csrf_token %}
+        <input type="hidden" name="account_id" value="{{ account.id }}">
+        <button type="button" id="generate-api-key-button" class="btn btn-success">Generate New API Key</button>
+    </form>
+</div><!-- Popup Notification -->
+<div id="popup-notification" style="display: none; position: fixed; bottom: 20px; right: 20px; background-color: #4CAF50; color: white; padding: 15px; border-radius: 5px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); z-index: 1000;"></div>
     <!-- Current Subscription Plan Section -->
     <div class="mt-5">
-        <h4 class="card-title">Current Subscription Plan</h4>
-        <div class="card">
+        <h4>Current Subscription Plan</h4>
+        <div class="card shadow-sm">
             <div class="card-body">
                 {% if current_plan %}
                 <h5 class="card-title">{{ current_plan.name }}</h5>
@@ -152,16 +131,51 @@
             </div>
         </div>
     </div>
-
 </div>
-
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const generateApiKeyButton = document.getElementById('generate-api-key-button');
+    generateApiKeyButton.addEventListener('click', function() {
+        const form = document.getElementById('generate-api-key-form');
+        const formData = new FormData(form);
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.api_key) {
+                showNotification('API Key generated successfully.');
+                // Optionally, update the UI to show the new API key
+                // You can reload the page or update a specific part of the page
+                location.reload(); // Reload the page to reflect changes
+            } else {
+                showNotification(data.error, true);
+            }
+        })
+        .catch(error => {
+            console.error('Error generating API key:', error);
+            showNotification('An error occurred while generating the API key. Please try again later.', true);
+        });
+});});
+function showNotification(message, isError = false) {
+        const notification = document.getElementById('popup-notification');
+        notification.textContent = message;
+        notification.style.backgroundColor = isError ? '#f44336' : '#4CAF50';
+        notification.style.display = 'block';
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, 3000);
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         const regenerateButtons = document.querySelectorAll('.regenerate-button');
         regenerateButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const keyId = this.getAttribute('data-key-id');
-
                 fetch("{% url 'api-key-re-generate' %}", {
                     method: "POST",
                     headers: {
@@ -189,23 +203,19 @@
                 });
             });
         });
-
         const revealButtons = document.querySelectorAll('.reveal-button');
         revealButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const keyId = this.getAttribute('data-key-id');
                 const revealed = this.getAttribute('data-revealed');
-
                 if (revealed === 'true') {
                     alert("This API key has already been revealed.");
                     return;
                 }
-
                 const confirmReveal = confirm("Are you sure you want to reveal this API key? Make sure to keep it in a safe place.");
                 if (!confirmReveal) {
                     return;
                 }
-
                 fetch("{% url 'api-key-reveal' %}", {
                     method: "POST",
                     headers: {
@@ -242,7 +252,6 @@
         primaryButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const keyId = this.getAttribute('data-key-id');
-
                 fetch("{% url 'set-primary-key' %}", {
                     method: "POST",
                     headers: {
@@ -269,5 +278,3 @@
     });
 </script>
 {% endblock %}
-
-{% include '../widgets/footer.html' %}

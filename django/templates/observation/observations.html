@@ -1,47 +1,46 @@
-{% include '../widgets/navbar.html' %}
+{% extends 'widgets/base.html' %}
 {% block content %}
 <div class="container mt-5">
-    <h2>Observations</h2>
+    <h2 class="text-center mb-4">Observations</h2>
     {% if observations %}
-        <div class="table-responsive mt-4">
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Coordinates</th>
-                        <th>Air Temp (°C)</th>
-                        <th>Water Temp (°C)</th>
-                        <th>Humidity (%)</th>
-                        <th>Wind Speed (m/s)</th>
-                        <th>Wind Direction (°)</th>
-                        <th>Precipitation (mm)</th>
-                        <th>Notes</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for observation in observations %}
-                    <tr>
-                        <td>{{ observation.id }}</td>
-                        <td>{{ observation.date }}</td>
-                        <td>{{ observation.time }}</td>
-                        <td>{{ observation.coordinates }}</td>
-                        <td>{{ observation.temperature_air }}</td>
-                        <td>{{ observation.temperature_water }}</td>
-                        <td>{{ observation.humidity }}</td>
-                        <td>{{ observation.wind_speed }}</td>
-                        <td>{{ observation.wind_direction }}</td>
-                        <td>{{ observation.precipitation }}</td>
-                        <td>{{ observation.notes }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+    <div class="table-responsive mt-4">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Coordinates</th>
+                    <th>Air Temp (°C)</th>
+                    <th>Water Temp (°C)</th>
+                    <th>Humidity (%)</th>
+                    <th>Wind Speed (m/s)</th>
+                    <th>Wind Direction (°)</th>
+                    <th>Precipitation (mm)</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for observation in observations %}
+                <tr>
+                    <td>{{ observation.id }}</td>
+                    <td>{{ observation.date }}</td>
+                    <td>{{ observation.time }}</td>
+                    <td>{{ observation.coordinates }}</td>
+                    <td>{{ observation.temperature_air }}</td>
+                    <td>{{ observation.temperature_water }}</td>
+                    <td>{{ observation.humidity }}</td>
+                    <td>{{ observation.wind_speed }}</td>
+                    <td>{{ observation.wind_direction }}</td>
+                    <td>{{ observation.precipitation }}</td>
+                    <td>{{ observation.notes }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
     {% else %}
-        <p>No observations found.</p>
+    <p class="text-center">No observations found.</p>
     {% endif %}
 </div>
 {% endblock %}
-{% include '../widgets/footer.html' %}

@@ -1,4 +1,4 @@
-{% include '../widgets/navbar.html'%}
+{% extends 'widgets/base.html' %}
 {% block content %}
 <div class="container">
     <h1>Verify MFA</h1>
@@ -20,4 +20,3 @@
     {% endif %}
 </div>
 {% endblock %}
-{% include '../widgets/footer.html'%}

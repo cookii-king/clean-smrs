@@ -1,0 +1,25 @@
+.footer {
+    background-color: #f8f9fa; /* Example background color */
+    padding: 1rem 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0; /* Remove default margin */
+}
+
+main {
+    flex: 1;
+}
+
+.hero-banner {
+    background-color: #e9ecef; /* Light background color for the hero section */
+    padding: 3rem 0; /* Add padding for spacing */
+}
+
+.hero-content {
+    text-align: center;
+    color: #343a40; /* Dark text color for contrast */
+}

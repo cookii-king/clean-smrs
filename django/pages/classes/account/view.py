@@ -2,8 +2,8 @@ import io, pyotp, base64, qrcode
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.shortcuts import render, redirect
-from ...models import ApiKey, Account, Subscription
 from django.contrib import messages
+from ...models import ApiKey, Account, Subscription
 from django.contrib.auth.hashers import check_password
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required

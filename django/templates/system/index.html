@@ -1,4 +1,100 @@
-{% include '../widgets/navbar.html'%}
-{% block content %}
+{% extends 'widgets/base.html' %}
+{% block title %}
+    Home - CleanSMRs
 {% endblock %}
-{% include '../widgets/footer.html'%}
+{% block content %}
+<div class="hero-banner position-relative text-center text-dark py-5">
+    <div class="hero-content">
+        <h1>Welcome to CleanSMRs</h1>
+        <p>Your go-to solution for sustainable energy solutions.</p>
+    </div>
+</div>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-4 d-flex align-items-stretch">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div class="mb-4">
+                        <h5 class="card-title">Our Products</h5>
+                        <p class="card-text">Explore our range of products designed to meet your energy needs.</p>
+                    </div>
+                    <a href="{% url 'products' %}" class="btn btn-primary mt-auto">View Products</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 d-flex align-items-stretch">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div class="mb-4">
+                        <h5 class="card-title">Plans & Pricing</h5>
+                        <p class="card-text">Find a plan that suits your budget and requirements.</p>
+                    </div>
+                    <a href="{% url 'plans-and-pricing' %}" class="btn btn-primary mt-auto">See Plans</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 d-flex align-items-stretch">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div class="mb-4">
+                        <h5 class="card-title">Contact Us</h5>
+                        <p class="card-text">Have questions? Get in touch with our team.</p>
+                    </div>
+                    <a href="{% url 'contact' %}" class="btn btn-primary mt-auto">Contact</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Enhanced Section for Clean Energy Benefits -->
+    <div class="mt-5 p-4 bg-light rounded shadow-sm">
+        <h2 class="text-center mb-4">Benefits of Clean Energy</h2>
+        <p>Clean energy is revolutionizing the way we power our world. By harnessing renewable resources, we can significantly reduce our carbon footprint and pave the way for a sustainable future. Here are some key benefits of clean energy:</p>
+        <div class="row">
+            <div class="col-md-6">
+                <ul class="list-unstyled">
+                    <li class="mb-3">
+                        <h5><strong>Environmental Impact</strong></h5>
+                        <p>Clean energy sources like wind, solar, and nuclear power produce little to no greenhouse gas emissions, helping to combat climate change and reduce air pollution.</p>
+                    </li>
+                    <li class="mb-3">
+                        <h5><strong>Energy Security</strong></h5>
+                        <p>By diversifying our energy sources, we reduce dependence on fossil fuels and enhance energy security, ensuring a stable and reliable energy supply.</p>
+                    </li>
+                    <li class="mb-3">
+                        <h5><strong>Economic Growth</strong></h5>
+                        <p>The clean energy sector is a rapidly growing industry, creating jobs and driving economic growth through innovation and investment.</p>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <ul class="list-unstyled">
+                    <li class="mb-3">
+                        <h5><strong>Health Benefits</strong></h5>
+                        <p>Reducing air pollution from fossil fuels can lead to improved public health outcomes, decreasing respiratory and cardiovascular diseases.</p>
+                    </li>
+                    <li class="mb-3">
+                        <h5><strong>Reliability</strong></h5>
+                        <p>Technologies like Small Modular Reactors (SMRs) provide a stable and continuous power supply, essential for data centers and other critical infrastructure.</p>
+                    </li>
+                    <li class="mb-3">
+                        <h5><strong>Innovation and Sustainability</strong></h5>
+                        <p>Clean energy fosters innovation in technology and sustainability practices, encouraging a shift towards a more environmentally conscious society.</p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <p class="mt-4">At CleanSMRs, we are committed to providing innovative nuclear solutions that support the transition to a cleaner, more sustainable energy future. Join us in making a positive impact on the environment and society.</p>
+    </div>
+    <!-- Additional Information Section -->
+    <div class="mt-5">
+        <h3>Why Choose CleanSMRs?</h3>
+        <p>CleanSMRs is at the forefront of the clean energy revolution, offering cutting-edge solutions that are both efficient and environmentally friendly. Our Small Modular Reactors are designed to meet the growing energy demands of data centers while minimizing environmental impact.</p>
+        <p>Our commitment to sustainability and innovation ensures that we provide our clients with the best possible solutions for their energy needs. By choosing CleanSMRs, you are investing in a future that prioritizes both technological advancement and environmental stewardship.</p>
+        <p>Explore our range of products and services to see how we can help you achieve your energy goals while contributing to a more sustainable world.</p>
+    </div>
+
+        <!-- Additional Information Section -->
+        <div class="mt-5">
+</div>
+</div>
+{% endblock %}

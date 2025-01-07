@@ -1,60 +1,59 @@
-{% include '../widgets/navbar.html' %}
+{% extends 'widgets/base.html' %}
 {% block content %}
 <div class="container mt-5">
-    <h2>Your Subscriptions</h2>
+    <h2 class="text-center mb-4">Your Subscriptions</h2>
     {% if subscriptions %}
-        <div class="table-responsive mt-4">
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Subscription ID</th>
-                        <th>Items</th>
-                        <th>Status</th>
-                        <th>Start Date</th>
-                        <th>End Date</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for subscription in subscriptions %}
-                    <tr>
-                        <td>{{ subscription.stripe_subscription_id }}</td>
-                        <td>
-                            {% for item in subscription.subscription_items.all %}
-                                {% if item.plan %}
-                                    Plan: {{ item.plan.stripe_plan_id }}
-                                {% elif item.price %}
-                                    Price: {{ item.price.stripe_price_id }}
-                                {% endif %}
-                                (Quantity: {{ item.quantity }})<br>
-                            {% endfor %}
-                        </td>
-                        <td>{{ subscription.status }}</td>
-                        <td>{{ subscription.created|date:"M d, Y" }}</td>
-                        <td>
-                            {% if subscription.deleted %}
-                                {{ subscription.deleted|date:"M d, Y" }}
-                            {% else %}
-                                Active
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if subscription.status == 'active' %}
-                                <form method="POST" action="{% url 'subscription-cancel' %}">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="subscription_id" value="{{ subscription.id }}">
-                                    <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
-                                </form>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+    <div class="table-responsive mt-4">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-light">
+                <tr>
+                    <th>Subscription ID</th>
+                    <th>Items</th>
+                    <th>Status</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for subscription in subscriptions %}
+                <tr>
+                    <td>{{ subscription.stripe_subscription_id }}</td>
+                    <td>
+                        {% for item in subscription.subscription_items.all %}
+                        {% if item.plan %}
+                        Plan: {{ item.plan.stripe_plan_id }}
+                        {% elif item.price %}
+                        Price: {{ item.price.stripe_price_id }}
+                        {% endif %}
+                        (Quantity: {{ item.quantity }})<br>
+                        {% endfor %}
+                    </td>
+                    <td>{{ subscription.status }}</td>
+                    <td>{{ subscription.created|date:"M d, Y" }}</td>
+                    <td>
+                        {% if subscription.deleted %}
+                        {{ subscription.deleted|date:"M d, Y" }}
+                        {% else %}
+                        Active
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if subscription.status == 'active' %}
+                        <form method="POST" action="{% url 'subscription-cancel' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="subscription_id" value="{{ subscription.id }}">
+                            <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
     {% else %}
-        <p>No subscriptions found.</p>
+    <p class="text-center">No subscriptions found.</p>
     {% endif %}
 </div>
 {% endblock %}
-{% include '../widgets/footer.html' %}
