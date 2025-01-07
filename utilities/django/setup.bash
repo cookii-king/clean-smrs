@@ -132,3 +132,5 @@ echo "Restarting services..."
 sudo supervisorctl restart guni:gunicorn
 sudo supervisorctl status
 sudo systemctl restart nginx
+
+gunicorn -w 4 -b 0.0.0.0:8000 system.wsgi:application
