@@ -41,42 +41,46 @@ python manage.py collectstatic --noinput
 
 # step 7
 # Define the source and destination paths
-gunicorn_utilities_conf_setup="utilities/django/gunicorn.conf"
+gunicorn_utilities_conf_setup="/home/ubuntu/clean-smrs/utilities/django/gunicorn.conf"
 gunicorn_server_conf_setup="/etc/supervisor/conf.d/gunicorn.conf"
-echo "Copying configuration files from utilities..."
-sudo cp "$gunicorn_utilities_conf_setup" "$gunicorn_server_conf_setup"
-# sudo nano /etc/supervisor/conf.d/gunicorn.conf
+nginx_utilities_conf_setup="/home/ubuntu/clean-smrs/utilities/django/nginx.conf"
+nginx_server_conf_setup="/etc/nginx/nginx.conf"
+django_utilities_conf_setup="/home/ubuntu/clean-smrs/utilities/django/django.conf"
+django_server_conf_setup="/etc/nginx/sites-available/django.conf"
 
-# step 8
-# Define the source and destination paths
-gunicorn_utilities_conf_setup="utilities/django/gunicorn.conf"
-gunicorn_server_conf_setup="/etc/supervisor/conf.d/gunicorn.conf"
-echo "Copying configuration files from utilities..."
-sudo cp "$gunicorn_utilities_conf_setup" "$gunicorn_server_conf_setup"
+# Copy Gunicorn configuration
+echo "Copying Gunicorn configuration file..."
+sudo cp "$gunicorn_utilities_conf_setup" "$gunicorn_server_conf_setup" || { echo "Failed to copy Gunicorn configuration"; exit 1; }
+
 # Create log directory for Gunicorn
 sudo mkdir -p /var/log/gunicorn
-nginx_utilities_conf_setup="utilities/django/nginx.conf"
-nginx_server_conf_setup="/etc/nginx/nginx.conf"
+
+# Update and copy Nginx configuration
 echo "Updating user directive in nginx.conf to run as root..."
 sed -i "s/^user .*/user root;/" "$nginx_utilities_conf_setup"
-sudo cp "$nginx_utilities_conf_setup" "$nginx_server_conf_setup"
+sudo cp "$nginx_utilities_conf_setup" "$nginx_server_conf_setup" || { echo "Failed to copy Nginx configuration"; exit 1; }
 
-django_utilities_conf_setup="utilities/django/django.conf"
-django_server_conf_setup="/etc/nginx/sites-available/django.conf"
 # Define the current and new IP addresses
 current_ip="35.165.93.124"
-new_ip="$(curl -s ifconfig.me)"  # Replace with the actual new IP address
+new_ip="$(curl -s ifconfig.me)"
+
 # Replace the IP address in the configuration file
 echo "Updating IP address in django.conf..."
 sed -i "s/$current_ip/$new_ip/g" "$django_utilities_conf_setup"
+sudo cp "$django_utilities_conf_setup" "$django_server_conf_setup" || { echo "Failed to copy Django configuration"; exit 1; }
 
-sudo cp "$django_utilities_conf_setup" "$django_server_conf_setup"
 # Enable the Nginx site configuration
-sudo ln -s /etc/nginx/sites-available/django.conf /etc/nginx/sites-enabled
-sudo nginx -t
+sudo ln -sf /etc/nginx/sites-available/django.conf /etc/nginx/sites-enabled
+
+# Test Nginx configuration
+sudo nginx -t || { echo "Nginx configuration test failed"; exit 1; }
+
 # Restart Nginx
-sudo service nginx restart
+echo "Restarting Nginx..."
+sudo service nginx restart || { echo "Failed to restart Nginx"; exit 1; }
+
 # Reload Supervisor configuration
+echo "Reloading Supervisor..."
 sudo supervisorctl reread
 sudo supervisorctl update
 sudo supervisorctl status
