@@ -91,4 +91,7 @@ echo "Reloading Supervisor..."
 sudo supervisorctl reread
 sudo supervisorctl update
 sudo supervisorctl status
+sudo supervisorctl restart guni:gunicorn
+sudo supervisorctl status
+sudo service nginx restart
 
