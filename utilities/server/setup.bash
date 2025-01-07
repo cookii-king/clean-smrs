@@ -149,3 +149,6 @@ else
     echo "Invalid choice. Please run the script again and select either 1 or 2."
     exit 1
 fi
+
+cd ~
+sudo rm -r instructions.bash

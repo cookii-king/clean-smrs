@@ -74,7 +74,9 @@ This dual-purpose platform bridges the gap between innovative energy solutions â
 For users with a fresh and blank Ubuntu server, you can quickly set up the Clean-SMR platform using the following command. This command will download and execute a script that automates the installation process:
 
 ```bash
-curl -sL https://github.com/cookii-king/clean-smrs/raw/main/utilities/server/instructions.bash | bash
+curl -sSL https://github.com/cookii-king/clean-smrs/raw/main/utilities/server/instructions.bash -o instructions.bash
+chmod +x instructions.bash
+./instructions.bash
 ```
 
 ### Manual Setup
