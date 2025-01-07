@@ -35,6 +35,9 @@ python3 manage.py migrate
 # Create a superuser
 echo "Creating superuser..."
 # python3 manage.py createsuperuser --username admin --email admin@cleansmrs.com
+# Username: admin
+# Email address: admin@cleansmrs.com
+# Password: 123456@Aa
 python3 manage.py create_superuser_if_none
 # Collect static files
 echo "Collecting static files..."

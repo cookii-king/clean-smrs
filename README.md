@@ -1,7 +1,8 @@
+
+---
+
 # ⚛️ Clean-SMR
-
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen) ![License](https://img.shields.io/badge/license-MIT-blue)
-
 **Clean-SMR** is an **eCommerce platform** that markets **nuclear energy solutions** powered by **Small Modular Reactors (SMRs)** ⚡. It also provides **environmental data analysis** tools for scientists 🧑‍🔬, helping them gather, process, and analyze environmental data efficiently.
 
 ---
@@ -25,7 +26,6 @@
 ---
 
 ## 🌍 Overview
-
 The **Clean-SMR** platform serves two primary purposes:
 1. **🛒 E-Commerce**: Markets clean energy solutions using **Small Modular Reactors (SMRs)** to power industries, businesses, and data centers sustainably.
 2. **📊 Data Analysis**: Provides tools and APIs for scientists and researchers to access and analyze environmental data for predictive insights.
@@ -53,7 +53,6 @@ This dual-purpose platform bridges the gap between innovative energy solutions �
 ---
 
 ## 🛠️ Technologies Used
-
 - **Backend**: Django 🐍, Django Rest Framework (DRF)
 - **Frontend**: HTML5, CSS3 🎨, Bootstrap
 - **Database**: SQLite 🗄️
@@ -70,6 +69,16 @@ This dual-purpose platform bridges the gap between innovative energy solutions �
 - Docker (optional for deployment)
 - SQLite
 
+### Quick Setup on Ubuntu
+
+For users with a fresh and blank Ubuntu server, you can quickly set up the Clean-SMR platform using the following command. This command will download and execute a script that automates the installation process:
+
+```bash
+curl -sL https://github.com/cookii-king/clean-smrs/raw/main/utilities/server/instructions.bash | bash
+```
+
+### Manual Setup
+
 Follow these steps to set up the project locally:
 
 1. **🧩 Clone the Repository**:
@@ -81,7 +90,7 @@ Follow these steps to set up the project locally:
 2. **🐍 Create a Virtual Environment**:
    ```bash
    python -m venv venv
-   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+   source venv/bin/activate # On Windows use `venv\Scripts\activate`
    ```
 
 3. **📦 Install Dependencies**:
@@ -96,24 +105,47 @@ Follow these steps to set up the project locally:
    python manage.py migrate
    ```
 
-5. **▶️ Run the Server**:
+5. **👤 Create a Superuser**:
+   You can create a superuser to access the admin panel using one of the following methods:
+
+   - **Custom Command**:
+     ```bash
+     python3 manage.py create_superuser_if_none
+     ```
+
+   - **Standard Django Command**:
+     ```bash
+     python3 manage.py createsuperuser --username admin --email admin@cleansmrs.com
+     ```
+
+     Follow the prompts to set the username, email, and password. For example:
+     - Username: admin
+     - Email address: admin@cleansmrs.com
+     - Password: 123456@Aa
+
+   - **Interactive Command**:
+     ```bash
+     python3 manage.py createsuperuser
+     ```
+
+     This will prompt you to enter the username, email, and password interactively.
+
+6. **▶️ Run the Server**:
    ```bash
    python manage.py runserver
    ```
 
-6. **🌐 Access the Platform**:
+7. **🌐 Access the Platform**:
    Visit `http://127.0.0.1:8000/` in your browser.
 
 ---
 
 ## 🔧 Configuration
-
 - **Environment Variables**: Set up `.env` file with necessary configurations like database URL, secret keys, etc.
 
 ---
 
 ## ✅ Testing
-
 To run tests, use the following command:
 ```bash
 python manage.py test
@@ -122,7 +154,6 @@ python manage.py test
 ---
 
 ## 📈 Future Plans
-
 - Integration with more IoT devices for enhanced data collection.
 - Expansion of eCommerce features to include more energy solutions.
 - Development of mobile applications for easier access.
@@ -130,19 +161,19 @@ python manage.py test
 ---
 
 ## 🙌 Acknowledgments
-
 - Thanks to the contributors and open-source libraries that made this project possible.
 
 ---
 
 ## 📞 Contact
-
 If you have any questions, suggestions, or issues, feel free to reach out:
-
-- 📧 **Email**: [support@cleansmrs.com](mailto:support@cleansmrs.com)  
-- 🌐 **Website**: [www.cleansmrs.com](#)  
+- 📧 **Email**: [support@cleansmrs.com](mailto:support@cleansmrs.com)
+- 🌐 **Website**: [www.cleansmrs.com](#)
 - 🐙 **GitHub**: [github.com/cookii-king](https://github.com/cookii-king)
 
 ---
 
 **⚡ Clean Energy. 🌱 Clean Data. 🌍 Clean Future.**
+
+---
+
