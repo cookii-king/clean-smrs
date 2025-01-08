@@ -1,3 +1,43 @@
 {% extends 'widgets/base.html' %}
+
+{% block title %}
+Support - CleanSMRs
+{% endblock %}
+
 {% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Support</h1>
+            <p>Welcome to the CleanSMRs Support page. We are here to help you with any questions or issues you may have. Below you will find various resources and ways to get in touch with our support team.</p>
+            
+            <h2>Contact Support</h2>
+            <p>If you need immediate assistance, please contact our support team:</p>
+            <ul>
+                <li><strong>Email:</strong> support@cleansmrs.com</li>
+                <li><strong>Phone:</strong> +1 (123) 456-7890</li>
+                <li><strong>Support Hours:</strong> Monday to Friday, 9 AM - 5 PM (EST)</li>
+            </ul>
+            
+            <h2>Frequently Asked Questions (FAQs)</h2>
+            <p>Here are some of the most common questions we receive from our customers:</p>
+            <ul>
+                <li><strong>How do I create an account?</strong> Visit our <a href="{% url 'register' %}">registration page</a> to sign up for an account.</li>
+                <li><strong>How can I reset my password?</strong> You can reset your password by clicking on the "Forgot Password" link on the login page.</li>
+                <li><strong>Where can I find product documentation?</strong> Product documentation is available in the <a href="{% url 'resources' %}">Resources</a> section of our website.</li>
+            </ul>
+            
+            <h2>Resources</h2>
+            <p>Explore our resources for additional support:</p>
+            <ul>
+                <li><a href="{% url 'user-guides' %}">User Guides</a></li>
+                <li><a href="{% url 'tutorials' %}">Tutorials</a></li>
+                <li><a href="{% url 'community-forum' %}">Community Forum</a></li>
+            </ul>
+            
+            <h2>Submit a Support Ticket</h2>
+            <p>If you have a specific issue that requires further assistance, please submit a support ticket through our <a href="{% url 'support-ticket' %}">Support Ticket System</a>.</p>
+        </div>
+    </div>
+</div>
 {% endblock %}

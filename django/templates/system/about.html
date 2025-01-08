@@ -1,3 +1,36 @@
 {% extends 'widgets/base.html' %}
+
+{% block title %}
+About Us - CleanSMRs
+{% endblock %}
+
 {% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>About CleanSMRs</h1>
+            <p>At CleanSMRs, we are dedicated to providing innovative and sustainable energy solutions through the use of Small Modular Reactors (SMRs). Our mission is to revolutionize the energy industry by offering clean, reliable, and efficient power solutions that meet the growing demands of modern infrastructure.</p>
+            
+            <h2>Our Mission</h2>
+            <p>Our mission is to lead the transition to a sustainable energy future by developing cutting-edge nuclear technologies that reduce carbon emissions and promote environmental stewardship. We are committed to delivering high-quality products and services that empower our clients to achieve their energy goals while minimizing their environmental impact.</p>
+            
+            <h2>Our Vision</h2>
+            <p>We envision a world where clean energy is the norm, and our innovative SMR solutions play a pivotal role in achieving this vision. By harnessing the power of nuclear energy, we aim to provide a stable and continuous power supply that supports the growth of data centers and other critical infrastructure.</p>
+            
+            <h2>Our Values</h2>
+            <ul>
+                <li><strong>Innovation:</strong> We are committed to pushing the boundaries of technology to develop advanced energy solutions.</li>
+                <li><strong>Sustainability:</strong> We prioritize environmental responsibility in all aspects of our business.</li>
+                <li><strong>Integrity:</strong> We conduct our business with honesty and transparency, building trust with our clients and partners.</li>
+                <li><strong>Excellence:</strong> We strive for excellence in everything we do, from product development to customer service.</li>
+            </ul>
+            
+            <h2>Our Team</h2>
+            <p>Our team is composed of industry experts and passionate individuals who are dedicated to advancing the field of clean energy. With a diverse range of skills and expertise, we work collaboratively to deliver innovative solutions that meet the unique needs of our clients.</p>
+            
+            <h2>Contact Us</h2>
+            <p>If you have any questions or would like to learn more about our products and services, please don't hesitate to <a href="{% url 'contact' %}">contact us</a>. We look forward to partnering with you on your journey to a sustainable energy future.</p>
+        </div>
+    </div>
+</div>
 {% endblock %}

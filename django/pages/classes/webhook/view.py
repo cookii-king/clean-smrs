@@ -1,13 +1,22 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from ...models import Webhook
 from django.conf import settings
 import stripe
+from ..authentication.view import JWTAuthentication, IsAuthenticated, LoginRequiredMixin, AuthenticationFailed
 
 class WebhookView(APIView):
+    def authenticate_user(self, request):
+        """Authenticate the user using JWT and return the account."""
+        jwt_auth = JWTAuthentication()
+        account, _ = jwt_auth.authenticate(request)
+        if account is None:
+            raise AuthenticationFailed('Authentication failed')
+        return account
     def post(self, request):
         try:
+            # account = self.authenticate_user(request)
             stripe_data = request.body  # Parse raw body data
             sig_header = request.META.get('HTTP_STRIPE_SIGNATURE')
             stripe_endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
@@ -40,6 +49,8 @@ class WebhookView(APIView):
             # Handle signature verification errors
             print(f"Webhook signature verification failed: {str(e)}")
             return Response({"error": "Invalid signature"}, status=400)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             # Handle other exceptions
             print(f"Error processing webhook: {str(e)}")
@@ -47,45 +58,63 @@ class WebhookView(APIView):
         
     def get(self, request):
         try:
+            account = self.authenticate_user(request)
             # Handle GET requests
             return render(request, 'webhook/webhook.html')
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return render(request, 'system/response.html', {'message': f"'GET' Method Failed for WebhookView: {e}", "is_error": True}, status=400)
                     # return Response(data={"error": f"'GET' Method Failed for WebhookView: {e}"}, status=400)
 
     def put(self, request):
         try:
+            account = self.authenticate_user(request)
             # Handle PUT requests
             return Response({"message": "PUT request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'PUT' Method Failed for WebhookView: {e}"}, status=400)
 
     def patch(self, request):
         try:
+            account = self.authenticate_user(request)
             # Handle PATCH requests
             return Response({"message": "PATCH request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'PATCH' Method Failed for WebhookView: {e}"}, status=400)
 
     def delete(self, request):
         try:
+            account = self.authenticate_user(request)
             # Handle DELETE requests
             return Response({"message": "DELETE request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'DELETE' Method Failed for WebhookView: {e}"}, status=400)
 
     def options(self, request, *args, **kwargs):
         try:
+            account = self.authenticate_user(request)
             # Handle OPTIONS requests
             return Response({"message": "OPTIONS request received"}, status=204)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'OPTIONS' Method Failed for WebhookView: {e}"}, status=400)
 
     def head(self, request, *args, **kwargs):
         try:
+            account = self.authenticate_user(request)
             # Handle HEAD requests
             # Since Django automatically handles HEAD, no implementation is required
             # The HEAD response will be the same as GET but without the body
             return Response({"message": "HEAD request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'HEAD' Method Failed for WebhookView: {e}"}, status=400)

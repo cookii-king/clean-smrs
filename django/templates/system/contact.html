@@ -1,3 +1,50 @@
 {% extends 'widgets/base.html' %}
+
+{% block title %}
+Contact Us - CleanSMRs
+{% endblock %}
+
 {% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            <h1>Contact Us</h1>
+            <p>If you have any questions, comments, or would like more information about our products and services, please feel free to reach out to us using the form below. We look forward to hearing from you!</p>
+            
+            <form method="post" action="{% url 'contact' %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="subject" class="form-label">Subject</label>
+                    <input type="text" class="form-control" id="subject" name="subject" required>
+                </div>
+                <div class="mb-3">
+                    <label for="message" class="form-label">Message</label>
+                    <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Send Message</button>
+            </form>
+        </div>
+        <div class="col-md-4">
+            <h2>Our Contact Information</h2>
+            <p><strong>Email:</strong> info@cleansmrs.com</p>
+            <p><strong>Phone:</strong> +1 (123) 456-7890</p>
+            <p><strong>Address:</strong> 123 Clean Energy Way, Sustainable City, SC 12345</p>
+            
+            <h3>Follow Us</h3>
+            <ul class="list-unstyled">
+                <li><a href="#" target="_blank">LinkedIn</a></li>
+                <li><a href="#" target="_blank">Twitter</a></li>
+                <li><a href="#" target="_blank">Facebook</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
 {% endblock %}

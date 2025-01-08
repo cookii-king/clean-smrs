@@ -1,0 +1,64 @@
+{% extends 'widgets/base.html' %}
+
+{% block title %}
+User Guide - CleanSMRs
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>User Guide: CleanSMRs Product</h1>
+            <p>This user guide provides detailed instructions on how to set up, configure, and use your CleanSMRs product. Follow the steps below to get started and make the most of your product.</p>
+            
+            <h2>Table of Contents</h2>
+            <ul>
+                <li><a href="#introduction">Introduction</a></li>
+                <li><a href="#setup">Setup and Installation</a></li>
+                <li><a href="#configuration">Configuration</a></li>
+                <li><a href="#usage">Usage</a></li>
+                <li><a href="#troubleshooting">Troubleshooting</a></li>
+                <li><a href="#support">Support and Resources</a></li>
+            </ul>
+            
+            <h2 id="introduction">Introduction</h2>
+            <p>Welcome to the CleanSMRs family! Our products are designed to provide efficient and sustainable energy solutions. This guide will help you understand the features and benefits of your CleanSMRs product.</p>
+            
+            <h2 id="setup">Setup and Installation</h2>
+            <p>Follow these steps to set up and install your CleanSMRs product:</p>
+            <ol>
+                <li>Unbox the product and ensure all components are included.</li>
+                <li>Connect the device to a power source using the provided cables.</li>
+                <li>Follow the on-screen instructions to complete the initial setup.</li>
+            </ol>
+            
+            <h2 id="configuration">Configuration</h2>
+            <p>Configure your product settings to suit your needs:</p>
+            <ul>
+                <li>Access the settings menu to adjust network preferences.</li>
+                <li>Set up user accounts and permissions.</li>
+                <li>Enable additional features and integrations.</li>
+            </ul>
+            
+            <h2 id="usage">Usage</h2>
+            <p>Learn how to use your CleanSMRs product effectively:</p>
+            <ul>
+                <li>Monitor performance through the dashboard.</li>
+                <li>Schedule regular maintenance checks.</li>
+                <li>Utilize advanced features for enhanced functionality.</li>
+            </ul>
+            
+            <h2 id="troubleshooting">Troubleshooting</h2>
+            <p>If you encounter any issues, refer to the troubleshooting section for solutions:</p>
+            <ul>
+                <li>Common error messages and their meanings.</li>
+                <li>Steps to resolve connectivity issues.</li>
+                <li>Contact support for further assistance.</li>
+            </ul>
+            
+            <h2 id="support">Support and Resources</h2>
+            <p>For additional support, visit our <a href="{% url 'support' %}">Support</a> page or contact our team. You can also explore more resources in the <a href="{% url 'resources' %}">Resources</a> section.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

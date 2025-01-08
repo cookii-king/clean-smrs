@@ -1,0 +1,43 @@
+{% extends 'widgets/base.html' %}
+
+{% block title %}
+Resources - CleanSMRs
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Resources</h1>
+            <p>Welcome to the CleanSMRs Resources page. Here you will find a collection of materials designed to help you better understand and utilize our products and services. Explore our guides, tutorials, and more to get the most out of your experience with CleanSMRs.</p>
+            
+            <h2>User Guides</h2>
+            <p>Our user guides provide detailed instructions on how to set up and use our products:</p>
+            <ul>
+                <li><a href="{% url 'user-guide-smr' %}">Small Modular Reactor User Guide</a></li>
+                <li><a href="{% url 'user-guide-portal' %}">Customer Portal User Guide</a></li>
+            </ul>
+            
+            <h2>Tutorials</h2>
+            <p>Watch our step-by-step tutorials to learn more about our products and services:</p>
+            <ul>
+                <li><a href="{% url 'tutorial-setup' %}">Setting Up Your SMR</a></li>
+                <li><a href="{% url 'tutorial-maintenance' %}">Maintenance Tips and Tricks</a></li>
+            </ul>
+            
+            <h2>Whitepapers</h2>
+            <p>Explore our whitepapers for in-depth insights into the clean energy industry and our innovative solutions:</p>
+            <ul>
+                <li><a href="{% url 'whitepaper-clean-energy' %}">The Future of Clean Energy</a></li>
+                <li><a href="{% url 'whitepaper-smr-technology' %}">Advancements in SMR Technology</a></li>
+            </ul>
+            
+            <h2>FAQs</h2>
+            <p>Find answers to common questions about our products and services in our <a href="{% url 'faqs' %}">Frequently Asked Questions</a> section.</p>
+            
+            <h2>Community Forum</h2>
+            <p>Join our <a href="{% url 'community-forum' %}">Community Forum</a> to connect with other users, share experiences, and get advice from experts.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'widgets/base.html' %}
+
+{% block title %}
+User Guides - CleanSMRs
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>User Guides</h1>
+            <p>Welcome to the CleanSMRs User Guides page. Here you will find a collection of guides designed to help you understand and effectively use our products and services. Click on a guide to learn more.</p>
+            
+            <div class="list-group">
+                <a href="{% url 'user-guide-smr' %}" class="list-group-item list-group-item-action">
+                    <h5 class="mb-1">Small Modular Reactor User Guide</h5>
+                    <p class="mb-1">Comprehensive instructions on setting up and using your Small Modular Reactor.</p>
+                </a>
+                <a href="{% url 'user-guide-portal' %}" class="list-group-item list-group-item-action">
+                    <h5 class="mb-1">Customer Portal User Guide</h5>
+                    <p class="mb-1">Step-by-step guide to navigating and utilizing the features of the Customer Portal.</p>
+                </a>
+                <!-- Add more user guide links as needed -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

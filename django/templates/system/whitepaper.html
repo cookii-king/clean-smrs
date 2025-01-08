@@ -1,0 +1,35 @@
+{% extends 'widgets/base.html' %}
+{% load static %}
+
+{% block title %}
+White Paper - CleanSMRs
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>White Paper: The Future of Clean Energy</h1>
+            <p>This white paper explores the advancements in clean energy technologies and the role of Small Modular Reactors (SMRs) in shaping a sustainable future. It provides insights into the benefits, challenges, and potential of SMRs in the energy landscape.</p>
+            
+            <h2>Overview</h2>
+            <p>As the world moves towards more sustainable energy solutions, the demand for clean and efficient power sources is increasing. This white paper examines how SMRs can meet this demand by offering a reliable and scalable energy solution.</p>
+            
+            <h2>Key Insights</h2>
+            <ul>
+                <li><strong>Environmental Benefits:</strong> SMRs produce minimal greenhouse gas emissions, contributing to a reduction in global carbon footprint.</li>
+                <li><strong>Economic Impact:</strong> The deployment of SMRs can drive economic growth by creating jobs and stimulating investment in the energy sector.</li>
+                <li><strong>Technological Advancements:</strong> Recent innovations in SMR technology have improved safety, efficiency, and cost-effectiveness.</li>
+                <li><strong>Challenges and Opportunities:</strong> The paper discusses the regulatory, financial, and technical challenges facing SMR deployment and the opportunities for overcoming these barriers.</li>
+            </ul>
+            
+            <h2>Conclusion</h2>
+            <p>SMRs represent a promising solution for the future of clean energy. By addressing the challenges and leveraging the opportunities, SMRs can play a crucial role in achieving global sustainability goals.</p>
+            
+            <h2>Download the Full White Paper</h2>
+            <p>To access the complete white paper, please click the link below:</p>
+            <a href="{% static 'documents/whitepaper-clean-energy.pdf' %}" class="btn btn-primary" target="_blank">Download White Paper</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -91,3 +91,5 @@ gunicorn -w 4 -b 0.0.0.0:8000 main:app
 
 sudo chmod +x /home/ubuntu/clean-smrs/utilities/server/setup.bash
 sudo bash /home/ubuntu/clean-smrs/utilities/server/setup.bash
+
+flask --app main.py run --debug

@@ -1,0 +1,52 @@
+{% extends 'widgets/base.html' %}
+
+{% block title %}
+Community Forum - CleanSMRs
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Community Forum</h1>
+            <p>Welcome to the CleanSMRs Community Forum! This is a place for users to connect, share experiences, and discuss topics related to clean energy and our products. Whether you're a new user or a seasoned expert, we encourage you to participate and contribute to the community.</p>
+            
+            <h2>Forum Categories</h2>
+            <div class="list-group mb-4">
+                <a href="#" class="list-group-item list-group-item-action">
+                    <h5 class="mb-1">General Discussion</h5>
+                    <p class="mb-1">Talk about anything related to clean energy and SMRs.</p>
+                </a>
+                <a href="#" class="list-group-item list-group-item-action">
+                    <h5 class="mb-1">Product Support</h5>
+                    <p class="mb-1">Get help and support for CleanSMRs products.</p>
+                </a>
+                <a href="#" class="list-group-item list-group-item-action">
+                    <h5 class="mb-1">Feature Requests</h5>
+                    <p class="mb-1">Suggest new features or improvements for our products.</p>
+                </a>
+                <a href="#" class="list-group-item list-group-item-action">
+                    <h5 class="mb-1">Technical Discussions</h5>
+                    <p class="mb-1">Dive deep into technical topics and share your expertise.</p>
+                </a>
+            </div>
+            
+            <h2>Recent Topics</h2>
+            <ul class="list-group mb-4">
+                <li class="list-group-item">
+                    <a href="#">How to optimize SMR performance?</a> - Posted by User123
+                </li>
+                <li class="list-group-item">
+                    <a href="#">Upcoming features in the next product update</a> - Posted by Admin
+                </li>
+                <li class="list-group-item">
+                    <a href="#">Best practices for maintaining your SMR</a> - Posted by EnergyExpert
+                </li>
+            </ul>
+            
+            <h2>Join the Conversation</h2>
+            <p>To participate in the forum, please <a href="{% url 'register' %}">register</a> for an account or <a href="{% url 'login' %}">log in</a> if you already have one. We look forward to your contributions!</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -15,10 +15,11 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'plans-and-pricing' %}">Plans & Pricing</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'cart' %}">Cart</a>
-                </li>
+
                 {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'cart' %}">Cart</a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'account' %}">Account</a>
                     </li>

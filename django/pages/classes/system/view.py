@@ -1,178 +1,262 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from ...models import Plan, Subscription
+from ..authentication.view import JWTAuthentication, IsAuthenticated, LoginRequiredMixin, AuthenticationFailed
+
 
 class IndexView(APIView):
+    def authenticate_user(self, request):
+        """Authenticate the user using JWT and return the account."""
+        jwt_auth = JWTAuthentication()
+        account, _ = jwt_auth.authenticate(request)
+        if account is None:
+            raise AuthenticationFailed('Authentication failed')
+        return account
     def post(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle POST requests
             return Response({"message": "POST request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'POST' Method Failed for IndexView: {e}"}, status=400)
 
     def get(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle GET requests
             return render(request, 'system/index.html')
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return render(request, 'system/response.html', {'message': f"'GET' Method Failed for IndexView: {e}", "is_error": True}, status=400)
                     # return Response(data={"error": f"'GET' Method Failed for IndexView: {e}"}, status=400)
 
     def put(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle PUT requests
             return Response({"message": "PUT request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'PUT' Method Failed for IndexView: {e}"}, status=400)
 
     def patch(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle PATCH requests
             return Response({"message": "PATCH request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'PATCH' Method Failed for IndexView: {e}"}, status=400)
 
     def delete(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle DELETE requests
             return Response({"message": "DELETE request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'DELETE' Method Failed for IndexView: {e}"}, status=400)
 
     def options(self, request, *args, **kwargs):
         try:
+            # account = self.authenticate_user(request)
             # Handle OPTIONS requests
             return Response({"message": "OPTIONS request received"}, status=204)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'OPTIONS' Method Failed for IndexView: {e}"}, status=400)
 
     def head(self, request, *args, **kwargs):
         try:
+            # account = self.authenticate_user(request)
             # Handle HEAD requests
             # Since Django automatically handles HEAD, no implementation is required
             # The HEAD response will be the same as GET but without the body
             return Response({"message": "HEAD request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'HEAD' Method Failed for IndexView: {e}"}, status=400)
 
 class Error404View(APIView):
+    def authenticate_user(self, request):
+        """Authenticate the user using JWT and return the account."""
+        jwt_auth = JWTAuthentication()
+        account, _ = jwt_auth.authenticate(request)
+        if account is None:
+            raise AuthenticationFailed('Authentication failed')
+        return account
     def post(self, request, dummy=None, *args, **kwargs):
         try:
+            # account = self.authenticate_user(request)
             # Handle POST requests
             return render(request, 'system/404.html')
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'POST' Method Failed for Error404View: {e}"}, status=400)
 
     def get(self, request, dummy=None, *args, **kwargs):
         try:
+            # account = self.authenticate_user(request)
             # Handle GET requests
             return render(request, 'system/404.html')
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return render(request, 'system/response.html', {'message': f"'GET' Method Failed for Error404View: {e}", "is_error": True}, status=400)
                     # return Response(data={"error": f"'GET' Method Failed for Error404View: {e}"}, status=400)
 
     def put(self, request, dummy=None, *args, **kwargs):
         try:
+            # account = self.authenticate_user(request)
             # Handle PUT requests
             return render(request, 'system/404.html')
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'PUT' Method Failed for Error404View: {e}"}, status=400)
 
     def patch(self, request, dummy=None, *args, **kwargs):
         try:
+            # account = self.authenticate_user(request)
             # Handle PATCH requests
             return render(request, 'system/404.html')
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'PATCH' Method Failed for Error404View: {e}"}, status=400)
 
     def delete(self, request, dummy=None, *args, **kwargs):
         try:
+            # account = self.authenticate_user(request)
             # Handle DELETE requests
             return render(request, 'system/404.html')
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'DELETE' Method Failed for Error404View: {e}"}, status=400)
 
     def options(self, request, dummy=None, *args, **kwargs):
         try:
+            # account = self.authenticate_user(request)
             # Handle OPTIONS requests
             return render(request, 'system/404.html')
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'OPTIONS' Method Failed for Error404View: {e}"}, status=400)
 
     def head(self, request, dummy=None, *args, **kwargs):
         try:
+            # account = self.authenticate_user(request)
             # Handle HEAD requests
             # Since Django automatically handles HEAD, no implementation is required
             # The HEAD response will be the same as GET but without the body
             return render(request, 'system/404.html')
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'HEAD' Method Failed for Error404View: {e}"}, status=400)
 
 class ResponseView(APIView):
+    def authenticate_user(self, request):
+        """Authenticate the user using JWT and return the account."""
+        jwt_auth = JWTAuthentication()
+        account, _ = jwt_auth.authenticate(request)
+        if account is None:
+            raise AuthenticationFailed('Authentication failed')
+        return account
     def post(self, request, dummy=None, *args, **kwargs):
         try:
+            # account = self.authenticate_user(request)
             # Extract the message and type from the request data
             message = request.data.get("message", "Operation completed.")
             is_error = request.data.get("is_error", False)
             # Render the response page
             return render(request, 'system/response.html', {'message': message, 'is_error': is_error})
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'POST' Method Failed for ResponseView: {e}"}, status=400)
 
     def get(self, request, dummy=None, *args, **kwargs):
         try:
+            # account = self.authenticate_user(request)
             # Extract the message and type from the request data
             message = request.data.get("message", "Operation completed.")
             is_error = request.data.get("is_error", False)
             # Render the response page
             return render(request, 'system/response.html', {'message': message, 'is_error': is_error})
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return render(request, 'system/response.html', {'message': f"'GET' Method Failed for ResponseView: {e}", "is_error": True}, status=400)
                     # return Response(data={"error": f"'GET' Method Failed for ResponseView: {e}"}, status=400)
 
     def put(self, request, dummy=None, *args, **kwargs):
         try:
+            # account = self.authenticate_user(request)
             # Extract the message and type from the request data
             message = request.data.get("message", "Operation completed.")
             is_error = request.data.get("is_error", False)
             # Render the response page
             return render(request, 'system/response.html', {'message': message, 'is_error': is_error})
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'PUT' Method Failed for ResponseView: {e}"}, status=400)
 
     def patch(self, request, dummy=None, *args, **kwargs):
         try:
+            # account = self.authenticate_user(request)
             # Extract the message and type from the request data
             message = request.data.get("message", "Operation completed.")
             is_error = request.data.get("is_error", False)
             # Render the response page
             return render(request, 'system/response.html', {'message': message, 'is_error': is_error})
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'PATCH' Method Failed for ResponseView: {e}"}, status=400)
 
     def delete(self, request, dummy=None, *args, **kwargs):
         try:
+            # account = self.authenticate_user(request)
             # Extract the message and type from the request data
             message = request.data.get("message", "Operation completed.")
             is_error = request.data.get("is_error", False)
             # Render the response page
             return render(request, 'system/response.html', {'message': message, 'is_error': is_error})
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'DELETE' Method Failed for ResponseView: {e}"}, status=400)
 
     def options(self, request, dummy=None, *args, **kwargs):
         try:
+            # account = self.authenticate_user(request)
             # Extract the message and type from the request data
             message = request.data.get("message", "Operation completed.")
             is_error = request.data.get("is_error", False)
             # Render the response page
             return render(request, 'system/response.html', {'message': message, 'is_error': is_error})
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'OPTIONS' Method Failed for ResponseView: {e}"}, status=400)
 
     def head(self, request, dummy=None, *args, **kwargs):
         try:
+            # account = self.authenticate_user(request)
             # Handle HEAD requests
             # Since Django automatically handles HEAD, no implementation is required
             # The HEAD response will be the same as GET but without the body
@@ -181,287 +265,440 @@ class ResponseView(APIView):
             is_error = request.data.get("is_error", False)
             # Render the response page
             return render(request, 'system/response.html', {'message': message, 'is_error': is_error})
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'HEAD' Method Failed for ResponseView: {e}"}, status=400)
 
 
 class AboutView(APIView):
+    def authenticate_user(self, request):
+        """Authenticate the user using JWT and return the account."""
+        jwt_auth = JWTAuthentication()
+        account, _ = jwt_auth.authenticate(request)
+        if account is None:
+            raise AuthenticationFailed('Authentication failed')
+        return account
     def post(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle POST requests
             return Response({"message": "POST request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'POST' Method Failed for AboutView: {e}"}, status=400)
 
     def get(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle GET requests
             return render(request, 'system/about.html')
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return render(request, 'system/response.html', {'message': f"'GET' Method Failed for AboutView: {e}", "is_error": True}, status=400)
                     # return Response(data={"error": f"'GET' Method Failed for AboutView: {e}"}, status=400)
 
     def put(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle PUT requests
             return Response({"message": "PUT request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'PUT' Method Failed for AboutView: {e}"}, status=400)
 
     def patch(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle PATCH requests
             return Response({"message": "PATCH request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'PATCH' Method Failed for AboutView: {e}"}, status=400)
 
     def delete(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle DELETE requests
             return Response({"message": "DELETE request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'DELETE' Method Failed for AboutView: {e}"}, status=400)
 
     def options(self, request, *args, **kwargs):
         try:
+            # account = self.authenticate_user(request)
             # Handle OPTIONS requests
             return Response({"message": "OPTIONS request received"}, status=204)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'OPTIONS' Method Failed for AboutView: {e}"}, status=400)
 
     def head(self, request, *args, **kwargs):
         try:
+            # account = self.authenticate_user(request)
             # Handle HEAD requests
             # Since Django automatically handles HEAD, no implementation is required
             # The HEAD response will be the same as GET but without the body
             return Response({"message": "HEAD request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'HEAD' Method Failed for AboutView: {e}"}, status=400)
 
 class ContactView(APIView):
+    def authenticate_user(self, request):
+        """Authenticate the user using JWT and return the account."""
+        jwt_auth = JWTAuthentication()
+        account, _ = jwt_auth.authenticate(request)
+        if account is None:
+            raise AuthenticationFailed('Authentication failed')
+        return account
     def post(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle POST requests
             return Response({"message": "POST request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'POST' Method Failed for ContactView: {e}"}, status=400)
 
     def get(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle GET requests
             return render(request, 'system/contact.html')
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return render(request, 'system/response.html', {'message': f"'GET' Method Failed for ContactView: {e}", "is_error": True}, status=400)
                     # return Response(data={"error": f"'GET' Method Failed for ContactView: {e}"}, status=400)
 
     def put(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle PUT requests
             return Response({"message": "PUT request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'PUT' Method Failed for ContactView: {e}"}, status=400)
 
     def patch(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle PATCH requests
             return Response({"message": "PATCH request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'PATCH' Method Failed for ContactView: {e}"}, status=400)
 
     def delete(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle DELETE requests
             return Response({"message": "DELETE request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'DELETE' Method Failed for ContactView: {e}"}, status=400)
 
     def options(self, request, *args, **kwargs):
         try:
+            # account = self.authenticate_user(request)
             # Handle OPTIONS requests
             return Response({"message": "OPTIONS request received"}, status=204)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'OPTIONS' Method Failed for ContactView: {e}"}, status=400)
 
     def head(self, request, *args, **kwargs):
         try:
+            # account = self.authenticate_user(request)
             # Handle HEAD requests
             # Since Django automatically handles HEAD, no implementation is required
             # The HEAD response will be the same as GET but without the body
             return Response({"message": "HEAD request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'HEAD' Method Failed for ContactView: {e}"}, status=400)
 
 class SupportView(APIView):
+    def authenticate_user(self, request):
+        """Authenticate the user using JWT and return the account."""
+        jwt_auth = JWTAuthentication()
+        account, _ = jwt_auth.authenticate(request)
+        if account is None:
+            raise AuthenticationFailed('Authentication failed')
+        return account
     def post(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle POST requests
             return Response({"message": "POST request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'POST' Method Failed for SupportView: {e}"}, status=400)
 
     def get(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle GET requests
             return render(request, 'system/support.html')
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return render(request, 'system/response.html', {'message': f"'GET' Method Failed for SupportView: {e}", "is_error": True}, status=400)
                     # return Response(data={"error": f"'GET' Method Failed for SupportView: {e}"}, status=400)
 
     def put(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle PUT requests
             return Response({"message": "PUT request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'PUT' Method Failed for SupportView: {e}"}, status=400)
 
     def patch(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle PATCH requests
             return Response({"message": "PATCH request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'PATCH' Method Failed for SupportView: {e}"}, status=400)
 
     def delete(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle DELETE requests
             return Response({"message": "DELETE request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'DELETE' Method Failed for SupportView: {e}"}, status=400)
 
     def options(self, request, *args, **kwargs):
         try:
+            # account = self.authenticate_user(request)
             # Handle OPTIONS requests
             return Response({"message": "OPTIONS request received"}, status=204)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'OPTIONS' Method Failed for SupportView: {e}"}, status=400)
 
     def head(self, request, *args, **kwargs):
         try:
+            # account = self.authenticate_user(request)
             # Handle HEAD requests
             # Since Django automatically handles HEAD, no implementation is required
             # The HEAD response will be the same as GET but without the body
             return Response({"message": "HEAD request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'HEAD' Method Failed for SupportView: {e}"}, status=400)
 
 class TermsOfServiceView(APIView):
+    def authenticate_user(self, request):
+        """Authenticate the user using JWT and return the account."""
+        jwt_auth = JWTAuthentication()
+        account, _ = jwt_auth.authenticate(request)
+        if account is None:
+            raise AuthenticationFailed('Authentication failed')
+        return account
     def post(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle POST requests
             return Response({"message": "POST request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'POST' Method Failed for TermsOfServiceView: {e}"}, status=400)
 
     def get(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle GET requests
             return render(request, 'system/terms-of-service.html')
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return render(request, 'system/response.html', {'message': f"'GET' Method Failed for TermsOfServiceView: {e}", "is_error": True}, status=400)
                     # return Response(data={"error": f"'GET' Method Failed for TermsOfServiceView: {e}"}, status=400)
 
     def put(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle PUT requests
             return Response({"message": "PUT request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'PUT' Method Failed for TermsOfServiceView: {e}"}, status=400)
 
     def patch(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle PATCH requests
             return Response({"message": "PATCH request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'PATCH' Method Failed for TermsOfServiceView: {e}"}, status=400)
 
     def delete(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle DELETE requests
             return Response({"message": "DELETE request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'DELETE' Method Failed for TermsOfServiceView: {e}"}, status=400)
 
     def options(self, request, *args, **kwargs):
         try:
+            # account = self.authenticate_user(request)
             # Handle OPTIONS requests
             return Response({"message": "OPTIONS request received"}, status=204)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'OPTIONS' Method Failed for TermsOfServiceView: {e}"}, status=400)
 
     def head(self, request, *args, **kwargs):
         try:
+            # account = self.authenticate_user(request)
             # Handle HEAD requests
             # Since Django automatically handles HEAD, no implementation is required
             # The HEAD response will be the same as GET but without the body
             return Response({"message": "HEAD request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'HEAD' Method Failed for TermsOfServiceView: {e}"}, status=400)
 
 
 class PrivacyPolicyView(APIView):
+    def authenticate_user(self, request):
+        """Authenticate the user using JWT and return the account."""
+        jwt_auth = JWTAuthentication()
+        account, _ = jwt_auth.authenticate(request)
+        if account is None:
+            raise AuthenticationFailed('Authentication failed')
+        return account
     def post(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle POST requests
             return Response({"message": "POST request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'POST' Method Failed for PrivacyPolicyView: {e}"}, status=400)
 
     def get(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle GET requests
             return render(request, 'system/privacy-policy.html')
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return render(request, 'system/response.html', {'message': f"'GET' Method Failed for PrivacyPolicyView: {e}", "is_error": True}, status=400)
                     # return Response(data={"error": f"'GET' Method Failed for PrivacyPolicyView: {e}"}, status=400)
 
     def put(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle PUT requests
             return Response({"message": "PUT request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'PUT' Method Failed for PrivacyPolicyView: {e}"}, status=400)
 
     def patch(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle PATCH requests
             return Response({"message": "PATCH request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'PATCH' Method Failed for PrivacyPolicyView: {e}"}, status=400)
 
     def delete(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle DELETE requests
             return Response({"message": "DELETE request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'DELETE' Method Failed for PrivacyPolicyView: {e}"}, status=400)
 
     def options(self, request, *args, **kwargs):
         try:
+            # account = self.authenticate_user(request)
             # Handle OPTIONS requests
             return Response({"message": "OPTIONS request received"}, status=204)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'OPTIONS' Method Failed for PrivacyPolicyView: {e}"}, status=400)
 
     def head(self, request, *args, **kwargs):
         try:
+            # account = self.authenticate_user(request)
             # Handle HEAD requests
             # Since Django automatically handles HEAD, no implementation is required
             # The HEAD response will be the same as GET but without the body
             return Response({"message": "HEAD request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'HEAD' Method Failed for PrivacyPolicyView: {e}"}, status=400)
 
 
 class PlansAndPricingView(APIView):
+    def authenticate_user(self, request):
+        """Authenticate the user using JWT and return the account."""
+        jwt_auth = JWTAuthentication()
+        account, _ = jwt_auth.authenticate(request)
+        if account is None:
+            raise AuthenticationFailed('Authentication failed')
+        return account
     def post(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle POST requests
             return Response({"message": "POST request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'POST' Method Failed for PlansAndPricingView: {e}"}, status=400)
 
     # def get(self, request):
     #     try:
+    # account = self.authenticate_user(request)
     #         # Handle GET requests
     #         account = request.user
     #         subscriptions = Subscription.objects.filter(customer=account.stripe_customer_id).all()
@@ -487,11 +724,14 @@ class PlansAndPricingView(APIView):
     #             'monthly_plans_subscription_counts': monthly_plans_subscription_counts,
     #             'yearly_plans_subscription_counts': yearly_plans_subscription_counts,
     #         })
-    #     except Exception as e:
+    # except AuthenticationFailed as e:
+            # return redirect('login')    
+    # except Exception as e:
     #                 return Response(data={"error": f"'GET' Method Failed for PlansAndPricingView: {e}"}, status=400)
 
     def get(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Fetch plans available for all users
             monthly_plans = Plan.objects.filter(interval='month').all()
             yearly_plans = Plan.objects.filter(interval='year').all()
@@ -533,6 +773,8 @@ class PlansAndPricingView(APIView):
                 'yearly_plans_subscription_data': yearly_plans_subscription_data,
                 'active_subscription': active_subscription,
             })
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return render(request, 'system/response.html', {
                 'message': f"'GET' Method Failed for PlansAndPricingView: {e}",
@@ -541,6 +783,7 @@ class PlansAndPricingView(APIView):
 
     # def get(self, request):
     #     try:
+    # account = self.authenticate_user(request)
     #         account = request.user
     #         if account != None:
     #             subscriptions = Subscription.objects.filter(customer=account.stripe_customer_id).all()
@@ -576,43 +819,789 @@ class PlansAndPricingView(APIView):
     #             'yearly_plans_subscription_data': yearly_plans_subscription_data,
     #             'active_subscription': active_subscription,
     #         })
-    #     except Exception as e:
+    # except AuthenticationFailed as e:
+            # return redirect('login')    
+    # except Exception as e:
     #         return render(request, 'system/response.html', {'message': f"'GET' Method Failed for PlansAndPricingView: {e}", "is_error": True}, status=400)
     #         # return Response(data={"error": f"'GET' Method Failed for PlansAndPricingView: {e}"}, status=400)
 
     def put(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle PUT requests
             return Response({"message": "PUT request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'PUT' Method Failed for PlansAndPricingView: {e}"}, status=400)
 
     def patch(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle PATCH requests
             return Response({"message": "PATCH request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'PATCH' Method Failed for PlansAndPricingView: {e}"}, status=400)
 
     def delete(self, request):
         try:
+            # account = self.authenticate_user(request)
             # Handle DELETE requests
             return Response({"message": "DELETE request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'DELETE' Method Failed for PlansAndPricingView: {e}"}, status=400)
 
     def options(self, request, *args, **kwargs):
         try:
+            # account = self.authenticate_user(request)
             # Handle OPTIONS requests
             return Response({"message": "OPTIONS request received"}, status=204)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'OPTIONS' Method Failed for PlansAndPricingView: {e}"}, status=400)
 
     def head(self, request, *args, **kwargs):
         try:
+            # account = self.authenticate_user(request)
             # Handle HEAD requests
             # Since Django automatically handles HEAD, no implementation is required
             # The HEAD response will be the same as GET but without the body
             return Response({"message": "HEAD request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'HEAD' Method Failed for PlansAndPricingView: {e}"}, status=400)
+
+class ResourcesView(APIView):
+    def authenticate_user(self, request):
+        """Authenticate the user using JWT and return the account."""
+        jwt_auth = JWTAuthentication()
+        account, _ = jwt_auth.authenticate(request)
+        if account is None:
+            raise AuthenticationFailed('Authentication failed')
+        return account
+    def post(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle POST requests
+            return Response({"message": "POST request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'POST' Method Failed for ResourcesView: {e}"}, status=400)
+
+    def get(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle GET requests
+            return render(request, 'system/resources.html')
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for ResourcesView: {e}", "is_error": True}, status=400)
+                    # return Response(data={"error": f"'GET' Method Failed for ResourcesView: {e}"}, status=400)
+
+    def put(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle PUT requests
+            return Response({"message": "PUT request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'PUT' Method Failed for ResourcesView: {e}"}, status=400)
+
+    def patch(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle PATCH requests
+            return Response({"message": "PATCH request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'PATCH' Method Failed for ResourcesView: {e}"}, status=400)
+
+    def delete(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle DELETE requests
+            return Response({"message": "DELETE request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'DELETE' Method Failed for ResourcesView: {e}"}, status=400)
+
+    def options(self, request, *args, **kwargs):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle OPTIONS requests
+            return Response({"message": "OPTIONS request received"}, status=204)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'OPTIONS' Method Failed for ResourcesView: {e}"}, status=400)
+
+    def head(self, request, *args, **kwargs):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle HEAD requests
+            # Since Django automatically handles HEAD, no implementation is required
+            # The HEAD response will be the same as GET but without the body
+            return Response({"message": "HEAD request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'HEAD' Method Failed for ResourcesView: {e}"}, status=400)
+
+class UserGuidesView(APIView):
+    def authenticate_user(self, request):
+        """Authenticate the user using JWT and return the account."""
+        jwt_auth = JWTAuthentication()
+        account, _ = jwt_auth.authenticate(request)
+        if account is None:
+            raise AuthenticationFailed('Authentication failed')
+        return account
+    def post(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle POST requests
+            return Response({"message": "POST request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'POST' Method Failed for UserGuidesView: {e}"}, status=400)
+
+    def get(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle GET requests
+            return render(request, 'system/user-guides.html')
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for UserGuidesView: {e}", "is_error": True}, status=400)
+                    # return Response(data={"error": f"'GET' Method Failed for UserGuidesView: {e}"}, status=400)
+
+    def put(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle PUT requests
+            return Response({"message": "PUT request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'PUT' Method Failed for UserGuidesView: {e}"}, status=400)
+
+    def patch(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle PATCH requests
+            return Response({"message": "PATCH request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'PATCH' Method Failed for UserGuidesView: {e}"}, status=400)
+
+    def delete(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle DELETE requests
+            return Response({"message": "DELETE request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'DELETE' Method Failed for UserGuidesView: {e}"}, status=400)
+
+    def options(self, request, *args, **kwargs):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle OPTIONS requests
+            return Response({"message": "OPTIONS request received"}, status=204)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'OPTIONS' Method Failed for UserGuidesView: {e}"}, status=400)
+
+    def head(self, request, *args, **kwargs):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle HEAD requests
+            # Since Django automatically handles HEAD, no implementation is required
+            # The HEAD response will be the same as GET but without the body
+            return Response({"message": "HEAD request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'HEAD' Method Failed for UserGuidesView: {e}"}, status=400)
+
+class TutorialsView(APIView):
+    def authenticate_user(self, request):
+        """Authenticate the user using JWT and return the account."""
+        jwt_auth = JWTAuthentication()
+        account, _ = jwt_auth.authenticate(request)
+        if account is None:
+            raise AuthenticationFailed('Authentication failed')
+        return account
+    def post(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle POST requests
+            return Response({"message": "POST request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'POST' Method Failed for TutorialsView: {e}"}, status=400)
+
+    def get(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle GET requests
+            return render(request, 'system/tutorials.html')
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for TutorialsView: {e}", "is_error": True}, status=400)
+                    # return Response(data={"error": f"'GET' Method Failed for TutorialsView: {e}"}, status=400)
+
+    def put(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle PUT requests
+            return Response({"message": "PUT request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'PUT' Method Failed for TutorialsView: {e}"}, status=400)
+
+    def patch(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle PATCH requests
+            return Response({"message": "PATCH request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'PATCH' Method Failed for TutorialsView: {e}"}, status=400)
+
+    def delete(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle DELETE requests
+            return Response({"message": "DELETE request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'DELETE' Method Failed for TutorialsView: {e}"}, status=400)
+
+    def options(self, request, *args, **kwargs):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle OPTIONS requests
+            return Response({"message": "OPTIONS request received"}, status=204)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'OPTIONS' Method Failed for TutorialsView: {e}"}, status=400)
+
+    def head(self, request, *args, **kwargs):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle HEAD requests
+            # Since Django automatically handles HEAD, no implementation is required
+            # The HEAD response will be the same as GET but without the body
+            return Response({"message": "HEAD request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'HEAD' Method Failed for TutorialsView: {e}"}, status=400)
+
+class CommunityForumView(APIView):
+    def authenticate_user(self, request):
+        """Authenticate the user using JWT and return the account."""
+        jwt_auth = JWTAuthentication()
+        account, _ = jwt_auth.authenticate(request)
+        if account is None:
+            raise AuthenticationFailed('Authentication failed')
+        return account
+    def post(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle POST requests
+            return Response({"message": "POST request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'POST' Method Failed for CommunityForumView: {e}"}, status=400)
+
+    def get(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle GET requests
+            return render(request, 'system/community-forum.html')
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for CommunityForumView: {e}", "is_error": True}, status=400)
+                    # return Response(data={"error": f"'GET' Method Failed for CommunityForumView: {e}"}, status=400)
+
+    def put(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle PUT requests
+            return Response({"message": "PUT request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'PUT' Method Failed for CommunityForumView: {e}"}, status=400)
+
+    def patch(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle PATCH requests
+            return Response({"message": "PATCH request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'PATCH' Method Failed for CommunityForumView: {e}"}, status=400)
+
+    def delete(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle DELETE requests
+            return Response({"message": "DELETE request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'DELETE' Method Failed for CommunityForumView: {e}"}, status=400)
+
+    def options(self, request, *args, **kwargs):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle OPTIONS requests
+            return Response({"message": "OPTIONS request received"}, status=204)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'OPTIONS' Method Failed for CommunityForumView: {e}"}, status=400)
+
+    def head(self, request, *args, **kwargs):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle HEAD requests
+            # Since Django automatically handles HEAD, no implementation is required
+            # The HEAD response will be the same as GET but without the body
+            return Response({"message": "HEAD request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'HEAD' Method Failed for CommunityForumView: {e}"}, status=400)
+
+class SupportTicketView(APIView):
+    def authenticate_user(self, request):
+        """Authenticate the user using JWT and return the account."""
+        jwt_auth = JWTAuthentication()
+        account, _ = jwt_auth.authenticate(request)
+        if account is None:
+            raise AuthenticationFailed('Authentication failed')
+        return account
+    def post(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle POST requests
+            return Response({"message": "POST request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'POST' Method Failed for SupportTicketView: {e}"}, status=400)
+
+    def get(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle GET requests
+            return render(request, 'system/support-ticket.html')
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for SupportTicketView: {e}", "is_error": True}, status=400)
+                    # return Response(data={"error": f"'GET' Method Failed for SupportTicketView: {e}"}, status=400)
+
+    def put(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle PUT requests
+            return Response({"message": "PUT request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'PUT' Method Failed for SupportTicketView: {e}"}, status=400)
+
+    def patch(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle PATCH requests
+            return Response({"message": "PATCH request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'PATCH' Method Failed for SupportTicketView: {e}"}, status=400)
+
+    def delete(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle DELETE requests
+            return Response({"message": "DELETE request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'DELETE' Method Failed for SupportTicketView: {e}"}, status=400)
+
+    def options(self, request, *args, **kwargs):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle OPTIONS requests
+            return Response({"message": "OPTIONS request received"}, status=204)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'OPTIONS' Method Failed for SupportTicketView: {e}"}, status=400)
+
+    def head(self, request, *args, **kwargs):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle HEAD requests
+            # Since Django automatically handles HEAD, no implementation is required
+            # The HEAD response will be the same as GET but without the body
+            return Response({"message": "HEAD request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'HEAD' Method Failed for SupportTicketView: {e}"}, status=400)
+
+class TutorialView(APIView):
+    def authenticate_user(self, request):
+        """Authenticate the user using JWT and return the account."""
+        jwt_auth = JWTAuthentication()
+        account, _ = jwt_auth.authenticate(request)
+        if account is None:
+            raise AuthenticationFailed('Authentication failed')
+        return account
+    def post(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle POST requests
+            return Response({"message": "POST request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'POST' Method Failed for TutorialView: {e}"}, status=400)
+
+    def get(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle GET requests
+            return render(request, 'system/tutorial.html')
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for TutorialView: {e}", "is_error": True}, status=400)
+                    # return Response(data={"error": f"'GET' Method Failed for TutorialView: {e}"}, status=400)
+
+    def put(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle PUT requests
+            return Response({"message": "PUT request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'PUT' Method Failed for TutorialView: {e}"}, status=400)
+
+    def patch(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle PATCH requests
+            return Response({"message": "PATCH request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'PATCH' Method Failed for TutorialView: {e}"}, status=400)
+
+    def delete(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle DELETE requests
+            return Response({"message": "DELETE request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'DELETE' Method Failed for TutorialView: {e}"}, status=400)
+
+    def options(self, request, *args, **kwargs):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle OPTIONS requests
+            return Response({"message": "OPTIONS request received"}, status=204)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'OPTIONS' Method Failed for TutorialView: {e}"}, status=400)
+
+    def head(self, request, *args, **kwargs):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle HEAD requests
+            # Since Django automatically handles HEAD, no implementation is required
+            # The HEAD response will be the same as GET but without the body
+            return Response({"message": "HEAD request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'HEAD' Method Failed for TutorialView: {e}"}, status=400)
+
+class WhitePaperView(APIView):
+    def authenticate_user(self, request):
+        """Authenticate the user using JWT and return the account."""
+        jwt_auth = JWTAuthentication()
+        account, _ = jwt_auth.authenticate(request)
+        if account is None:
+            raise AuthenticationFailed('Authentication failed')
+        return account
+    def post(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle POST requests
+            return Response({"message": "POST request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'POST' Method Failed for WhitePaperView: {e}"}, status=400)
+
+    def get(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle GET requests
+            return render(request, 'system/whitepaper.html')
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for WhitePaperView: {e}", "is_error": True}, status=400)
+                    # return Response(data={"error": f"'GET' Method Failed for WhitePaperView: {e}"}, status=400)
+
+    def put(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle PUT requests
+            return Response({"message": "PUT request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'PUT' Method Failed for WhitePaperView: {e}"}, status=400)
+
+    def patch(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle PATCH requests
+            return Response({"message": "PATCH request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'PATCH' Method Failed for WhitePaperView: {e}"}, status=400)
+
+    def delete(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle DELETE requests
+            return Response({"message": "DELETE request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'DELETE' Method Failed for WhitePaperView: {e}"}, status=400)
+
+    def options(self, request, *args, **kwargs):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle OPTIONS requests
+            return Response({"message": "OPTIONS request received"}, status=204)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'OPTIONS' Method Failed for WhitePaperView: {e}"}, status=400)
+
+    def head(self, request, *args, **kwargs):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle HEAD requests
+            # Since Django automatically handles HEAD, no implementation is required
+            # The HEAD response will be the same as GET but without the body
+            return Response({"message": "HEAD request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'HEAD' Method Failed for WhitePaperView: {e}"}, status=400)
+
+class UserGuideView(APIView):
+    def authenticate_user(self, request):
+        """Authenticate the user using JWT and return the account."""
+        jwt_auth = JWTAuthentication()
+        account, _ = jwt_auth.authenticate(request)
+        if account is None:
+            raise AuthenticationFailed('Authentication failed')
+        return account
+    def post(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle POST requests
+            return Response({"message": "POST request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'POST' Method Failed for UserGuideView: {e}"}, status=400)
+
+    def get(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle GET requests
+            return render(request, 'system/user-guide.html')
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for UserGuideView: {e}", "is_error": True}, status=400)
+                    # return Response(data={"error": f"'GET' Method Failed for UserGuideView: {e}"}, status=400)
+
+    def put(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle PUT requests
+            return Response({"message": "PUT request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'PUT' Method Failed for UserGuideView: {e}"}, status=400)
+
+    def patch(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle PATCH requests
+            return Response({"message": "PATCH request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'PATCH' Method Failed for UserGuideView: {e}"}, status=400)
+
+    def delete(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle DELETE requests
+            return Response({"message": "DELETE request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'DELETE' Method Failed for UserGuideView: {e}"}, status=400)
+
+    def options(self, request, *args, **kwargs):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle OPTIONS requests
+            return Response({"message": "OPTIONS request received"}, status=204)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'OPTIONS' Method Failed for UserGuideView: {e}"}, status=400)
+
+    def head(self, request, *args, **kwargs):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle HEAD requests
+            # Since Django automatically handles HEAD, no implementation is required
+            # The HEAD response will be the same as GET but without the body
+            return Response({"message": "HEAD request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'HEAD' Method Failed for UserGuideView: {e}"}, status=400)
+
+class FAQsView(APIView):
+    def authenticate_user(self, request):
+        """Authenticate the user using JWT and return the account."""
+        jwt_auth = JWTAuthentication()
+        account, _ = jwt_auth.authenticate(request)
+        if account is None:
+            raise AuthenticationFailed('Authentication failed')
+        return account
+    def post(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle POST requests
+            return Response({"message": "POST request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'POST' Method Failed for FAQsView: {e}"}, status=400)
+
+    def get(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle GET requests
+            return render(request, 'system/faqs.html')
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for FAQsView: {e}", "is_error": True}, status=400)
+                    # return Response(data={"error": f"'GET' Method Failed for FAQsView: {e}"}, status=400)
+
+    def put(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle PUT requests
+            return Response({"message": "PUT request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'PUT' Method Failed for FAQsView: {e}"}, status=400)
+
+    def patch(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle PATCH requests
+            return Response({"message": "PATCH request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'PATCH' Method Failed for FAQsView: {e}"}, status=400)
+
+    def delete(self, request):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle DELETE requests
+            return Response({"message": "DELETE request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'DELETE' Method Failed for FAQsView: {e}"}, status=400)
+
+    def options(self, request, *args, **kwargs):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle OPTIONS requests
+            return Response({"message": "OPTIONS request received"}, status=204)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'OPTIONS' Method Failed for FAQsView: {e}"}, status=400)
+
+    def head(self, request, *args, **kwargs):
+        try:
+            # account = self.authenticate_user(request)
+            # Handle HEAD requests
+            # Since Django automatically handles HEAD, no implementation is required
+            # The HEAD response will be the same as GET but without the body
+            return Response({"message": "HEAD request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
+        except Exception as e:
+            return Response(data={"error": f"'HEAD' Method Failed for FAQsView: {e}"}, status=400)

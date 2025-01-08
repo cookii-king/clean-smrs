@@ -23,6 +23,7 @@ class Account(AbstractUser):
     email_confirmation_secret = models.CharField(max_length=16, blank=True, null=True)
     email_confirmed = models.BooleanField(default=False)
     mfa_secret = models.CharField(max_length=16, blank=True, null=True)
+    mfa_confirmed = models.BooleanField(default=False)
     mfa_enabled = models.BooleanField(default=False)
     password = models.CharField(max_length=255)
     stripe_customer_id = models.CharField(max_length=255, blank=True, unique=True, null=True)
@@ -67,6 +68,16 @@ class Account(AbstractUser):
     def validate_email_confirmed(self):
         """Marks the email as confirmed."""
         self.email_confirmed = True
+        self.save()
+    
+    def validate_mfa_confirmed(self):
+        """Marks the mfa as confirmed."""
+        self.mfa_confirmed = True
+        self.save()
+
+    def validate_mfa_unconfirmed(self):
+        """Marks the mfa as confirmed."""
+        self.mfa_confirmed = False
         self.save()
 
     def validate_mfa_enabled(self):

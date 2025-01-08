@@ -7,11 +7,30 @@ from ...models import ApiKey, Account, Subscription
 from django.contrib.auth.hashers import check_password
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
-class AccountView(APIView):
-    @method_decorator(login_required)
+from ..authentication.view import JWTAuthentication, IsAuthenticated, LoginRequiredMixin, AuthenticationFailed
+
+class AccountView(LoginRequiredMixin, APIView):
+    def authenticate_user(self, request):
+        """Authenticate the user using JWT and return the account."""
+        jwt_auth = JWTAuthentication()
+        account, _ = jwt_auth.authenticate(request)
+        if account is None:
+            raise AuthenticationFailed('Authentication failed')
+        return account
+    def check_mfa(self, account):
+        if not account.mfa_confirmed and account.mfa_enabled:
+              return redirect("verify-mfa")
+    
     def post(self, request):
+ 
         try:
-            account = request.user
+            # Use the authenticate_user method
+            account = self.authenticate_user(request)
+            self.check_mfa(account=account)
+            
+            
+            if not account.mfa_confirmed:
+              return redirect("verify-mfa")
             if request.path == '/account/edit':
                 name = request.POST.get('name')
                 email = request.POST.get('email')
@@ -49,13 +68,17 @@ class AccountView(APIView):
 
             # Handle POST requests
             return Response({"message": "POST request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'POST' Method Failed for AccountView: {e}", "is_error": True}, status=400)
-    @method_decorator(login_required)
+    
+    # @method_decorator(login_required)
     def get(self, request):
         try:
-            user = request.user
-            account = Account.objects.filter(id=user.id).first()
+            # Use the authenticate_user method
+            account = self.authenticate_user(request)
+            self.check_mfa(account=account)
             token = request.COOKIES.get('jwt')
             if request.path == '/account/edit':
                 return render(request, 'account/edit.html',{"account": account, })
@@ -96,43 +119,70 @@ class AccountView(APIView):
                         "interval": subscription_item.price.recurring.get("interval", "N/A"),
                     }
             return render(request, 'account/account.html', {"api_keys": api_keys, "account": account,   'current_plan': current_plan, 'current_subscription': current_subscription, 'token': token, 'qrcode': qr_code_data_uri})
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return render(request, 'system/response.html', {'message': f"'GET' Method Failed for AccountView: {e}", "is_error": True}, status=400)
                     # return Response(data={"error": f"'GET' Method Failed for AccountView: {e}", "is_error": True}, status=400)
-    @method_decorator(login_required)
+    # @method_decorator(login_required)
     def put(self, request):
         try:
+            # Use the authenticate_user method
+            account = self.authenticate_user(request)
+            self.check_mfa(account=account)
             # Handle PUT requests
             return Response({"message": "PUT request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'PUT' Method Failed for AccountView: {e}", "is_error": True}, status=400)
-    @method_decorator(login_required)
+    # @method_decorator(login_required)
     def patch(self, request):
         try:
+            # Use the authenticate_user method
+            account = self.authenticate_user(request)
+            self.check_mfa(account=account)
             # Handle PATCH requests
             return Response({"message": "PATCH request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'PATCH' Method Failed for AccountView: {e}", "is_error": True}, status=400)
-    @method_decorator(login_required)
+    # @method_decorator(login_required)
     def delete(self, request):
         try:
+            # Use the authenticate_user method
+            account = self.authenticate_user(request)
+            self.check_mfa(account=account)
             # Handle DELETE requests
             return Response({"message": "DELETE request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'DELETE' Method Failed for AccountView: {e}", "is_error": True}, status=400)
-    @method_decorator(login_required)
+    # @method_decorator(login_required)
     def options(self, request, *args, **kwargs):
         try:
+            # Use the authenticate_user method
+            account = self.authenticate_user(request)
+            self.check_mfa(account=account)
             # Handle OPTIONS requests
             return Response({"message": "OPTIONS request received"}, status=204)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'OPTIONS' Method Failed for AccountView: {e}", "is_error": True}, status=400)
-    @method_decorator(login_required)
+    # @method_decorator(login_required)
     def head(self, request, *args, **kwargs):
         try:
+            # Use the authenticate_user method
+            account = self.authenticate_user(request)
+            self.check_mfa(account=account)
             # Handle HEAD requests
             # Since Django automatically handles HEAD, no implementation is required
             # The HEAD response will be the same as GET but without the body
             return Response({"message": "HEAD request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')
         except Exception as e:
             return Response(data={"error": f"'HEAD' Method Failed for AccountView: {e}", "is_error": True}, status=400)

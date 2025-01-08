@@ -1,0 +1,45 @@
+{% extends 'widgets/base.html' %}
+
+{% block title %}
+Submit a Support Ticket - CleanSMRs
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1>Submit a Support Ticket</h1>
+            <p>If you're experiencing an issue or have a question that requires assistance, please fill out the form below to submit a support ticket. Our support team will get back to you as soon as possible.</p>
+            
+            <form method="post" action="{% url 'submit-support-ticket' %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="subject" class="form-label">Subject</label>
+                    <input type="text" class="form-control" id="subject" name="subject" required>
+                </div>
+                <div class="mb-3">
+                    <label for="priority" class="form-label">Priority</label>
+                    <select class="form-select" id="priority" name="priority" required>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="message" class="form-label">Message</label>
+                    <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Ticket</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

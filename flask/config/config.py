@@ -15,7 +15,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
-DEBUG = False
+DEBUG = True
 
 # Load Django URL from environment variables
 DJANGO_URL = os.getenv("DJANGO_URL")

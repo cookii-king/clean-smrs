@@ -1,0 +1,44 @@
+{% extends 'widgets/base.html' %}
+
+{% block title %}
+Tutorial - CleanSMRs
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Tutorial: Setting Up Your CleanSMRs Product</h1>
+            <p>Welcome to the CleanSMRs tutorial. This guide will walk you through the steps to set up and start using your CleanSMRs product effectively.</p>
+            
+            <h2>Step 1: Unboxing and Initial Setup</h2>
+            <p>Begin by carefully unboxing your CleanSMRs product. Ensure that all components are present and undamaged. Follow the instructions in the user manual to connect the necessary cables and power on the device.</p>
+            
+            <h2>Step 2: Connecting to the Network</h2>
+            <p>To connect your CleanSMRs product to the network, follow these steps:</p>
+            <ol>
+                <li>Access the settings menu on the device.</li>
+                <li>Select "Network Settings" and choose your Wi-Fi network.</li>
+                <li>Enter the Wi-Fi password and confirm the connection.</li>
+            </ol>
+            
+            <h2>Step 3: Configuring the Device</h2>
+            <p>Once connected to the network, configure your device settings to suit your preferences:</p>
+            <ul>
+                <li>Set the device name and location.</li>
+                <li>Adjust the power settings for optimal performance.</li>
+                <li>Enable any additional features you wish to use.</li>
+            </ul>
+            
+            <h2>Step 4: Monitoring and Maintenance</h2>
+            <p>Regular monitoring and maintenance are essential for optimal performance. Use the CleanSMRs app to track device status and receive notifications for any required maintenance tasks.</p>
+            
+            <h2>Additional Resources</h2>
+            <p>For more detailed instructions and troubleshooting tips, refer to the <a href="{% url 'user-guides' %}">User Guides</a> section on our website.</p>
+            
+            <h2>Need Help?</h2>
+            <p>If you encounter any issues or have questions, please visit our <a href="{% url 'support' %}">Support</a> page or contact our support team for assistance.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

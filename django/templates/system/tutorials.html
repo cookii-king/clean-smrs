@@ -1,0 +1,28 @@
+{% extends 'widgets/base.html' %}
+
+{% block title %}
+Tutorials - CleanSMRs
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Tutorials</h1>
+            <p>Welcome to the CleanSMRs Tutorials page. Here you will find a collection of tutorials designed to help you get the most out of your CleanSMRs products and services. Click on a tutorial to learn more.</p>
+            
+            <div class="list-group">
+                <a href="{% url 'tutorial-setup' %}" class="list-group-item list-group-item-action">
+                    <h5 class="mb-1">Setting Up Your CleanSMRs Product</h5>
+                    <p class="mb-1">Learn how to unbox, set up, and configure your CleanSMRs product for optimal performance.</p>
+                </a>
+                <a href="{% url 'tutorial-maintenance' %}" class="list-group-item list-group-item-action">
+                    <h5 class="mb-1">Maintenance Tips and Tricks</h5>
+                    <p class="mb-1">Discover best practices for maintaining your CleanSMRs product to ensure long-lasting performance.</p>
+                </a>
+                <!-- Add more tutorial links as needed -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -11,6 +11,11 @@
         </div>
         <button type="submit">Confirm Email</button>
     </form>
+    <form method="POST" action="{% url 'confirm-email' %}">
+        {% csrf_token %}
+        <input type="hidden" name="resend" value="true">
+        <button type="submit">Resend Confirmation Code</button>
+    </form>
     {% else %}
     <p class="message">Email Confirmed Already!</p>
     {% endif %}

@@ -5,12 +5,24 @@ from ...models import Checkout, CheckoutLineItem, Plan, Price, Cart, Subscriptio
 from ...config.config import stripe
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
+from ..authentication.view import JWTAuthentication, IsAuthenticated, LoginRequiredMixin, AuthenticationFailed
 
 class CheckoutView(APIView):
-    @method_decorator(login_required)
+    def authenticate_user(self, request):
+        """Authenticate the user using JWT and return the account."""
+        jwt_auth = JWTAuthentication()
+        account, _ = jwt_auth.authenticate(request)
+        if account is None:
+            raise AuthenticationFailed('Authentication failed')
+        return account
+    def check_mfa(self, account):
+        if not account.mfa_confirmed and account.mfa_enabled:
+              return redirect("verify-mfa")
+    # @method_decorator(login_required)
     def post(self, request):
         try:
-            account = request.user
+            account = self.authenticate_user(request)
+            self.check_mfa(account=account)
             print(f"path: {request.path}")
 
             if request.path == '/checkout/subscribe':
@@ -136,11 +148,15 @@ class CheckoutView(APIView):
 
         except Cart.DoesNotExist:
             return Response({"error": "Cart not found for the user."}, status=404)
+        except AuthenticationFailed as e:
+            return redirect('login')  
         except Exception as e:
             return Response({"error": f"Failed to create checkout session: {str(e)}"}, status=500)
-    @method_decorator(login_required)
+    # @method_decorator(login_required)
     def get(self, request):
         try:
+            account = self.authenticate_user(request)
+            self.check_mfa(account=account)
             if request.path in ['/checkout/success', '/checkout/success/']:
                 # Retrieve the Checkout ID from the query parameters
                 checkout_id = request.GET.get('checkout')
@@ -157,100 +173,160 @@ class CheckoutView(APIView):
                 return render(request, 'checkout/failure.html')
 
             return Response({"message": "GET request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')  
         except Exception as e:
             return render(request, 'system/response.html', {'message': f"'GET' Method Failed for CheckoutView: {e}", "is_error": True}, status=400)
             # return Response(data={"error": f"'GET' Method Failed for CheckoutView: {e}"}, status=400)
 
-    @method_decorator(login_required)
+    # @method_decorator(login_required)
     def put(self, request):
         try:
+            account = self.authenticate_user(request)
+            self.check_mfa(account=account)
             # Handle PUT requests
             return Response({"message": "PUT request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')  
         except Exception as e:
             return Response(data={"error": f"'PUT' Method Failed for CheckoutView: {e}"}, status=400)
-    @method_decorator(login_required)
+    # @method_decorator(login_required)
     def patch(self, request):
         try:
+            account = self.authenticate_user(request)
+            self.check_mfa(account=account)
             # Handle PATCH requests
             return Response({"message": "PATCH request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')  
         except Exception as e:
             return Response(data={"error": f"'PATCH' Method Failed for CheckoutView: {e}"}, status=400)
-    @method_decorator(login_required)
+    # @method_decorator(login_required)
     def delete(self, request):
         try:
+            account = self.authenticate_user(request)
+            self.check_mfa(account=account)
             # Handle DELETE requests
             return Response({"message": "DELETE request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')  
         except Exception as e:
             return Response(data={"error": f"'DELETE' Method Failed for CheckoutView: {e}"}, status=400)
-    @method_decorator(login_required)
+    # @method_decorator(login_required)
     def options(self, request, *args, **kwargs):
         try:
+            account = self.authenticate_user(request)
+            self.check_mfa(account=account)
             # Handle OPTIONS requests
             return Response({"message": "OPTIONS request received"}, status=204)
+        except AuthenticationFailed as e:
+            return redirect('login')  
         except Exception as e:
             return Response(data={"error": f"'OPTIONS' Method Failed for CheckoutView: {e}"}, status=400)
-    @method_decorator(login_required)
+    # @method_decorator(login_required)
     def head(self, request, *args, **kwargs):
         try:
+            account = self.authenticate_user(request)
+            self.check_mfa(account=account)
             # Handle HEAD requests
             # Since Django automatically handles HEAD, no implementation is required
             # The HEAD response will be the same as GET but without the body
             return Response({"message": "HEAD request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')  
         except Exception as e:
             return Response(data={"error": f"'HEAD' Method Failed for CheckoutView: {e}"}, status=400)
     
 class CheckoutsView(APIView):
-    @method_decorator(login_required)
+    def authenticate_user(self, request):
+        """Authenticate the user using JWT and return the account."""
+        jwt_auth = JWTAuthentication()
+        account, _ = jwt_auth.authenticate(request)
+        if account is None:
+            raise AuthenticationFailed('Authentication failed')
+        return account
+    def check_mfa(self, account):
+        if not account.mfa_confirmed and account.mfa_enabled:
+              return redirect("verify-mfa")
+    # @method_decorator(login_required)
     def post(self, request):
         try:
+            account = self.authenticate_user(request)
+            self.check_mfa(account=account)
             # Handle POST requests
             return Response({"message": "POST request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')  
         except Exception as e:
             return Response(data={"error": f"'POST' Method Failed for CheckoutsView: {e}"}, status=400)
-    @method_decorator(login_required)
+    # @method_decorator(login_required)
     def get(self, request):
         try:
+            account = self.authenticate_user(request)
+            self.check_mfa(account=account)
             # Handle GET requests
             checkouts = Checkout.objects.all()
             return render(request, 'checkout/checkouts.html', {"checkouts": checkouts})
+        except AuthenticationFailed as e:
+            return redirect('login')  
         except Exception as e:
             return render(request, 'system/response.html', {'message': f"'GET' Method Failed for CheckoutsView: {e}", "is_error": True}, status=400)
                     # return Response(data={"error": f"'GET' Method Failed for CheckoutsView: {e}"}, status=400)
-    @method_decorator(login_required)
+    # @method_decorator(login_required)
     def put(self, request):
         try:
+            account = self.authenticate_user(request)
+            self.check_mfa(account=account)
             # Handle PUT requests
             return Response({"message": "PUT request received"}, status=201)
+        except AuthenticationFailed as e:
+            return redirect('login')  
         except Exception as e:
             return Response(data={"error": f"'PUT' Method Failed for CheckoutsView: {e}"}, status=400)
-    @method_decorator(login_required)
+    # @method_decorator(login_required)
     def patch(self, request):
         try:
+            account = self.authenticate_user(request)
+            self.check_mfa(account=account)
             # Handle PATCH requests
             return Response({"message": "PATCH request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')  
         except Exception as e:
             return Response(data={"error": f"'PATCH' Method Failed for CheckoutsView: {e}"}, status=400)
-    @method_decorator(login_required)
+    # @method_decorator(login_required)
     def delete(self, request):
         try:
+            account = self.authenticate_user(request)
+            self.check_mfa(account=account)
             # Handle DELETE requests
             return Response({"message": "DELETE request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')  
         except Exception as e:
             return Response(data={"error": f"'DELETE' Method Failed for CheckoutsView: {e}"}, status=400)
-    @method_decorator(login_required)
+    # @method_decorator(login_required)
     def options(self, request, *args, **kwargs):
         try:
+            account = self.authenticate_user(request)
+            self.check_mfa(account=account)
             # Handle OPTIONS requests
             return Response({"message": "OPTIONS request received"}, status=204)
+        except AuthenticationFailed as e:
+            return redirect('login')  
         except Exception as e:
             return Response(data={"error": f"'OPTIONS' Method Failed for CheckoutsView: {e}"}, status=400)
-    @method_decorator(login_required)
+    # @method_decorator(login_required)
     def head(self, request, *args, **kwargs):
         try:
+            account = self.authenticate_user(request)
+            self.check_mfa(account=account)
             # Handle HEAD requests
             # Since Django automatically handles HEAD, no implementation is required
             # The HEAD response will be the same as GET but without the body
             return Response({"message": "HEAD request received"}, status=200)
+        except AuthenticationFailed as e:
+            return redirect('login')  
         except Exception as e:
             return Response(data={"error": f"'HEAD' Method Failed for CheckoutsView: {e}"}, status=400)
         
@@ -293,8 +369,9 @@ class CheckoutsView(APIView):
 #             return Response({"message": "Invalid action."}, status=400)
 
 #         except Plan.DoesNotExist:
-#             return Response({"error": "Plan not found."}, status=404)
-#         except Exception as e:
+#             return Response({"error": "Plan not found."}, status=404)        except AuthenticationFailed as e:
+            return redirect('login')          
+# except Exception as e:
 #             return Response(data={"error": f"Failed to create checkout: {e}"}, status=500)
         
 #     def get(self, request):
@@ -308,36 +385,41 @@ class CheckoutsView(APIView):
 #             if request.path == '/checkout/failure/':
 #                 return render(request, 'checkout/failure.html')
 #             # Handle GET requests
-#             return render(request, 'checkout/checkout.html')
-#         except Exception as e:
+#             return render(request, 'checkout/checkout.html')        except AuthenticationFailed as e:
+            return redirect('login')          
+# except Exception as e:
 #                     return Response(data={"error": f"'GET' Method Failed for CheckoutView: {e}"}, status=400)
 
 #     def put(self, request):
 #         try:
 #             # Handle PUT requests
-#             return Response({"message": "PUT request received"}, status=201)
-#         except Exception as e:
+#             return Response({"message": "PUT request received"}, status=201)        except AuthenticationFailed as e:
+            return redirect('login')          
+# except Exception as e:
 #             return Response(data={"error": f"'PUT' Method Failed for CheckoutView: {e}"}, status=400)
 
 #     def patch(self, request):
 #         try:
 #             # Handle PATCH requests
-#             return Response({"message": "PATCH request received"}, status=200)
-#         except Exception as e:
+#             return Response({"message": "PATCH request received"}, status=200)        except AuthenticationFailed as e:
+            return redirect('login')          
+# except Exception as e:
 #             return Response(data={"error": f"'PATCH' Method Failed for CheckoutView: {e}"}, status=400)
 
 #     def delete(self, request):
 #         try:
 #             # Handle DELETE requests
-#             return Response({"message": "DELETE request received"}, status=200)
-#         except Exception as e:
+#             return Response({"message": "DELETE request received"}, status=200)        except AuthenticationFailed as e:
+            return redirect('login')          
+# except Exception as e:
 #             return Response(data={"error": f"'DELETE' Method Failed for CheckoutView: {e}"}, status=400)
 
 #     def options(self, request, *args, **kwargs):
 #         try:
 #             # Handle OPTIONS requests
-#             return Response({"message": "OPTIONS request received"}, status=204)
-#         except Exception as e:
+#             return Response({"message": "OPTIONS request received"}, status=204)        except AuthenticationFailed as e:
+            return redirect('login')          
+# except Exception as e:
 #             return Response(data={"error": f"'OPTIONS' Method Failed for CheckoutView: {e}"}, status=400)
 
 #     def head(self, request, *args, **kwargs):
@@ -345,8 +427,9 @@ class CheckoutsView(APIView):
 #             # Handle HEAD requests
 #             # Since Django automatically handles HEAD, no implementation is required
 #             # The HEAD response will be the same as GET but without the body
-#             return Response({"message": "HEAD request received"}, status=200)
-#         except Exception as e:
+#             return Response({"message": "HEAD request received"}, status=200)        except AuthenticationFailed as e:
+            return redirect('login')          
+# except Exception as e:
 #             return Response(data={"error": f"'HEAD' Method Failed for CheckoutView: {e}"}, status=400)
     
 
