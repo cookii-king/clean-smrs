@@ -15,3 +15,8 @@ PyJWT
 qrcode
 stripe
 gunicorn
+flask-smorest
+
+flask 
+flask-restful 
+flask-swagger

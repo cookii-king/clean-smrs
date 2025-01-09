@@ -1,0 +1,251 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Observation API",
+    "version": "1.0.0",
+    "description": "API for managing observations"
+  },
+  "paths": {
+    "/observation/create": {
+      "post": {
+        "summary": "Create a new observation",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "time": {
+                    "type": "string",
+                    "format": "time"
+                  },
+                  "time_zone_offset": {
+                    "type": "string"
+                  },
+                  "latitude": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "longitude": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "temperature_water": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "temperature_air": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "humidity": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "wind_speed": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "wind_direction": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "precipitation": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "haze": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "becquerel": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "notes": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "date",
+                  "time",
+                  "time_zone_offset",
+                  "latitude",
+                  "longitude"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Observation created successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/observation/{observation_id}": {
+      "get": {
+        "summary": "Get an observation by ID",
+        "parameters": [
+          {
+            "name": "observation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Observation details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Observation"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Observation not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update an observation by ID",
+        "parameters": [
+          {
+            "name": "observation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Observation"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Observation updated successfully"
+          },
+          "404": {
+            "description": "Observation not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an observation by ID",
+        "parameters": [
+          {
+            "name": "observation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Observation deleted successfully"
+          },
+          "404": {
+            "description": "Observation not found"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Observation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "time": {
+            "type": "string",
+            "format": "time"
+          },
+          "time_zone_offset": {
+            "type": "string"
+          },
+          "coordinates": {
+            "type": "string"
+          },
+          "temperature_water": {
+            "type": "number",
+            "format": "float"
+          },
+          "temperature_air": {
+            "type": "number",
+            "format": "float"
+          },
+          "humidity": {
+            "type": "number",
+            "format": "float"
+          },
+          "wind_speed": {
+            "type": "number",
+            "format": "float"
+          },
+          "wind_direction": {
+            "type": "number",
+            "format": "float"
+          },
+          "precipitation": {
+            "type": "number",
+            "format": "float"
+          },
+          "haze": {
+            "type": "number",
+            "format": "float"
+          },
+          "becquerel": {
+            "type": "number",
+            "format": "float"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deleted": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  }
+}

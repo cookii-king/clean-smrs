@@ -1,0 +1,814 @@
+Directory structure and file contents for: flask
+
+Generating directory structure...
+flask
+├── __pycache__
+│   └── main.cpython-313.pyc
+├── config
+│   ├── __pycache__
+│   │   └── config.cpython-313.pyc
+│   ├── config.py
+│   └── static
+│       ├── openapi.json
+│       └── swagger.yaml
+├── instance
+├── main.py
+└── pages
+    ├── __pycache__
+    │   └── endpoints.cpython-313.pyc
+    ├── classes
+    │   ├── observation
+    │   │   ├── __pycache__
+    │   │   │   ├── delete.cpython-313.pyc
+    │   │   │   ├── get.cpython-313.pyc
+    │   │   │   ├── head.cpython-313.pyc
+    │   │   │   ├── model.cpython-313.pyc
+    │   │   │   ├── options.cpython-313.pyc
+    │   │   │   ├── patch.cpython-313.pyc
+    │   │   │   ├── post.cpython-313.pyc
+    │   │   │   ├── put.cpython-313.pyc
+    │   │   │   └── view.cpython-313.pyc
+    │   │   ├── model.py
+    │   │   └── view.py
+    │   └── system
+    │       ├── __pycache__
+    │       │   ├── delete.cpython-313.pyc
+    │       │   ├── get.cpython-313.pyc
+    │       │   ├── head.cpython-313.pyc
+    │       │   ├── options.cpython-313.pyc
+    │       │   ├── patch.cpython-313.pyc
+    │       │   ├── post.cpython-313.pyc
+    │       │   ├── put.cpython-313.pyc
+    │       │   └── view.cpython-313.pyc
+    │       └── view.py
+    └── endpoints.py
+
+13 directories, 28 files
+
+Appending file contents...
+File: flask/config/config.py
+----------------------------------------
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_marshmallow import Marshmallow
+from flask_swagger_ui import get_swaggerui_blueprint
+from dotenv import load_dotenv
+import os, request, requests, jsonify
+
+# Load environment variables from .env file
+load_dotenv()
+
+db = SQLAlchemy()
+ma = Marshmallow()
+
+class Config:
+    """Base configuration."""
+    SQLALCHEMY_DATABASE_URI = "sqlite:///db.sqlite3"
+    SQLALCHEMY_ECHO = True
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    DEBUG = True
+
+def create_app():
+    """Create and configure the Flask app."""
+    app = Flask(__name__)
+    app.config.from_object(Config)
+
+    # Initialize extensions
+    db.init_app(app)
+    ma.init_app(app)
+
+    # Register Blueprints
+    from pages.classes.system.view import system_bp
+    from pages.classes.observation.view import observation_bp
+    app.register_blueprint(system_bp)
+    app.register_blueprint(observation_bp)
+
+    # Register Swagger UI
+    register_swagger_ui(app)
+
+    return app
+
+def register_swagger_ui(app):
+    """Register Swagger UI blueprint."""
+    SWAGGER_URL = '/api'
+    API_URL = '/static/swagger.yaml'
+    swaggerui_blueprint = get_swaggerui_blueprint(
+        SWAGGER_URL,
+        API_URL,
+        config={'app_name': "Test application"}
+    )
+    app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
+
+def validate_api_key(func):
+    """Decorator to validate API key."""
+    def wrapper(*args, **kwargs):
+        try:
+            DJANGO_URL = os.getenv("DJANGO_URL")
+            DJANGO_LOCAL_HOST_URL = os.getenv("DJANGO_LOCAL_HOST_URL")
+
+            # Use local Django URL if DEBUG is enabled
+            if Config.DEBUG:
+                DJANGO_URL = DJANGO_LOCAL_HOST_URL
+
+            if not DJANGO_URL:
+                raise ValueError("DJANGO_URL is not set in the environment variables.")
+
+            print(f"Validating API key with DJANGO_URL: {DJANGO_URL}")
+
+            # Get API key from request headers
+            api_key = request.headers.get("X-API-KEY")
+            if not api_key:
+                return jsonify({"error": "API key is missing"}), 401
+
+            # Payload and headers for Django validation request
+            payload = {"api_key": api_key}
+            headers = {"Content-Type": "application/json"}
+
+            # Make POST request to Django endpoint
+            response = requests.post(
+                f"{DJANGO_URL}/api-key/validate/",
+                json=payload,
+                headers=headers,
+                timeout=5
+            )
+            response.raise_for_status()
+
+            # If validation succeeds, call the original function
+            return func(*args, **kwargs)
+
+        except requests.exceptions.RequestException as re:
+            error_message = (
+                re.response.json() if re.response and re.response.content else str(re)
+            )
+            return jsonify({"error": f"API key validation failed: {error_message}"}), 403
+
+    return wrapper
+
+
+File: flask/config/static/swagger.yaml
+----------------------------------------
+openapi: 3.0.0
+info:
+  title: Observation API
+  version: 1.0.0
+  description: API for managing observations
+
+paths:
+  /observation/create:
+    post:
+      summary: Create a new observation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                date:
+                  type: string
+                  format: date
+                time:
+                  type: string
+                  format: time
+                time_zone_offset:
+                  type: string
+                latitude:
+                  type: number
+                  format: float
+                longitude:
+                  type: number
+                  format: float
+                temperature_water:
+                  type: number
+                  format: float
+                temperature_air:
+                  type: number
+                  format: float
+                humidity:
+                  type: number
+                  format: float
+                wind_speed:
+                  type: number
+                  format: float
+                wind_direction:
+                  type: number
+                  format: float
+                precipitation:
+                  type: number
+                  format: float
+                haze:
+                  type: number
+                  format: float
+                becquerel:
+                  type: number
+                  format: float
+                notes:
+                  type: string
+              required:
+                - date
+                - time
+                - time_zone_offset
+                - latitude
+                - longitude
+      responses:
+        '201':
+          description: Observation created successfully
+        '400':
+          description: Invalid input
+
+  /observation/{observation_id}:
+    get:
+      summary: Get an observation by ID
+      parameters:
+        - name: observation_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Observation details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Observation'
+        '404':
+          description: Observation not found
+
+    put:
+      summary: Update an observation by ID
+      parameters:
+        - name: observation_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Observation'
+      responses:
+        '200':
+          description: Observation updated successfully
+        '404':
+          description: Observation not found
+
+    delete:
+      summary: Delete an observation by ID
+      parameters:
+        - name: observation_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Observation deleted successfully
+        '404':
+          description: Observation not found
+
+components:
+  schemas:
+    Observation:
+      type: object
+      properties:
+        id:
+          type: string
+        date:
+          type: string
+          format: date
+        time:
+          type: string
+          format: time
+        time_zone_offset:
+          type: string
+        coordinates:
+          type: string
+        temperature_water:
+          type: number
+          format: float
+        temperature_air:
+          type: number
+          format: float
+        humidity:
+          type: number
+          format: float
+        wind_speed:
+          type: number
+          format: float
+        wind_direction:
+          type: number
+          format: float
+        precipitation:
+          type: number
+          format: float
+        haze:
+          type: number
+          format: float
+        becquerel:
+          type: number
+          format: float
+        notes:
+          type: string
+        created:
+          type: string
+          format: date-time
+        updated:
+          type: string
+          format: date-time
+        deleted:
+          type: string
+          format: date-time
+
+
+File: flask/config/static/openapi.json
+----------------------------------------
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Observation API",
+    "version": "1.0.0",
+    "description": "API for managing observations"
+  },
+  "paths": {
+    "/observation/create": {
+      "post": {
+        "summary": "Create a new observation",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "date": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "time": {
+                    "type": "string",
+                    "format": "time"
+                  },
+                  "time_zone_offset": {
+                    "type": "string"
+                  },
+                  "latitude": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "longitude": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "temperature_water": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "temperature_air": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "humidity": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "wind_speed": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "wind_direction": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "precipitation": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "haze": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "becquerel": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "notes": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "date",
+                  "time",
+                  "time_zone_offset",
+                  "latitude",
+                  "longitude"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Observation created successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/observation/{observation_id}": {
+      "get": {
+        "summary": "Get an observation by ID",
+        "parameters": [
+          {
+            "name": "observation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Observation details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Observation"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Observation not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update an observation by ID",
+        "parameters": [
+          {
+            "name": "observation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Observation"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Observation updated successfully"
+          },
+          "404": {
+            "description": "Observation not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an observation by ID",
+        "parameters": [
+          {
+            "name": "observation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Observation deleted successfully"
+          },
+          "404": {
+            "description": "Observation not found"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Observation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "time": {
+            "type": "string",
+            "format": "time"
+          },
+          "time_zone_offset": {
+            "type": "string"
+          },
+          "coordinates": {
+            "type": "string"
+          },
+          "temperature_water": {
+            "type": "number",
+            "format": "float"
+          },
+          "temperature_air": {
+            "type": "number",
+            "format": "float"
+          },
+          "humidity": {
+            "type": "number",
+            "format": "float"
+          },
+          "wind_speed": {
+            "type": "number",
+            "format": "float"
+          },
+          "wind_direction": {
+            "type": "number",
+            "format": "float"
+          },
+          "precipitation": {
+            "type": "number",
+            "format": "float"
+          },
+          "haze": {
+            "type": "number",
+            "format": "float"
+          },
+          "becquerel": {
+            "type": "number",
+            "format": "float"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deleted": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  }
+}
+
+
+File: flask/.env
+----------------------------------------
+DJANGO_URL=http://35.165.93.124
+DJANGO_LOCAL_HOST_URL=http://127.0.0.1:8000
+FLASK_URL=http://54.213.235.34
+FLASK_LOCAL_HOST_URL=http://127.0.0.1:5000
+DJANGO_SERVER_IP=35.165.93.124
+FLASK_SERVER_IP=54.213.235.34
+LOCAL_HOST_IP=127.0.0.1
+
+
+File: flask/main.py
+----------------------------------------
+from config.config import create_app, db
+
+def setup_database(app):
+    """Create database tables."""
+    with app.app_context():
+        db.create_all()
+
+def main():
+    """Run the Flask application."""
+    app = create_app()
+    setup_database(app)
+    app.run(debug=app.config['DEBUG'])
+
+if __name__ == "__main__":
+    main()
+
+
+File: flask/pages/classes/system/view.py
+----------------------------------------
+from flask import Blueprint
+
+# Create a Blueprint for the system routes
+system_bp = Blueprint('system', __name__)
+
+@system_bp.route("/", methods=["GET"])
+def root():
+    return "Hello World!"
+
+
+File: flask/pages/classes/observation/model.py
+----------------------------------------
+import uuid
+from datetime import datetime
+from decimal import Decimal
+from config.config import db, ma
+
+
+class Observation(db.Model):
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    date = db.Column(db.Date, nullable=False)
+    time = db.Column(db.Time, nullable=False)
+    time_zone_offset = db.Column(db.String(10), nullable=False)
+    coordinates = db.Column(db.String(50), nullable=False)
+    temperature_water = db.Column(db.Float, nullable=True)
+    temperature_air = db.Column(db.Float, nullable=True)
+    humidity = db.Column(db.Float, nullable=True)
+    wind_speed = db.Column(db.Float, nullable=True)
+    wind_direction = db.Column(db.Float, nullable=True)
+    precipitation = db.Column(db.Float, nullable=True)
+    haze = db.Column(db.Float, nullable=True)
+    becquerel = db.Column(db.Float, nullable=True)
+    notes = db.Column(db.Text, nullable=True)
+    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    updated = db.Column(db.DateTime, nullable=True, default=datetime.utcnow, onupdate=datetime.utcnow)
+    deleted = db.Column(db.DateTime, nullable=True)
+
+    def __repr__(self):
+        return f"<Observation {self.id}>"
+
+    @staticmethod
+    def create(data):
+        new_observation = Observation(
+            date=data.get("date"),
+            time=data.get("time"),
+            time_zone_offset=data.get("time_zone_offset"),
+            coordinates=data.get("coordinates"),
+            temperature_water=data.get("temperature_water"),
+            temperature_air=data.get("temperature_air"),
+            humidity=data.get("humidity"),
+            wind_speed=data.get("wind_speed"),
+            wind_direction=data.get("wind_direction"),
+            precipitation=data.get("precipitation"),
+            haze=data.get("haze"),
+            becquerel=data.get("becquerel"),
+            notes=data.get("notes"),
+        )
+        db.session.add(new_observation)
+        db.session.commit()
+        return new_observation
+
+    @staticmethod
+    def get(observation_id):
+        return Observation.query.get(observation_id)
+
+    @staticmethod
+    def get_all():
+        return Observation.query.all()
+
+    @staticmethod
+    def update(observation_id, data):
+        observation = Observation.query.get(observation_id)
+        if observation:
+            for key, value in data.items():
+                if hasattr(observation, key) and key not in ["id", "created", "deleted"]:
+                    setattr(observation, key, value)
+            observation.updated = datetime.utcnow()
+            db.session.commit()
+            return observation
+        return None
+    
+    @staticmethod
+    def patch(observation_id, data):
+        observation = Observation.query.get(observation_id)
+        if observation:
+            for key, value in data.items():
+                if hasattr(observation, key) and key not in ["id", "created", "deleted"]:
+                    setattr(observation, key, value)
+            observation.updated = datetime.utcnow()
+            db.session.commit()
+            return observation
+        return None
+
+
+    @staticmethod
+    def soft_delete(observation_id):
+        observation = Observation.query.get(observation_id)
+        if observation:
+            observation.deleted = datetime.utcnow()
+            db.session.commit()
+            return observation
+        return None
+
+    @staticmethod
+    def delete(observation_id):
+        observation = Observation.query.get(observation_id)
+        if observation:
+            db.session.delete(observation)
+            db.session.commit()
+            return {"message": f"Observation {observation_id} permanently deleted."}
+        return {"message": "Observation not found."}
+
+
+class ObservationSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Observation
+        fields = (
+            "id", "date", "time", "time_zone_offset", "coordinates",
+            "temperature_water", "temperature_air", "humidity", "wind_speed",
+            "wind_direction", "precipitation", "haze", "becquerel", "notes",
+            "created", "updated", "deleted"
+        )
+
+observation_schema = ObservationSchema()
+observations_schema = ObservationSchema(many=True)
+
+
+
+File: flask/pages/classes/observation/view.py
+----------------------------------------
+from flask import Blueprint, request, abort, jsonify
+from datetime import datetime
+from config.config import validate_api_key
+from .model import Observation, observation_schema, observations_schema
+
+# Create a Blueprint for the observation routes
+observation_bp = Blueprint('observation', __name__)
+
+@observation_bp.route("/observations", methods=["GET"], endpoint='list_observations')
+@validate_api_key
+def list_observations():
+    """List all observations."""
+    try:
+        all_observations = Observation.get_all()
+        result = observations_schema.dump(all_observations)
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({"error": f"'GET' Method Failed for observations: {str(e)}"}), 400
+
+@observation_bp.route("/observation/<observation_id>", methods=["GET"], endpoint='get_observation')
+@validate_api_key
+def get_observation(observation_id):
+    """Get a single observation by ID."""
+    try:
+        observation = Observation.get(observation_id)
+        if observation is None:
+            abort(404, description="Observation not found")
+        result = observation_schema.dump(observation)
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({"error": f"'GET' Method Failed for observation: {str(e)}"}), 400
+
+@observation_bp.route("/observation/create", methods=["POST"], endpoint='create_observation')
+@validate_api_key
+def create_observation():
+    """Create a new observation."""
+    try:
+        data = request.get_json()
+        
+        required_fields = [
+            "date", "time", "time_zone_offset", "latitude", "longitude",
+            "temperature_water", "temperature_air", "humidity", "wind_speed",
+            "wind_direction", "precipitation", "haze", "becquerel", "notes"
+        ]
+
+        missing_fields = [field for field in required_fields if field not in data]
+        if missing_fields:
+            abort(400, description=f"Missing required fields: {', '.join(missing_fields)}")
+        
+        try:
+            data["date"] = datetime.strptime(data["date"], "%Y-%m-%d").date()
+            data["time"] = datetime.strptime(data["time"], "%H:%M:%S").time()
+        except ValueError as e:
+            abort(400, description=f"Invalid date or time format: {e}")
+
+        data["coordinates"] = f"{data['latitude']},{data['longitude']}"
+
+        new_observation = Observation.create(data)
+        result = observation_schema.dump(new_observation)
+
+        return jsonify(result), 201
+    except Exception as e:
+        return jsonify({"error": f"'POST' Method Failed for observation: {str(e)}"}), 400
+
+
+File: flask/pages/endpoints.py
+----------------------------------------
+from .classes.system import view
+from .classes.observation import view
+
+
+
