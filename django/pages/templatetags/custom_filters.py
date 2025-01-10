@@ -7,6 +7,11 @@ def get_item(dictionary, key):
     return dictionary.get(key)
 
 @register.filter
+def get_amount(item):
+    # Check if the item has an 'amount' attribute (for Plan) or 'unit_amount' (for Price)
+    return getattr(item, 'amount', None) or getattr(item, 'unit_amount', None)
+
+@register.filter
 def cart_total(cart_items):
     """
     Calculate the total cost of the cart.

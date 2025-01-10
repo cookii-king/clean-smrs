@@ -1,209 +1,360 @@
+from django.shortcuts import render, redirect
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.shortcuts import render, redirect
-from ...models import Product, Cart, CartItem
-from ...serializers import ProductSerializer
-from django.utils.decorators import method_decorator
-from django.contrib.auth.decorators import login_required
-from ..authentication.view import JWTAuthentication, IsAuthenticated, LoginRequiredMixin, AuthenticationFailed
-
+from django.shortcuts import render, redirect, get_object_or_404
+from django.utils.timezone import now
+# from ...models import Product
+from ...models import Product, ProductImage, ProductVideo, Price
+from ...forms import ProductForm, ProductImageForm, ProductVideoForm  # Assume you have these forms
+from ...views import authenticate_user, check_mfa
 class ProductView(APIView):
-    def authenticate_user(self, request):
-        """Authenticate the user using JWT and return the account."""
-        jwt_auth = JWTAuthentication()
-        account, _ = jwt_auth.authenticate(request)
-        if account is None:
-            raise AuthenticationFailed('Authentication failed')
-        return account
-    # @method_decorator(login_required)
-    def post(self, request):
+    def post(self, request, product_id=None):
         try:
-            account = self.authenticate_user(request)
-            if request.path == '/product/create':
-                serializer = ProductSerializer(data=request.data)
-                if serializer.is_valid():
-                    product = serializer.save()
-                    product.create_or_get_stripe_product()  # Sync with Stripe
-                    return redirect(f'/product/{product.id}')  # Redirect to the product detail page
-                else:
-                    return Response({"errors": serializer.errors}, status=400)
+            if product_id:
+                # Check if the action is to delete the product
+                if request.POST.get('action') == 'delete':
+                    product = get_object_or_404(Product, id=product_id)
+                    product.delete_stripe_product()  # Delete from Stripe
+                    product.delete()  # Delete from local database
+                    message = "Product deleted successfully."
+                    is_error = False
+                    status_code = 200
+                    return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
 
-            elif request.path == '/product/edit':
-                product_id = request.data.get("product_id")
-                product = Product.objects.filter(id=product_id).first()
-                if not product:
-                    return Response({"error": "Product not found."}, status=404)
-
-                serializer = ProductSerializer(product, data=request.data, partial=True)
-                if serializer.is_valid():
-                    updated_product = serializer.save()
-                    updated_product.create_or_get_stripe_product()  # Sync updates with Stripe
-                    return Response({"message": "Product updated successfully."}, status=200)
-                else:
-                    return Response({"errors": serializer.errors}, status=400)
-
+                # Update existing product
+                product = get_object_or_404(Product, id=product_id)
+                form = ProductForm(request.POST, request.FILES, instance=product)
             else:
-                return Response({"error": "Unsupported path."}, status=404)
+                # Create new product
+                form = ProductForm(request.POST, request.FILES)
 
-        except AuthenticationFailed as e:
-            return redirect('login') 
+            if form.is_valid():
+                product = form.save()
+
+                # Handle image uploads
+                for image in request.FILES.getlist('images'):
+                    ProductImage.objects.create(product=product, image=image)
+
+                # Handle video uploads
+                for video in request.FILES.getlist('videos'):
+                    ProductVideo.objects.create(product=product, video=video)
+
+                # Create product in Stripe if it doesn't already exist
+                if not product.stripe_product_id:
+                    product.create_stripe_product()
+
+                # Handle price creation
+                price_amount = request.POST.get('price_amount')
+                price_currency = request.POST.get('price_currency', 'usd')
+                price_interval = request.POST.get('price_interval', 'one_time')
+
+                if price_amount:  # Only create a price if the amount is provided
+                    recurring = (
+                        {"interval": price_interval}
+                        if price_interval in ["month", "year"]
+                        else None
+                    )
+                    try:
+                        # Create a local Price instance
+                        price = Price.objects.create(
+                            product=product,
+                            unit_amount=float(price_amount),
+                            currency=price_currency,
+                            recurring=recurring,
+                        )
+
+                        # Create the Stripe price and save the Stripe ID
+                        price.create_stripe_price()
+
+                    except Exception as e:
+                        print(f"Error creating price: {e}")
+                        message = f"Failed to create price: {e}"
+                        is_error = True
+                        status_code = 500
+                        return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+
+                message = "Product and price saved successfully."
+                is_error = False
+                status_code = 201
+            else:
+                print("Form errors:", form.errors)
+                message = "Form is not valid."
+                is_error = True
+                status_code = 400
+
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'POST' Method Failed for ProductView: {e}"}, status=500)
-    # @method_decorator(login_required)
+            message = f"'POST' Method Failed for ProductView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+
+    # def post(self, request, product_id=None):
+    #     try:
+    #         if product_id:
+    #             # Check if the action is to delete the product
+    #             if request.POST.get('action') == 'delete':
+    #                 product = get_object_or_404(Product, id=product_id)
+    #                 product.delete_stripe_product()  # Delete from Stripe
+    #                 product.delete()  # Delete from local database
+    #                 message = "Product deleted successfully."
+    #                 is_error = False
+    #                 status_code = 200
+    #                 return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+
+    #             # Update existing product
+    #             product = get_object_or_404(Product, id=product_id)
+    #             form = ProductForm(request.POST, request.FILES, instance=product)
+    #         else:
+    #             # Create new product
+    #             form = ProductForm(request.POST, request.FILES)
+
+    #         if form.is_valid():
+    #             product = form.save()
+
+    #             # Handle image uploads
+    #             for image in request.FILES.getlist('images'):
+    #                 ProductImage.objects.create(product=product, image=image)
+
+    #             # Handle video uploads
+    #             for video in request.FILES.getlist('videos'):
+    #                 ProductVideo.objects.create(product=product, video=video)
+
+    #             # Create product in Stripe if it doesn't already exist
+    #             if not product.stripe_product_id:
+    #                 product.create_stripe_product()
+
+    #             message = "Product saved successfully."
+    #             is_error = False
+    #             status_code = 201
+    #         else:
+    #             print("Form errors:", form.errors)
+    #             message = "Form is not valid."
+    #             is_error = True
+    #             status_code = 400
+
+    #         return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+    #     except Exception as e:
+    #         message = f"'POST' Method Failed for ProductView: {e}"
+    #         is_error = True
+    #         status_code = 500
+    #         return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+
     def get(self, request, product_id=None):
         try:
-            
-            if request.path == '/product/create':
-                account = self.authenticate_user(request)
-                return render(request, 'product/create.html')
-            if request.path == '/product/edit':
-                account = self.authenticate_user(request)
-                return render(request, 'product/edit.html')
-            if product_id:  # Check if product_id is provided
-                product = Product.objects.prefetch_related('images', 'prices').filter(id=product_id).first()
-                if not product:
-                    return Response({"error": "Product not found."}, status=404)
-                return render(request, 'product/product.html', {"product": product})
-            # Handle GET requests
-            return render(request, 'product/product.html')
-        except AuthenticationFailed as e:
-            return redirect('login') 
+            # account = authenticate_user(request)
+            # check_mfa(account=account)
+            action = request.GET.get('action', 'view')
+            print(f"${action}")
+            product = None
+            images = None
+            videos = None
+
+            if product_id:
+                product = get_object_or_404(Product, id=product_id)
+                images = ProductImage.objects.filter(product=product)
+                videos = ProductVideo.objects.filter(product=product)
+
+            if action == 'create' and request.user.is_superuser:
+                form = ProductForm()
+                return render(request, 'product/create.html', {'form': form})
+            elif action == 'edit' and request.user.is_superuser:
+                form = ProductForm(instance=product)
+                return render(request, 'product/edit.html', {
+                    'form': form,
+                    'images': images,
+                    'videos': videos,
+                    'product': product
+                })
+            else:
+                return render(request, 'product/product.html', {
+                    'product': product,
+                    'images': images,
+                    'videos': videos
+                })
         except Exception as e:
-            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for ProductView: {e}", "is_error": True}, status=400)
-                    # return Response(data={"error": f"'GET' Method Failed for ProductView: {e}"}, status=400)
-    # @method_decorator(login_required)
+            message = f"'GET' Method Failed for ProductView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+    # def get(self, request, product_id=None):
+    #     try:
+    #         if product_id:
+    #             # Editing an existing product
+    #             product = get_object_or_404(Product, id=product_id)
+    #             form = ProductForm(instance=product)
+    #             images = ProductImage.objects.filter(product=product)
+    #             videos = ProductVideo.objects.filter(product=product)
+    #         else:
+    #             # Creating a new product
+    #             form = ProductForm()
+    #             images = None
+    #             videos = None
+
+    #         return render(request, 'product/create.html', {
+    #             'form': form,
+    #             'images': images,
+    #             'videos': videos,
+    #             'product': product if product_id else None
+    #         })
+    #     except Exception as e:
+    #         message = f"'GET' Method Failed for ProductView: {e}"
+    #         is_error = True
+    #         status_code = 500
+    #         return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
     def put(self, request):
         try:
-            account = self.authenticate_user(request)
             # Handle PUT requests
-            return Response({"message": "PUT request received"}, status=201)
-        except AuthenticationFailed as e:
-            return redirect('login') 
+            message = "PUT request received"
+            is_error = False
+            status_code = 201
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'PUT' Method Failed for ProductView: {e}"}, status=400)
-    # @method_decorator(login_required)
+            message = f"'PUT' Method Failed for ProductView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+
     def patch(self, request):
         try:
-            account = self.authenticate_user(request)
             # Handle PATCH requests
-            return Response({"message": "PATCH request received"}, status=200)
-        except AuthenticationFailed as e:
-            return redirect('login') 
+            message = "PATCH request received"
+            is_error = False
+            status_code = 200
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'PATCH' Method Failed for ProductView: {e}"}, status=400)
-    # @method_decorator(login_required)
-    def delete(self, request):
+            message = f"'PATCH' Method Failed for ProductView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+    def delete(self, request, product_id):
         try:
-            account = self.authenticate_user(request)
-            # Handle DELETE requests
-            return Response({"message": "DELETE request received"}, status=200)
-        except AuthenticationFailed as e:
-            return redirect('login') 
+            product = get_object_or_404(Product, id=product_id)
+            product.delete()
+            message = "Product deleted successfully."
+            is_error = False
+            status_code = 200
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'DELETE' Method Failed for ProductView: {e}"}, status=400)
-    # @method_decorator(login_required)
+            message = f"'DELETE' Method Failed for ProductView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
     def options(self, request, *args, **kwargs):
         try:
-            account = self.authenticate_user(request)
             # Handle OPTIONS requests
-            return Response({"message": "OPTIONS request received"}, status=204)
-        except AuthenticationFailed as e:
-            return redirect('login') 
+            message = "OPTIONS request received"
+            is_error = False
+            status_code = 204
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'OPTIONS' Method Failed for ProductView: {e}"}, status=400)
-    # @method_decorator(login_required)
+            message = f"'OPTIONS' Method Failed for ProductView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
     def head(self, request, *args, **kwargs):
         try:
-            account = self.authenticate_user(request)
             # Handle HEAD requests
             # Since Django automatically handles HEAD, no implementation is required
             # The HEAD response will be the same as GET but without the body
-            return Response({"message": "HEAD request received"}, status=200)
-        except AuthenticationFailed as e:
-            return redirect('login') 
+            message = "HEAD request received"
+            is_error = False
+            status_code = 200
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'HEAD' Method Failed for ProductView: {e}"}, status=400)
-    
+            message = f"'HEAD' Method Failed for ProductView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+
 
 class ProductsView(APIView):
-    def authenticate_user(self, request):
-        """Authenticate the user using JWT and return the account."""
-        jwt_auth = JWTAuthentication()
-        account, _ = jwt_auth.authenticate(request)
-        if account is None:
-            raise AuthenticationFailed('Authentication failed')
-        return account
-    # @method_decorator(login_required)
     def post(self, request):
         try:
-            account = self.authenticate_user(request)
             # Handle POST requests
-            return Response({"message": "POST request received"}, status=201)
-        except AuthenticationFailed as e:
-            return redirect('login') 
+            message = "POST request received"
+            is_error = False
+            status_code = 201
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'POST' Method Failed for ProductsView: {e}"}, status=400)
-    # @method_decorator(login_required)
+            message = f"'POST' Method Failed for ProductsView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+
     def get(self, request):
         try:
-            # account = self.authenticate_user(request)
-            # Handle GET requests
-            # products = Product.objects.prefetch_related('images').all()
-            products = Product.objects.filter(type='product', reoccurrence='one-time').prefetch_related('images', 'prices').all()
-            return render(request, 'product/products.html', {"products": products})
-        except AuthenticationFailed as e:
-            return redirect('login') 
+            # Filter products to show only goods
+            products = Product.objects.filter(deleted__isnull=True, type='good')
+            return render(request, 'product/products.html', {'products': products})
         except Exception as e:
-                    return Response(data={"error": f"'GET' Method Failed for ProductsView: {e}"}, status=400)
-    # @method_decorator(login_required)
+            message = f"'GET' Method Failed for ProductsView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+        
     def put(self, request):
         try:
-            account = self.authenticate_user(request)
             # Handle PUT requests
-            return Response({"message": "PUT request received"}, status=201)
-        except AuthenticationFailed as e:
-            return redirect('login') 
+            message = "PUT request received"
+            is_error = False
+            status_code = 201
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'PUT' Method Failed for ProductsView: {e}"}, status=400)
-    # @method_decorator(login_required)
+            message = f"'PUT' Method Failed for ProductsView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+
     def patch(self, request):
         try:
-            account = self.authenticate_user(request)
             # Handle PATCH requests
-            return Response({"message": "PATCH request received"}, status=200)
-        except AuthenticationFailed as e:
-            return redirect('login') 
+            message = "PATCH request received"
+            is_error = False
+            status_code = 200
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'PATCH' Method Failed for ProductsView: {e}"}, status=400)
-    # @method_decorator(login_required)
-    def delete(self, request):
+            message = f"'PATCH' Method Failed for ProductsView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+    def delete(self, request, product_id):
         try:
-            account = self.authenticate_user(request)
-            # Handle DELETE requests
-            return Response({"message": "DELETE request received"}, status=200)
-        except AuthenticationFailed as e:
-            return redirect('login') 
+            product = get_object_or_404(Product, id=product_id)
+            product.deleted = now()
+            product.save()
+            message = "Product deleted successfully."
+            is_error = False
+            status_code = 200
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'DELETE' Method Failed for ProductsView: {e}"}, status=400)
-    # @method_decorator(login_required)
+            message = f"'DELETE' Method Failed for ProductsView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
     def options(self, request, *args, **kwargs):
         try:
-            account = self.authenticate_user(request)
             # Handle OPTIONS requests
-            return Response({"message": "OPTIONS request received"}, status=204)
-        except AuthenticationFailed as e:
-            return redirect('login') 
+            message = "OPTIONS request received"
+            is_error = False
+            status_code = 204
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'OPTIONS' Method Failed for ProductsView: {e}"}, status=400)
-    # @method_decorator(login_required)
+            message = f"'OPTIONS' Method Failed for ProductsView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
     def head(self, request, *args, **kwargs):
         try:
-            account = self.authenticate_user(request)
             # Handle HEAD requests
             # Since Django automatically handles HEAD, no implementation is required
             # The HEAD response will be the same as GET but without the body
-            return Response({"message": "HEAD request received"}, status=200)
-        except AuthenticationFailed as e:
-            return redirect('login') 
+            message = "HEAD request received"
+            is_error = False
+            status_code = 200
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'HEAD' Method Failed for ProductsView: {e}"}, status=400)
+            message = f"'HEAD' Method Failed for ProductsView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')

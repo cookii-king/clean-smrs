@@ -2,10 +2,9 @@ import uuid
 from django.db import models
 from django.utils.timezone import now
 from ...config.config import stripe
-
 class Product(models.Model):
     PRODUCT_TYPE_CHOICES = [
-        ('product', 'Product'),
+        ('good', 'Good'),
         ('service', 'Service'),
     ]
     PRODUCT_REOCCURRENCE_CHOICES = [
@@ -14,240 +13,174 @@ class Product(models.Model):
     ]
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
-    type = models.CharField(max_length=255, choices=PRODUCT_TYPE_CHOICES, default='product')
+    type = models.CharField(max_length=255, choices=PRODUCT_TYPE_CHOICES, default='good')
     reoccurrence = models.CharField(max_length=255, choices=PRODUCT_REOCCURRENCE_CHOICES, default='one-time')
     description = models.TextField(blank=True, null=True)
     stripe_product_id = models.CharField(max_length=255, blank=True, unique=True, null=True)
+    stock = models.IntegerField(default=1)
     created = models.DateTimeField(default=now)
     updated = models.DateTimeField(auto_now=True)
     deleted = models.DateTimeField(null=True, blank=True)
 
-    def create_or_get_stripe_product(self):
-        """Get an existing Stripe product or create a new one."""
+    def create_stripe_product(self):
+        """Creates a Stripe product and stores the product ID."""
         try:
-            if self.stripe_product_id:
-                stripe_product = stripe.Product.retrieve(self.stripe_product_id)
-                print(f"Found existing Stripe product with ID: {self.stripe_product_id}")
-                return stripe_product
-            else:
-                stripe_product = stripe.Product.create(
-                    name=self.name,
-                    description=self.description or None,
-                )
-                self.stripe_product_id = stripe_product["id"]
-                self.save()
-                print(f"Created new Stripe product with ID: {stripe_product['id']}")
-                return stripe_product
-        except Exception as e:
-            print(f"Error in create_or_get_stripe_product: {e}")
-            raise
-
-    def update_stripe_images(self):
-        """Update Stripe product with associated image URLs."""
-        if not self.stripe_product_id:
-            raise ValueError("Cannot update images for a product without a Stripe product ID.")
-
-        # Collect Stripe file URLs from related images
-        image_urls = [
-            image.stripe_file_url for image in self.images.all() if image.stripe_file_url
-        ]
-
-        try:
-            stripe.Product.modify(
-                self.stripe_product_id,
-                images=image_urls,
+            # Create a new Stripe product
+            product = stripe.Product.create(
+                name=self.name,
+                type=self.type,
+                description=self.description or None,
             )
-            print(f"Updated Stripe product images for {self.stripe_product_id}")
+            # Store the Stripe product ID in the product
+            self.stripe_product_id = product.id
+            self.save()
+            return product
+        except stripe.error.StripeError as e:
+            # Handle Stripe errors
+            print(f"Stripe error: {e}")
+            raise Exception(f"Failed to create Stripe product: {e}")
         except Exception as e:
-            print(f"Error updating Stripe product images: {e}")
-            raise
+            # Handle other exceptions
+            print(f"Error: {e}")
+            raise Exception(f"Failed to create Stripe product: {e}")
 
-    def save(self, *args, **kwargs):
-        # Automatically update product images in Stripe after saving the product
-        super().save(*args, **kwargs)
-        # self.update_stripe_images()
+    def update_stripe_product(self, **kwargs):
+        """Updates the Stripe product with the provided details."""
+        if not self.stripe_product_id:
+            raise Exception("Stripe product ID not set for this product.")
 
+        try:
+            # Update the Stripe product
+            product = stripe.Product.modify(
+                self.stripe_product_id,
+                **kwargs
+            )
+            # Optionally update local fields if needed
+            if 'name' in kwargs:
+                self.name = kwargs['name']
+            if 'description' in kwargs:
+                self.description = kwargs['description']
+            self.save()
+            return product
+        except stripe.error.StripeError as e:
+            # Handle Stripe errors
+            print(f"Stripe error: {e}")
+            raise Exception(f"Failed to update Stripe product: {e}")
+        except Exception as e:
+            # Handle other exceptions
+            print(f"Error: {e}")
+            raise Exception(f"Failed to update Stripe product: {e}")
+    
+    def delete_stripe_product(self):
+        """Deletes the Stripe product associated with this product."""
+        if not self.stripe_product_id:
+            raise Exception("Stripe product ID not set for this product.")
+
+        try:
+            # Delete the Stripe product
+            stripe.Product.delete(self.stripe_product_id)
+
+            # Optionally, clear the stripe_product_id field
+            self.stripe_product_id = None
+            self.save()
+            print("Stripe product deleted successfully.")
+        except stripe.error.StripeError as e:
+            # Handle Stripe errors
+            print(f"Stripe error: {e}")
+            raise Exception(f"Failed to delete Stripe product: {e}")
+        except Exception as e:
+            # Handle other exceptions
+            print(f"Error: {e}")
+            raise Exception(f"Failed to delete Stripe product: {e}")
+        
     def __str__(self):
         return str(self.id)
 
-
-# class Product(models.Model):
-#     PRODUCT_TYPE_CHOICES = [
-#         ('product', 'Product'),
-#         ('service', 'Service'),
-#     ]
-#     PRODUCT_REOCCURRENCE_CHOICES = [
-#         ('one-time', 'One Time'),
-#         ('reoccurring', 'Re-Occurring'),
-#     ]
-#     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-#     name = models.CharField(max_length=255)
-#     type = models.CharField(max_length=255, choices=PRODUCT_TYPE_CHOICES, default='product')
-#     reoccurrence = models.CharField(max_length=255, choices=PRODUCT_REOCCURRENCE_CHOICES, default='one-time')
-#     description = models.TextField(blank=True, null=True)
-#     # images = models.JSONField(blank=True, default=list)
-#     stripe_product_id = models.CharField(max_length=255, blank=True, unique=True, null=True)
-#     created = models.DateTimeField(default=now)
-#     updated = models.DateTimeField(auto_now=True)
-#     deleted = models.DateTimeField(null=True, blank=True)
-
-#     def create_or_get_stripe_product(self):
-#         """Get an existing Stripe product or create a new one."""
-#         try:
-#             if self.stripe_product_id:
-#                 # Check if the product already exists in Stripe
-#                 stripe_product = stripe.Product.retrieve(self.stripe_product_id)
-#                 print(f"Found existing Stripe product with ID: {self.stripe_product_id}")
-#                 return stripe_product
-#             else:
-#                 # Create a new Stripe product
-#                 stripe_product = stripe.Product.create(
-#                     name=self.name,
-#                     description=self.description or "",  # Use an empty string if description is None
-#                 )
-#                 self.stripe_product_id = stripe_product["id"]
-#                 self.save()
-#                 print(f"Created new Stripe product with ID: {stripe_product['id']}")
-#                 return stripe_product
-#         except Exception as e:
-#             print(f"Error in create_or_get_stripe_product: {e}")
-#             raise
-
-#     def update_stripe_product(self):
-#         """Update the Stripe product with the latest details from the model."""
-#         if not self.stripe_product_id:
-#             raise ValueError("Stripe product ID does not exist. Cannot update non-existent Stripe product.")
-        
-#         try:
-#             stripe.Product.modify(
-#                 self.stripe_product_id,
-#                 name=self.name,
-#                 description=self.description or "",
-#             )
-#             print(f"Updated Stripe product with ID: {self.stripe_product_id}")
-#         except Exception as e:
-#             print(f"Error updating Stripe product: {e}")
-#             raise
-
-#     def delete_stripe_product(self):
-#         """
-#         Delete the Stripe product associated with this model.
-#         """
-#         if self.stripe_product_id:
-#             try:
-#                 stripe.Product.delete(self.stripe_product_id)
-#                 print(f"Deleted Stripe product: {self.stripe_product_id}")
-#                 self.stripe_product_id = None
-#                 self.save()
-#             except Exception as e:
-#                 print(f"Error deleting Stripe product: {e}")
-#                 raise
-
-#     def update_stripe_images(self):
-#         """Update Stripe product with associated image URLs."""
-#         if not self.stripe_product_id:
-#             raise ValueError("Cannot update images for a product without a Stripe product ID.")
-
-#         # Collect Stripe file URLs from related images
-#         image_urls = [
-#             image.stripe_file_url for image in self.images.all() if image.stripe_file_url
-#         ]
-
-#         try:
-#             stripe.Product.modify(
-#                 self.stripe_product_id,
-#                 images=image_urls,
-#             )
-#             print(f"Updated Stripe product images for {self.stripe_product_id}")
-#         except Exception as e:
-#             print(f"Error updating Stripe product images: {e}")
-#             raise
-
-#     def save(self, *args, **kwargs):
-#         if not self.stripe_product_id:
-#             self.create_or_get_stripe_product()
-#         else:
-#             self.update_stripe_product()  # Update the Stripe product details
-#         super().save(*args, **kwargs)
-#         self.update_stripe_images()
-
-#     def delete(self, *args, **kwargs):
-#         """
-#         Override the delete method to delete the Stripe product first.
-#         """
-#         if self.stripe_product_id:
-#             self.delete_stripe_product()
-#         super().delete(*args, **kwargs)
-
-#     def __str__(self):
-#         return str(self.id)
-
-# class ProductImage(models.Model):
-#     product = models.ForeignKey(Product, related_name='images', on_delete=models.CASCADE)
-#     image = models.ImageField(upload_to='product_images/', blank=True, null=True)
-#     image_url = models.URLField(blank=True, null=True)  # For external image URLs
-#     stripe_file_url = models.CharField(max_length=255, blank=True, null=True)
-#     uploaded_at = models.DateTimeField(auto_now_add=True)
-
-#     def upload_to_stripe(self):
-#         """Upload the image file to Stripe."""
-#         if self.image:
-#             try:
-#                 with self.image.open('rb') as img_file:
-#                     stripe_file = stripe.File.create(
-#                         purpose="dispute_evidence",
-#                         file=img_file
-#                     )
-#                     self.stripe_file_url = stripe_file["url"]
-#                     self.save()
-#                     print(f"Uploaded file to Stripe: {stripe_file['id']}")
-#                     return stripe_file
-#             except Exception as e:
-#                 print(f"Error uploading file to Stripe: {e}")
-#                 raise
-#         elif self.image_url:
-#             print("Skipping Stripe upload for external URL images.")
-#         else:
-#             raise ValueError("No image or URL provided for upload.")
-
-#     def __str__(self):
-#         return f"Image for {self.product.name}"
-
+    # Meta Class
+    class Meta:
+        db_table = "pages_product"
+    
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, related_name='images', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='product_images/', blank=True, null=True)
+    image = models.ImageField(upload_to='product/images/', blank=True, null=True)
     image_url = models.URLField(blank=True, null=True)  # For external image URLs
-    stripe_file_url = models.CharField(max_length=255, blank=True, null=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(default=now)
+    updated = models.DateTimeField(auto_now=True)
+    deleted = models.DateTimeField(null=True, blank=True)
 
-    def upload_to_stripe(self):
-        """Upload the image file to Stripe."""
-        if self.image:
-            try:
-                with self.image.open('rb') as img_file:
-                    stripe_file = stripe.File.create(
-                        purpose="product_image",  # Correct Stripe purpose
-                        file=img_file
-                    )
-                    self.stripe_file_url = stripe_file["url"]
-                    self.save()
-                    print(f"Uploaded file to Stripe: {stripe_file['id']}")
-                    return stripe_file["id"]  # Return the file ID
-            except Exception as e:
-                print(f"Error uploading file to Stripe: {e}")
-                raise
-        elif self.image_url:
-            print("Skipping Stripe upload for external URL images.")
-            return None
-        else:
-            raise ValueError("No image or URL provided for upload.")
+    def create_product_image(product, image=None, image_url=None):
+        """Creates a new ProductImage."""
+        product_image = ProductImage.objects.create(
+            product=product,
+            image=image,
+            image_url=image_url
+        )
+        return product_image
+    
+    def update_product_image(product_image, image=None, image_url=None):
+        """Updates an existing ProductImage."""
+        if image is not None:
+            product_image.image = image
+        if image_url is not None:
+            product_image.image_url = image_url
+        product_image.save()
+        return product_image
 
-    def save(self, *args, **kwargs):
-        # Automatically upload to Stripe on save
-        if not self.stripe_file_url and self.image:
-            self.upload_to_stripe()
-        super().save(*args, **kwargs)
+    def delete_product_image(product_image):
+        """Deletes a ProductImage."""
+        # product_image.deleted = now()
+        # product_image.save()
+        # Alternatively, to permanently delete:
+        product_image.delete()
+
 
     def __str__(self):
-        return f"Image for {self.product.name}"
+        return str(self.id)
+    
+    # Meta Class
+    class Meta:
+        db_table = "pages_product_image"
 
+
+class ProductVideo(models.Model):
+    product = models.ForeignKey(Product, related_name='videos', on_delete=models.CASCADE)
+    video = models.FileField(upload_to='product/videos/', blank=True, null=True)
+    video_url = models.URLField(blank=True, null=True)  # For external image URLs
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(default=now)
+    updated = models.DateTimeField(auto_now=True)
+    deleted = models.DateTimeField(null=True, blank=True)
+
+    def create_product_video(product, video=None, video_url=None):
+        """Creates a new ProductVideo."""
+        product_video = ProductVideo.objects.create(
+            product=product,
+            video=video,
+            video_url=video_url
+        )
+        return product_video
+
+    def update_product_video(product_video, video=None, video_url=None):
+        """Updates an existing ProductVideo."""
+        if video is not None:
+            product_video.video = video
+        if video_url is not None:
+            product_video.video_url = video_url
+        product_video.save()
+        return product_video
+
+    def delete_product_video(product_video):
+        """Deletes a ProductVideo."""
+        # product_video.deleted = now()
+        # product_video.save()
+        # Alternatively, to permanently delete:
+        product_video.delete()
+
+
+    def __str__(self):
+        return str(self.id)
+    
+    # Meta Class
+    class Meta:
+        db_table = "pages_product_video"

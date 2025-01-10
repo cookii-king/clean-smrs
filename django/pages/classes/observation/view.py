@@ -1,14 +1,11 @@
+import requests, os
+from django.shortcuts import render, redirect
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.shortcuts import render, redirect
-from ...models import Plan, Subscription, ApiKey
-import requests, os
+from rest_framework.exceptions import AuthenticationFailed
+from ...models import ApiKey, Subscription
 from django.conf import settings
-
-from django.utils.decorators import method_decorator
-from django.contrib.auth.decorators import login_required
-from ..authentication.view import JWTAuthentication, IsAuthenticated, LoginRequiredMixin, AuthenticationFailed
-
+from ...views import authenticate_user, check_mfa
 
 FLASK_URL = os.getenv('FLASK_URL')
 FLASK_LOCAL_HOST_URL = os.getenv('FLASK_LOCAL_HOST_URL')
@@ -17,34 +14,23 @@ if settings.DEBUG:
     FLASK_URL = FLASK_LOCAL_HOST_URL
 
 
+
 class ObservationView(APIView):
-    def authenticate_user(self, request):
-        """Authenticate the user using JWT and return the account."""
-        jwt_auth = JWTAuthentication()
-        account, _ = jwt_auth.authenticate(request)
-        if account is None:
-            raise AuthenticationFailed('Authentication failed')
-        return account
-    def check_mfa(self, account):
-        if not account.mfa_confirmed and account.mfa_enabled:
-              return redirect("verify-mfa")
-    # @method_decorator(login_required)
     def post(self, request):
         try:
-            account = self.authenticate_user(request)
-            self.check_mfa(account=account)
+            account = authenticate_user(request)
+            check_mfa(account=account)
+
             # Get the user's primary API key
-            api_key = ApiKey.objects.filter(account=request.user, primary=True).first()
+            api_key = ApiKey.objects.filter(account=account, primary=True).first()
             if not api_key:
                 return Response({"error": "No primary API key found"}, status=400)
 
             # Data from the form submission
             time = request.data.get("time")
-            # Ensure the time format is HH:MM:SS
             if time and len(time) == 5:  # Only HH:MM (without seconds)
                 time = f"{time}:00"  # Append seconds as 00
 
-            # Data from the form submission
             data = {
                 "date": request.data.get("date"),
                 "time": time,
@@ -71,141 +57,121 @@ class ObservationView(APIView):
 
             # Make POST request to the external API
             response = requests.post(url, json=data, headers=headers)
-
             if response.status_code == 201:
-                # On success, redirect back to the form with a success message
-                return render(
-                    request, 
-                    'observation/create.html', 
-                    {"message": "Observation created successfully!"}
-                )
+                return render(request, 'observation/create.html', {"message": "Observation created successfully!"})
             else:
-                # Handle errors from the external API
-                return render(
-                    request, 
-                    'observation/create.html', 
-                    {"error": f"Failed to create observation: {response.text}"}
-                )
-        except AuthenticationFailed as e:
-            return redirect('login')  
+                return render(request, 'observation/create.html', {"error": f"Failed to create observation: {response.text}"})
+
+        except AuthenticationFailed:
+            return redirect('login')
         except Exception as e:
-            # return render(request, 'system/response.html', {'message': f"'POST' Method Failed for ObservationView: {e}", "is_error": True}, status=500)
-            return Response(data={"error": f"'POST' Method Failed for ObservationView: {e}", "is_error": True}, status=500)
-            
-    # @method_decorator(login_required)
+            return Response({"error": f"'POST' Method Failed for ObservationView: {e}"}, status=500)
+
     def get(self, request):
         try:
-            account = self.authenticate_user(request)
-            self.check_mfa(account=account)
+            account = authenticate_user(request)
+            check_mfa(account=account)
             if request.path == '/observation/create':
                 return render(request, 'observation/create.html')
-            # Handle GET requests
             return render(request, 'observation/observation.html')
-        except AuthenticationFailed as e:
-            return redirect('login')  
+        except AuthenticationFailed:
+            return redirect('login')
         except Exception as e:
             return render(request, 'system/response.html', {'message': f"'GET' Method Failed for ObservationView: {e}", "is_error": True}, status=400)
-            # return Response(data={"error": f"'GET' Method Failed for ObservationView: {e}", "is_error": True}, status=500)
-            
-    # @method_decorator(login_required)
+        except Exception as e:
+            message = f"'GET' Method Failed for ObservationView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+
     def put(self, request):
         try:
-            account = self.authenticate_user(request)
-            self.check_mfa(account=account)
             # Handle PUT requests
-            return Response({"message": "PUT request received"}, status=201)
-        except AuthenticationFailed as e:
-            return redirect('login')  
+            message = "PUT request received"
+            is_error = False
+            status_code = 201
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            # return render(request, 'system/response.html', {'message': f"'PUT' Method Failed for ObservationView: {e}", "is_error": True}, status=500)
-            return Response(data={"error": f"'PUT' Method Failed for ObservationView: {e}", "is_error": True}, status=400)
-            
-    # @method_decorator(login_required)
+            message = f"'PUT' Method Failed for ObservationView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+
     def patch(self, request):
         try:
-            account = self.authenticate_user(request)
-            self.check_mfa(account=account)
             # Handle PATCH requests
-            return Response({"message": "PATCH request received"}, status=200)
-        except AuthenticationFailed as e:
-            return redirect('login')  
+            message = "PATCH request received"
+            is_error = False
+            status_code = 200
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            # return render(request, 'system/response.html', {'message': f"'PATCH' Method Failed for ObservationView: {e}", "is_error": True}, status=400)
-            return Response(data={"error": f"'PATCH' Method Failed for ObservationView: {e}", "is_error": True}, status=400)
-    # @method_decorator(login_required)
+            message = f"'PATCH' Method Failed for ObservationView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
     def delete(self, request):
         try:
-            account = self.authenticate_user(request)
-            self.check_mfa(account=account)
             # Handle DELETE requests
-            return Response({"message": "DELETE request received"}, status=200)
-        except AuthenticationFailed as e:
-            return redirect('login')  
+            message = "DELETE request received"
+            is_error = False
+            status_code = 200
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            # return render(request, 'system/response.html', {'message': f"'DELETE' Method Failed for ObservationView: {e}", "is_error": True}, status=400)
-            return Response(data={"error": f"'DELETE' Method Failed for ObservationView: {e}", "is_error": True}, status=400)
-    # @method_decorator(login_required)
+            message = f"'DELETE' Method Failed for ObservationView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
     def options(self, request, *args, **kwargs):
         try:
-            account = self.authenticate_user(request)
-            self.check_mfa(account=account)
             # Handle OPTIONS requests
-            return Response({"message": "OPTIONS request received"}, status=204)
-        except AuthenticationFailed as e:
-            return redirect('login')  
+            message = "OPTIONS request received"
+            is_error = False
+            status_code = 204
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            # return render(request, 'system/response.html', {'message': f"'OPTIONS' Method Failed for ObservationView: {e}", "is_error": True}, status=400)
-            return Response(data={"error": f"'OPTIONS' Method Failed for ObservationView: {e}", "is_error": True}, status=400)
-    # @method_decorator(login_required)
+            message = f"'OPTIONS' Method Failed for ObservationView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
     def head(self, request, *args, **kwargs):
         try:
-            account = self.authenticate_user(request)
-            self.check_mfa(account=account)
             # Handle HEAD requests
             # Since Django automatically handles HEAD, no implementation is required
             # The HEAD response will be the same as GET but without the body
-            return Response({"message": "HEAD request received"}, status=200)
-        except AuthenticationFailed as e:
-            return redirect('login')  
+            message = "HEAD request received"
+            is_error = False
+            status_code = 200
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            # return render(request, 'system/response.html', {'message': f"'HEAD' Method Failed for ObservationView: {e}", "is_error": True}, status=400)
-            return Response(data={"error": f"'HEAD' Method Failed for ObservationView: {e}", "is_error": True}, status=400)
+            message = f"'HEAD' Method Failed for ObservationView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
 
 class ObservationsView(APIView):
-    def authenticate_user(self, request):
-        """Authenticate the user using JWT and return the account."""
-        jwt_auth = JWTAuthentication()
-        account, _ = jwt_auth.authenticate(request)
-        if account is None:
-            raise AuthenticationFailed('Authentication failed')
-        return account
-    def check_mfa(self, account):
-        if not account.mfa_confirmed and account.mfa_enabled:
-              return redirect("verify-mfa")
-    # @method_decorator(login_required)
     def post(self, request):
         try:
-            account = self.authenticate_user(request)
-            self.check_mfa(account=account)
             # Handle POST requests
-            return Response({"message": "POST request received"}, status=201)
-        except AuthenticationFailed as e:
-            return redirect('login')  
+            message = "POST request received"
+            is_error = False
+            status_code = 201
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            # return render(request, 'system/response.html', {'message': f"'POST' Method Failed for ObservationsView: {e}", "is_error": True}, status=400)
-            return Response(data={"error": f"'POST' Method Failed for ObservationsView: {e}", "is_error": True}, status=400)
-    # @method_decorator(login_required)
+            message = f"'POST' Method Failed for ObservationsView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+
     def get(self, request):
         try:
-            account = self.authenticate_user(request)
-            self.check_mfa(account=account)
+            # Authenticate the user
+            account = authenticate_user(request)
+            check_mfa(account=account)
 
             # Get the user's primary API key
             api_key = ApiKey.objects.filter(account=account, primary=True).first()
-            message = None
             if not api_key:
                 message = "No Primary API key selected in your Account, please either generate a new key or select and set one"
-                # Return early if there's no API key
                 return render(request, 'observation/observations.html', {"observations": [], "message": message})
 
             # Check if the user has an active subscription
@@ -220,6 +186,7 @@ class ObservationsView(APIView):
                 "X-API-KEY": api_key.key,
             }
             response = requests.get(url, headers=headers)
+
             if response.status_code == 200:
                 observations = response.json()
                 return render(request, 'observation/observations.html', {"observations": observations})
@@ -227,68 +194,74 @@ class ObservationsView(APIView):
                 message = f"Failed to fetch observations: {response.text}"
                 return render(request, 'observation/observations.html', {"observations": [], "message": message})
 
-        except AuthenticationFailed as e:
+        except AuthenticationFailed:
             return redirect('login')
         except Exception as e:
-            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for ObservationsView: {e}", "is_error": True}, status=400)
-            # return Response(data={"error": f"'GET' Method Failed for ObservationsView: {e}", "is_error": True}, status=400)
-    # @method_decorator(login_required)
+            return render(request, 'system/response.html', {
+                'message': f"'GET' Method Failed for ObservationsView: {e}",
+                "is_error": True
+            }, status=400)
+
     def put(self, request):
         try:
-            account = self.authenticate_user(request)
-            self.check_mfa(account=account)
             # Handle PUT requests
-            return Response({"message": "PUT request received"}, status=201)
-        except AuthenticationFailed as e:
-            return redirect('login')  
+            message = "PUT request received"
+            is_error = False
+            status_code = 201
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            # return render(request, 'system/response.html', {'message': f"'PUT' Method Failed for ObservationsView: {e}", "is_error": True}, status=400)
-            return Response(data={"error": f"'PUT' Method Failed for ObservationsView: {e}", "is_error": True}, status=400)
-    # @method_decorator(login_required)
+            message = f"'PUT' Method Failed for ObservationsView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+
     def patch(self, request):
         try:
-            account = self.authenticate_user(request)
-            self.check_mfa(account=account)
             # Handle PATCH requests
-            return Response({"message": "PATCH request received"}, status=200)
-        except AuthenticationFailed as e:
-            return redirect('login')  
+            message = "PATCH request received"
+            is_error = False
+            status_code = 200
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            # return render(request, 'system/response.html', {'message': f"'PATCH' Method Failed for ObservationsView: {e}", "is_error": True}, status=400)
-            return Response(data={"error": f"'PATCH' Method Failed for ObservationsView: {e}", "is_error": True}, status=400)
-    # @method_decorator(login_required)
+            message = f"'PATCH' Method Failed for ObservationsView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
     def delete(self, request):
         try:
-            account = self.authenticate_user(request)
-            self.check_mfa(account=account)
             # Handle DELETE requests
-            return Response({"message": "DELETE request received"}, status=200)
-        except AuthenticationFailed as e:
-            return redirect('login')  
+            message = "DELETE request received"
+            is_error = False
+            status_code = 200
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            # return render(request, 'system/response.html', {'message': f"'PATCH' Method Failed for ObservationsView: {e}", "is_error": True}, status=400)
-            return Response(data={"error": f"'DELETE' Method Failed for ObservationsView: {e}", "is_error": True}, status=400)
-    # @method_decorator(login_required)
+            message = f"'DELETE' Method Failed for ObservationsView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
     def options(self, request, *args, **kwargs):
         try:
-            account = self.authenticate_user(request)
-            self.check_mfa(account=account)
             # Handle OPTIONS requests
-            return Response({"message": "OPTIONS request received"}, status=204)
-        except AuthenticationFailed as e:
-            return redirect('login')  
+            message = "OPTIONS request received"
+            is_error = False
+            status_code = 204
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'OPTIONS' Method Failed for ObservationsView: {e}", "is_error": True}, status=400)
-    # @method_decorator(login_required)
+            message = f"'OPTIONS' Method Failed for ObservationsView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
     def head(self, request, *args, **kwargs):
         try:
-            account = self.authenticate_user(request)
-            self.check_mfa(account=account)
             # Handle HEAD requests
             # Since Django automatically handles HEAD, no implementation is required
             # The HEAD response will be the same as GET but without the body
-            return Response({"message": "HEAD request received"}, status=200)
-        except AuthenticationFailed as e:
-            return redirect('login')  
+            message = "HEAD request received"
+            is_error = False
+            status_code = 200
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'HEAD' Method Failed for ObservationsView: {e}", "is_error": True}, status=400)
+            message = f"'HEAD' Method Failed for ObservationsView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')

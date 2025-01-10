@@ -1,11 +1,9 @@
-import uuid
+import uuid, secrets
+from django.utils.timezone import now, timedelta
 from django.db import models
-from django.utils.timezone import now
 from ...config.config import stripe
 from ...models import Account, Price, Plan
-from datetime import datetime
 from django.utils.timezone import is_aware, make_aware
-
 class Subscription(models.Model):
     SUBSCRIPTION_STATUS_CHOICES = [
         ('incomplete', 'incomplete'),
@@ -102,46 +100,6 @@ class Subscription(models.Model):
         """
         return self.subscription_items.all()
 
-    def create_or_update_stripe_subscription(self):
-        """
-        Create or update a Stripe subscription based on the current items.
-        """
-        items = []
-
-        # Iterate through all subscription items and add to the items list
-        for item in self.get_items():
-            if item.price:
-                stripe_id = item.price.stripe_price_id
-            elif item.plan:
-                stripe_id = item.plan.stripe_plan_id
-            else:
-                raise ValueError("SubscriptionItem must have either a price or a plan.")
-
-            items.append({
-                "price": stripe_id,
-                "quantity": item.quantity
-            })
-
-        print(f"model items: {items}")
-
-        if not items:
-            raise ValueError("No items to create or update subscription.")
-
-        if self.stripe_subscription_id:
-            # Update existing Stripe subscription
-            stripe.Subscription.modify(
-                self.stripe_subscription_id,
-                items=items
-            )
-        else:
-            # Create a new Stripe subscription
-            stripe_subscription = stripe.Subscription.create(
-                items=items,
-                customer=self.customer.stripe_customer_id
-            )
-            self.stripe_subscription_id = stripe_subscription['id']
-            self.save()
-
 
     def subscription_duration(self):
         """
@@ -183,6 +141,11 @@ class Subscription(models.Model):
     def __str__(self):
         return str(self.id)
 
+    # Meta Class
+    class Meta:
+        db_table = "pages_subscription"
+
+
 class SubscriptionItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     subscription = models.ForeignKey(
@@ -206,6 +169,10 @@ class SubscriptionItem(models.Model):
     )
     quantity = models.PositiveIntegerField(default=1)
     stripe_subscription_item_id = models.CharField(max_length=255, blank=True, unique=True, null=True)
+    created = models.DateTimeField(default=now)
+    updated = models.DateTimeField(auto_now=True)
+    deleted = models.DateTimeField(null=True, blank=True)
+
 
     def update_quantity(self, quantity):
         """
@@ -225,3 +192,7 @@ class SubscriptionItem(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+    # Meta Class
+    class Meta:
+        db_table = "pages_subscription_item"

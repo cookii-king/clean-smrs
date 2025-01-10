@@ -1,15 +1,8 @@
-from config.config import create_app, db
+from config.config import app, db, DEBUG
+from pages import endpoints
 
-def setup_database(app):
-    """Create database tables."""
-    with app.app_context():
-        db.create_all()
-
-def main():
-    """Run the Flask application."""
-    app = create_app()
-    setup_database(app)
-    app.run(debug=app.config['DEBUG'])
+with app.app_context():
+    db.create_all()
 
 if __name__ == "__main__":
-    main()
+    app.run(debug=DEBUG)

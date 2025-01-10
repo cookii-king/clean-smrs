@@ -1,0 +1,2370 @@
+Directory structure and file contents for: templates
+
+Generating directory structure...
+templates
+├── account
+│   ├── account.html
+│   └── edit.html
+├── authentication
+│   ├── confirm-email.html
+│   ├── enable-mfa.html
+│   ├── login.html
+│   ├── register.html
+│   └── verify-mfa.html
+├── cart
+│   ├── cart.html
+│   └── carts.html
+├── checkout
+│   ├── checkout.html
+│   ├── checkouts.html
+│   ├── failure.html
+│   └── success.html
+├── observation
+│   ├── create.html
+│   ├── observation.html
+│   ├── observations.html
+│   └── update.html
+├── order
+│   ├── order.html
+│   └── orders.html
+├── payment-link
+│   └── payment-link.html
+├── plan
+│   ├── create.html
+│   ├── edit.html
+│   ├── plan.html
+│   └── plans.html
+├── product
+│   ├── create.html
+│   ├── edit.html
+│   ├── product.html
+│   └── products.html
+├── subscription
+│   ├── subscription.html
+│   └── subscriptions.html
+├── system
+│   ├── 404.html
+│   ├── about.html
+│   ├── community-forum.html
+│   ├── contact.html
+│   ├── error.html
+│   ├── faqs.html
+│   ├── index.html
+│   ├── plans-and-pricing.html
+│   ├── privacy-policy.html
+│   ├── resources.html
+│   ├── response.html
+│   ├── support-ticket.html
+│   ├── support.html
+│   ├── terms-of-service.html
+│   ├── tutorial.html
+│   ├── tutorials.html
+│   ├── user-guide.html
+│   ├── user-guides.html
+│   └── whitepaper.html
+├── webhook
+│   └── webhook.html
+└── widgets
+    ├── base.html
+    ├── footer.html
+    └── navbar.html
+
+14 directories, 53 files
+
+Appending file contents...
+File: templates/webhook/webhook.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% block content %}
+{% endblock %}
+
+
+File: templates/order/order.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% block content %}
+{% endblock %}
+
+
+File: templates/order/orders.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% load custom_filters %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Your Orders</h2>
+    {% if orders %}
+    <div class="table-responsive mt-4">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-light">
+                <tr>
+                    <th>Order ID</th>
+                    <th>Items</th>
+                    <th>Order Date</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>
+                        <ul class="list-unstyled">
+                            {% for item in order.order_items.all %}
+                            <li>
+                                {% if item.product %}
+                                {{ item.product.name }}
+                                {% elif item.price %}
+                                {{ item.price.name }}
+                                {% elif item.plan %}
+                                {{ item.plan.name }}
+                                {% endif %}
+                                (Quantity: {{ item.quantity }})
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                    <td>{{ order.created|date:"M d, Y" }}</td>
+                    <td>
+                        ${{ order.order_items.all|sum_prices }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-center">No orders found.</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+
+File: templates/plan/plans.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% block content %}
+{% endblock %}
+
+
+File: templates/plan/create.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% block content %}
+{% endblock %}
+
+
+File: templates/plan/edit.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% block content %}
+{% endblock %}
+
+
+File: templates/plan/plan.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% block content %}
+{% endblock %}
+
+
+File: templates/product/product.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% block content %}
+<div class="product-container">
+    <h1>{{ product.name }}</h1>
+    <p>{{ product.description }}</p>
+
+    <!-- Product Images -->
+    <div class="product-images">
+        <h3>Images:</h3>
+        {% for image in product.images.all %}
+            {% if image.image %}
+                <img src="{{ image.image.url }}" alt="Uploaded Image">
+            {% elif image.image_url %}
+                <img src="{{ image.image_url }}" alt="External Image">
+            {% endif %}
+            {% if image.stripe_file_url %}
+                <p><a href="{{ image.stripe_file_url }}" target="_blank">View Stripe File</a></p>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <!-- Product Prices -->
+    <div class="product-price">
+        <h3>Price:</h3>
+        {% for price in product.prices.all %}
+            <p>${{ price.unit_amount }}</p>
+        {% empty %}
+            <p>No price available.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Add to Cart -->
+    <form class="add-to-cart-form" data-product-id="{{ product.id }}">
+        {% csrf_token %}
+        <input type="number" name="quantity" value="1" min="1">
+        <button type="button" class="add-to-cart-button">Add to Cart</button>
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('.add-to-cart-button').on('click', function() {
+            const form = $(this).closest('.add-to-cart-form');
+            const productId = form.data('product-id');
+            const quantity = form.find('input[name="quantity"]').val();
+            const csrfToken = form.find('input[name="csrfmiddlewaretoken"]').val();
+
+            $.ajax({
+                url: "{% url 'add_to_cart' %}",
+                method: "POST",
+                data: {
+                    product_id: productId,
+                    quantity: quantity,
+                    csrfmiddlewaretoken: csrfToken
+                },
+                success: function(response) {
+                    alert('Item added to cart!');
+                },
+                error: function(xhr) {
+                    alert('Failed to add item to cart.');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
+
+
+
+File: templates/product/products.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Products</h1>
+    <div class="row">
+        {% for product in products %}
+        <div class="col-md-4 mb-4">
+            <div class="card product-card">
+                {% if product.images.all %}
+                <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}" class="card-img-top img-fluid">
+                {% endif %}
+                <div class="card-body">
+                    <h2 class="card-title">{{ product.name }}</h2>
+                    <p class="card-text">{{ product.description }}</p>
+
+                    <!-- Display price -->
+                    {% if product.prices.exists %}
+                    <p class="card-text">
+                        <strong>Price:</strong>
+                        {{ product.prices.first.unit_amount|floatformat:2 }} {{ product.prices.first.currency|upper }}
+                    </p>
+                    {% else %}
+                    <p class="card-text text-muted"><em>No price available</em></p>
+                    {% endif %}
+
+                    <!-- Action Buttons -->
+                    <div class="btn-group mt-3" role="group">
+                        <a href="{% url 'product-update' product.id %}" class="btn btn-primary">Edit</a>
+                        {% if request.user.is_superuser %}
+                        <form method="POST" action="{% url 'product-delete' product.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="delete">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                        {% endif %}
+
+                        <!-- Add to Cart Button -->
+                        <form method="POST" action="{% url 'add-to-cart' product.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success">Add to Cart</button>
+                        </form>
+
+                        <!-- Buy Now Button -->
+                        <form method="POST" action="{% url 'buy-now' product.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-warning">Buy Now</button>
+                        </form>
+
+                        <!-- View Product Button -->
+                        <a href="{% url 'product-detail' product.id %}" class="btn btn-info">View Product</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+
+File: templates/product/create.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">{% if product %}Update{% else %}Create{% endif %} Product</h1>
+    <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <!-- Product Type Selection -->
+        <div class="mb-4">
+            <label for="type" class="form-label">Product Type</label>
+            <select id="type" name="type" class="form-select" required>
+                <option value="good" {% if form.type.value == 'good' %}selected{% endif %}>Goods</option>
+                <option value="service" {% if form.type.value == 'service' %}selected{% endif %}>Subscription</option>
+            </select>
+        </div>
+
+        <!-- Price Details -->
+        <div class="mb-4">
+            <h5>Price Details</h5>
+            <label for="price_amount" class="form-label">Price Amount (in dollars)</label>
+            <input 
+                type="number" 
+                step="0.01" 
+                id="price_amount" 
+                name="price_amount" 
+                class="form-control" 
+                placeholder="e.g., 10.50 (for $10.50)" 
+                min="0.01" 
+                max="1000000.00" 
+                required>
+            
+            <label for="price_currency" class="form-label mt-3">Currency</label>
+            <select id="price_currency" name="price_currency" class="form-select" required>
+                <option value="usd">USD</option>
+                <option value="eur">EUR</option>
+                <!-- Add other currencies as needed -->
+            </select>
+
+            <label for="price_interval" class="form-label mt-3">Billing Interval</label>
+            <select id="price_interval" name="price_interval" class="form-select">
+                <option value="one_time">One Time</option>
+                <option value="month">Monthly</option>
+                <option value="year">Yearly</option>
+            </select>
+        </div>
+
+        <!-- Existing Images Section -->
+        {% if images %}
+        <div class="mb-4">
+            <h5>Existing Images</h5>
+            <div class="row">
+                {% for image in images %}
+                <div class="col-md-3 mb-3">
+                    <img src="{{ image.image.url }}" alt="Product Image" class="img-fluid">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="delete_images" value="{{ image.id }}" id="deleteImage{{ image.id }}">
+                        <label class="form-check-label" for="deleteImage{{ image.id }}">Delete</label>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Upload New Images -->
+        <div class="mb-4">
+            <label for="images" class="form-label">Add New Images</label>
+            <input type="file" id="images" name="images" class="form-control" multiple>
+        </div>
+
+        <!-- Existing Videos Section -->
+        {% if videos %}
+        <div class="mb-4">
+            <h5>Existing Videos</h5>
+            <div class="row">
+                {% for video in videos %}
+                <div class="col-md-3 mb-3">
+                    <video controls class="img-fluid">
+                        <source src="{{ video.video.url }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="delete_videos" value="{{ video.id }}" id="deleteVideo{{ video.id }}">
+                        <label class="form-check-label" for="deleteVideo{{ video.id }}">Delete</label>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Upload New Videos -->
+        <div class="mb-4">
+            <label for="videos" class="form-label">Add New Videos</label>
+            <input type="file" id="videos" name="videos" class="form-control" multiple>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">{% if product %}Update{% else %}Create{% endif %} Product</button>
+    </form>
+</div>
+{% endblock %}
+
+
+File: templates/product/edit.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% block content %}
+{% endblock %}
+
+
+File: templates/checkout/failure.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% block content %}
+Checkout Failure!
+{% endblock %}
+
+
+File: templates/checkout/checkouts.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% block content %}
+{% endblock %}
+
+
+File: templates/checkout/checkout.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% block content %}
+{% endblock %}
+
+
+File: templates/checkout/success.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% load custom_filters %}
+{% block content %}
+<div class="container text-center mt-5">
+    <div class="card mx-auto" style="max-width: 600px; border: 2px solid #28a745;">
+        <div class="card-body">
+            <h1 class="text-success">
+                <i class="bi bi-check-circle-fill"></i> Success!
+            </h1>
+            <h2 class="mt-3">Your Checkout is Complete</h2>
+            <p class="mt-3">Thank you for your purchase! Your order has been successfully processed.</p>
+            <hr>
+            {% if order %}
+            <div class="text-start mt-4">
+                <h4>Order Details</h4>
+                <p><strong>Order ID:</strong> {{ order.id }}</p>
+                <p><strong>Order Date:</strong> {{ order.created|date:"F j, Y, g:i a" }}</p>
+                <h5 class="mt-3">Items:</h5>
+                <ul class="list-group">
+                    {% for item in order.order_items.all %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ item.product.name }}</strong>
+                            <br>
+                            Quantity: {{ item.quantity }}
+                        </div>
+                        <span>${{ item.price.unit_amount|floatformat:2 }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <div class="text-end mt-3">
+                    <h5><strong>Total:</strong> ${{ order.order_items.all|sum_prices }}</h5>
+                </div>
+            </div>
+            {% else %}
+            <p>No order details available.</p>
+            {% endif %}
+            <hr>
+            <p class="mt-3">Need help? <a href="{% url 'support' %}">Contact Support</a></p>
+            <a href="{% url 'index' %}" class="btn btn-primary mt-3">Go to Homepage</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+File: templates/subscription/subscriptions.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Your Subscriptions</h2>
+    {% if subscriptions %}
+    <div class="table-responsive mt-4">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-light">
+                <tr>
+                    <th>Subscription ID</th>
+                    <th>Items</th>
+                    <th>Status</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for subscription in subscriptions %}
+                <tr>
+                    <td>{{ subscription.stripe_subscription_id }}</td>
+                    <td>
+                        {% for item in subscription.subscription_items.all %}
+                        {% if item.plan %}
+                        Plan: {{ item.plan.stripe_plan_id }}
+                        {% elif item.price %}
+                        Price: {{ item.price.stripe_price_id }}
+                        {% endif %}
+                        (Quantity: {{ item.quantity }})<br>
+                        {% endfor %}
+                    </td>
+                    <td>{{ subscription.status }}</td>
+                    <td>{{ subscription.created|date:"M d, Y" }}</td>
+                    <td>
+                        {% if subscription.deleted %}
+                        {{ subscription.deleted|date:"M d, Y" }}
+                        {% else %}
+                        Active
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if subscription.status == 'active' %}
+                        <form method="POST" action="{% url 'subscription-cancel' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="subscription_id" value="{{ subscription.id }}">
+                            <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-center">No subscriptions found.</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+
+File: templates/subscription/subscription.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% block content %}
+{% endblock %}
+
+
+File: templates/system/faqs.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+
+{% block title %}
+FAQs - CleanSMRs
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Frequently Asked Questions</h1>
+            <p>Here are some of the most common questions we receive from our customers. If you have a question that isn't answered here, please feel free to <a href="{% url 'contact' %}">contact us</a>.</p>
+            
+            <div class="accordion" id="faqAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            What is a Small Modular Reactor (SMR)?
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            A Small Modular Reactor (SMR) is a type of nuclear reactor that is smaller in size and output compared to traditional nuclear reactors. SMRs are designed to be more flexible and scalable, making them ideal for providing power to smaller grids or remote locations.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingTwo">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            How do I purchase a CleanSMRs product?
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            You can purchase our products by visiting the <a href="{% url 'products' %}">Products</a> page on our website. From there, you can view detailed information about each product and proceed to purchase.
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingThree">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            What support options are available?
+                        </button>
+                    </h2>
+                    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            We offer a variety of support options, including email support, phone support, and a comprehensive <a href="{% url 'support' %}">Support</a> page with resources and FAQs. You can also submit a support ticket through our website.
+                        </div>
+                    </div>
+                </div>
+                <!-- Add more FAQ items as needed -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+File: templates/system/tutorial.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+
+{% block title %}
+Tutorial - CleanSMRs
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Tutorial: Setting Up Your CleanSMRs Product</h1>
+            <p>Welcome to the CleanSMRs tutorial. This guide will walk you through the steps to set up and start using your CleanSMRs product effectively.</p>
+            
+            <h2>Step 1: Unboxing and Initial Setup</h2>
+            <p>Begin by carefully unboxing your CleanSMRs product. Ensure that all components are present and undamaged. Follow the instructions in the user manual to connect the necessary cables and power on the device.</p>
+            
+            <h2>Step 2: Connecting to the Network</h2>
+            <p>To connect your CleanSMRs product to the network, follow these steps:</p>
+            <ol>
+                <li>Access the settings menu on the device.</li>
+                <li>Select "Network Settings" and choose your Wi-Fi network.</li>
+                <li>Enter the Wi-Fi password and confirm the connection.</li>
+            </ol>
+            
+            <h2>Step 3: Configuring the Device</h2>
+            <p>Once connected to the network, configure your device settings to suit your preferences:</p>
+            <ul>
+                <li>Set the device name and location.</li>
+                <li>Adjust the power settings for optimal performance.</li>
+                <li>Enable any additional features you wish to use.</li>
+            </ul>
+            
+            <h2>Step 4: Monitoring and Maintenance</h2>
+            <p>Regular monitoring and maintenance are essential for optimal performance. Use the CleanSMRs app to track device status and receive notifications for any required maintenance tasks.</p>
+            
+            <h2>Additional Resources</h2>
+            <p>For more detailed instructions and troubleshooting tips, refer to the <a href="{% url 'user-guides' %}">User Guides</a> section on our website.</p>
+            
+            <h2>Need Help?</h2>
+            <p>If you encounter any issues or have questions, please visit our <a href="{% url 'support' %}">Support</a> page or contact our support team for assistance.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+File: templates/system/index.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% block title %}
+    Home - CleanSMRs
+{% endblock %}
+{% block content %}
+<div class="hero-banner position-relative text-center text-dark py-5">
+    <div class="hero-content">
+        <h1>Welcome to CleanSMRs</h1>
+        <p>Your go-to solution for sustainable energy solutions.</p>
+    </div>
+</div>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-4 d-flex align-items-stretch">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div class="mb-4">
+                        <h5 class="card-title">Our Products</h5>
+                        <p class="card-text">Explore our range of products designed to meet your energy needs.</p>
+                    </div>
+                    <a href="{% url 'products' %}" class="btn btn-primary mt-auto">View Products</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 d-flex align-items-stretch">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div class="mb-4">
+                        <h5 class="card-title">Plans & Pricing</h5>
+                        <p class="card-text">Find a plan that suits your budget and requirements.</p>
+                    </div>
+                    <a href="{% url 'plans-and-pricing' %}" class="btn btn-primary mt-auto">See Plans</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 d-flex align-items-stretch">
+            <div class="card h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div class="mb-4">
+                        <h5 class="card-title">Contact Us</h5>
+                        <p class="card-text">Have questions? Get in touch with our team.</p>
+                    </div>
+                    <a href="{% url 'contact' %}" class="btn btn-primary mt-auto">Contact</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Enhanced Section for Clean Energy Benefits -->
+    <div class="mt-5 p-4 bg-light rounded shadow-sm">
+        <h2 class="text-center mb-4">Benefits of Clean Energy</h2>
+        <p>Clean energy is revolutionizing the way we power our world. By harnessing renewable resources, we can significantly reduce our carbon footprint and pave the way for a sustainable future. Here are some key benefits of clean energy:</p>
+        <div class="row">
+            <div class="col-md-6">
+                <ul class="list-unstyled">
+                    <li class="mb-3">
+                        <h5><strong>Environmental Impact</strong></h5>
+                        <p>Clean energy sources like wind, solar, and nuclear power produce little to no greenhouse gas emissions, helping to combat climate change and reduce air pollution.</p>
+                    </li>
+                    <li class="mb-3">
+                        <h5><strong>Energy Security</strong></h5>
+                        <p>By diversifying our energy sources, we reduce dependence on fossil fuels and enhance energy security, ensuring a stable and reliable energy supply.</p>
+                    </li>
+                    <li class="mb-3">
+                        <h5><strong>Economic Growth</strong></h5>
+                        <p>The clean energy sector is a rapidly growing industry, creating jobs and driving economic growth through innovation and investment.</p>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <ul class="list-unstyled">
+                    <li class="mb-3">
+                        <h5><strong>Health Benefits</strong></h5>
+                        <p>Reducing air pollution from fossil fuels can lead to improved public health outcomes, decreasing respiratory and cardiovascular diseases.</p>
+                    </li>
+                    <li class="mb-3">
+                        <h5><strong>Reliability</strong></h5>
+                        <p>Technologies like Small Modular Reactors (SMRs) provide a stable and continuous power supply, essential for data centers and other critical infrastructure.</p>
+                    </li>
+                    <li class="mb-3">
+                        <h5><strong>Innovation and Sustainability</strong></h5>
+                        <p>Clean energy fosters innovation in technology and sustainability practices, encouraging a shift towards a more environmentally conscious society.</p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <p class="mt-4">At CleanSMRs, we are committed to providing innovative nuclear solutions that support the transition to a cleaner, more sustainable energy future. Join us in making a positive impact on the environment and society.</p>
+    </div>
+    <!-- Additional Information Section -->
+    <div class="mt-5">
+        <h3>Why Choose CleanSMRs?</h3>
+        <p>CleanSMRs is at the forefront of the clean energy revolution, offering cutting-edge solutions that are both efficient and environmentally friendly. Our Small Modular Reactors are designed to meet the growing energy demands of data centers while minimizing environmental impact.</p>
+        <p>Our commitment to sustainability and innovation ensures that we provide our clients with the best possible solutions for their energy needs. By choosing CleanSMRs, you are investing in a future that prioritizes both technological advancement and environmental stewardship.</p>
+        <p>Explore our range of products and services to see how we can help you achieve your energy goals while contributing to a more sustainable world.</p>
+    </div>
+
+        <!-- Additional Information Section -->
+        <div class="mt-5">
+</div>
+</div>
+{% endblock %}
+
+
+File: templates/system/support-ticket.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+
+{% block title %}
+Submit a Support Ticket - CleanSMRs
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1>Submit a Support Ticket</h1>
+            <p>If you're experiencing an issue or have a question that requires assistance, please fill out the form below to submit a support ticket. Our support team will get back to you as soon as possible.</p>
+            
+            <form method="post" action="{% url 'submit-support-ticket' %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="subject" class="form-label">Subject</label>
+                    <input type="text" class="form-control" id="subject" name="subject" required>
+                </div>
+                <div class="mb-3">
+                    <label for="priority" class="form-label">Priority</label>
+                    <select class="form-select" id="priority" name="priority" required>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="message" class="form-label">Message</label>
+                    <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Ticket</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+File: templates/system/response.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% block content %}
+<div style="text-align: center; padding: 50px 0;">
+    {% if is_error %}
+        <h1 id="response-title" style="font-size: 72px; font-weight: bold; color: red;">Error</h1>
+    {% else %}
+        <h1 id="response-title" style="font-size: 72px; font-weight: bold; color: green;">Success</h1>
+    {% endif %}
+    <p id="response-message" style="font-size: 18px; color: #555;">{{ message }}</p>
+    <a href="{% url 'index' %}" style="text-decoration: none; font-size: 18px; color: #007bff;">
+        Go back to Home
+    </a>
+</div>
+{% endblock %}
+
+
+File: templates/system/about.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+
+{% block title %}
+About Us - CleanSMRs
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>About CleanSMRs</h1>
+            <p>At CleanSMRs, we are dedicated to providing innovative and sustainable energy solutions through the use of Small Modular Reactors (SMRs). Our mission is to revolutionize the energy industry by offering clean, reliable, and efficient power solutions that meet the growing demands of modern infrastructure.</p>
+            
+            <h2>Our Mission</h2>
+            <p>Our mission is to lead the transition to a sustainable energy future by developing cutting-edge nuclear technologies that reduce carbon emissions and promote environmental stewardship. We are committed to delivering high-quality products and services that empower our clients to achieve their energy goals while minimizing their environmental impact.</p>
+            
+            <h2>Our Vision</h2>
+            <p>We envision a world where clean energy is the norm, and our innovative SMR solutions play a pivotal role in achieving this vision. By harnessing the power of nuclear energy, we aim to provide a stable and continuous power supply that supports the growth of data centers and other critical infrastructure.</p>
+            
+            <h2>Our Values</h2>
+            <ul>
+                <li><strong>Innovation:</strong> We are committed to pushing the boundaries of technology to develop advanced energy solutions.</li>
+                <li><strong>Sustainability:</strong> We prioritize environmental responsibility in all aspects of our business.</li>
+                <li><strong>Integrity:</strong> We conduct our business with honesty and transparency, building trust with our clients and partners.</li>
+                <li><strong>Excellence:</strong> We strive for excellence in everything we do, from product development to customer service.</li>
+            </ul>
+            
+            <h2>Our Team</h2>
+            <p>Our team is composed of industry experts and passionate individuals who are dedicated to advancing the field of clean energy. With a diverse range of skills and expertise, we work collaboratively to deliver innovative solutions that meet the unique needs of our clients.</p>
+            
+            <h2>Contact Us</h2>
+            <p>If you have any questions or would like to learn more about our products and services, please don't hesitate to <a href="{% url 'contact' %}">contact us</a>. We look forward to partnering with you on your journey to a sustainable energy future.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+File: templates/system/privacy-policy.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+
+{% block title %}
+Privacy Policy - CleanSMRs
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Privacy Policy</h1>
+            <p>At CleanSMRs, we are committed to protecting your privacy. This Privacy Policy outlines how we collect, use, disclose, and safeguard your information when you visit our website or use our services.</p>
+            
+            <h2>Information We Collect</h2>
+            <p>We may collect personal information that you provide to us directly, such as your name, email address, and phone number, when you contact us or register for an account. We also collect information automatically as you navigate through our site, such as your IP address, browser type, and usage data.</p>
+            
+            <h2>How We Use Your Information</h2>
+            <p>We use the information we collect to:</p>
+            <ul>
+                <li>Provide, operate, and maintain our website and services</li>
+                <li>Improve, personalize, and expand our website and services</li>
+                <li>Understand and analyze how you use our website</li>
+                <li>Communicate with you, either directly or through one of our partners, including for customer service, to provide you with updates and other information relating to the website, and for marketing and promotional purposes</li>
+                <li>Process your transactions and manage your orders</li>
+                <li>Find and prevent fraud</li>
+            </ul>
+            
+            <h2>Sharing Your Information</h2>
+            <p>We do not sell, trade, or otherwise transfer your personal information to outside parties without your consent, except as described in this policy. We may share your information with trusted third parties who assist us in operating our website, conducting our business, or servicing you, so long as those parties agree to keep this information confidential.</p>
+            
+            <h2>Data Security</h2>
+            <p>We implement a variety of security measures to maintain the safety of your personal information. However, no method of transmission over the Internet or method of electronic storage is 100% secure, and we cannot guarantee its absolute security.</p>
+            
+            <h2>Your Rights</h2>
+            <p>You have the right to access, update, or delete your personal information. If you wish to exercise any of these rights, please contact us using the information provided below.</p>
+            
+            <h2>Changes to This Privacy Policy</h2>
+            <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page. You are advised to review this Privacy Policy periodically for any changes.</p>
+            
+            <h2>Contact Us</h2>
+            <p>If you have any questions about this Privacy Policy, please contact us at:</p>
+            <p>Email: privacy@cleansmrs.com</p>
+            <p>Phone: +1 (123) 456-7890</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+File: templates/system/contact.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+
+{% block title %}
+Contact Us - CleanSMRs
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            <h1>Contact Us</h1>
+            <p>If you have any questions, comments, or would like more information about our products and services, please feel free to reach out to us using the form below. We look forward to hearing from you!</p>
+            
+            <form method="post" action="{% url 'contact' %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="subject" class="form-label">Subject</label>
+                    <input type="text" class="form-control" id="subject" name="subject" required>
+                </div>
+                <div class="mb-3">
+                    <label for="message" class="form-label">Message</label>
+                    <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Send Message</button>
+            </form>
+        </div>
+        <div class="col-md-4">
+            <h2>Our Contact Information</h2>
+            <p><strong>Email:</strong> info@cleansmrs.com</p>
+            <p><strong>Phone:</strong> +1 (123) 456-7890</p>
+            <p><strong>Address:</strong> 123 Clean Energy Way, Sustainable City, SC 12345</p>
+            
+            <h3>Follow Us</h3>
+            <ul class="list-unstyled">
+                <li><a href="#" target="_blank">LinkedIn</a></li>
+                <li><a href="#" target="_blank">Twitter</a></li>
+                <li><a href="#" target="_blank">Facebook</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+File: templates/system/support.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+
+{% block title %}
+Support - CleanSMRs
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Support</h1>
+            <p>Welcome to the CleanSMRs Support page. We are here to help you with any questions or issues you may have. Below you will find various resources and ways to get in touch with our support team.</p>
+            
+            <h2>Contact Support</h2>
+            <p>If you need immediate assistance, please contact our support team:</p>
+            <ul>
+                <li><strong>Email:</strong> support@cleansmrs.com</li>
+                <li><strong>Phone:</strong> +1 (123) 456-7890</li>
+                <li><strong>Support Hours:</strong> Monday to Friday, 9 AM - 5 PM (EST)</li>
+            </ul>
+            
+            <h2>Frequently Asked Questions (FAQs)</h2>
+            <p>Here are some of the most common questions we receive from our customers:</p>
+            <ul>
+                <li><strong>How do I create an account?</strong> Visit our <a href="{% url 'register' %}">registration page</a> to sign up for an account.</li>
+                <li><strong>How can I reset my password?</strong> You can reset your password by clicking on the "Forgot Password" link on the login page.</li>
+                <li><strong>Where can I find product documentation?</strong> Product documentation is available in the <a href="{% url 'resources' %}">Resources</a> section of our website.</li>
+            </ul>
+            
+            <h2>Resources</h2>
+            <p>Explore our resources for additional support:</p>
+            <ul>
+                <li><a href="{% url 'user-guides' %}">User Guides</a></li>
+                <li><a href="{% url 'tutorials' %}">Tutorials</a></li>
+                <li><a href="{% url 'community-forum' %}">Community Forum</a></li>
+            </ul>
+            
+            <h2>Submit a Support Ticket</h2>
+            <p>If you have a specific issue that requires further assistance, please submit a support ticket through our <a href="{% url 'support-ticket' %}">Support Ticket System</a>.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+File: templates/system/plans-and-pricing.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% block title %}
+    Plans & Pricing - CleanSMRs
+{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Plans and Pricing</h1>
+    <div class="toggle-buttons text-center mt-4">
+        <button class="btn btn-primary" id="monthly-btn" onclick="showPlans('monthly')">Monthly</button>
+        <button class="btn btn-secondary" id="yearly-btn" onclick="showPlans('yearly')">Yearly</button>
+    </div>
+    <div class="plans mt-5">
+        <!-- Monthly Items -->
+        <div id="monthly-plans" style="display: none;">
+            <h2 class="text-center mb-4">Monthly Plans</h2>
+            <div class="row">
+                {% for item in monthly_items %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h3 class="card-title">{{ item.product.name }}</h3>
+                            <p class="card-text">
+                                ${{ item.amount }} / month
+                            </p>
+                            <form method="POST" action="{% url 'checkout-subscribe' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="plan_id" value="{{ item.stripe_id }}">
+                                <input type="hidden" name="mode" value="subscription">
+                                <button type="submit" class="btn btn-success w-100">
+                                    Subscribe
+                                </button>
+                            </form>
+                            {% if active_subscription and active_subscription.plan.stripe_plan_id != item.stripe_id %}
+                            <form method="POST" action="{% url 'checkout-upgrade' %}" class="mt-2">
+                                {% csrf_token %}
+                                <input type="hidden" name="plan_id" value="{{ item.stripe_id }}">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    Upgrade to {{ item.product.name }}
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <!-- Yearly Items -->
+        <div id="yearly-plans" style="display: none;">
+            <h2 class="text-center mb-4">(-30% off) Yearly Plans</h2>
+            <div class="row">
+                {% for item in yearly_items %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h3 class="card-title">{{ item.product.name }}</h3>
+                            <p class="card-text">
+                                ${{ item.amount }} / year
+                            </p>
+                            <form method="POST" action="{% url 'checkout-subscribe' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="plan_id" value="{{ item.stripe_id }}">
+                                <input type="hidden" name="mode" value="subscription">
+                                <button type="submit" class="btn btn-success w-100">
+                                    Subscribe
+                                </button>
+                            </form>
+                            {% if active_subscription and active_subscription.plan.stripe_plan_id != item.stripe_id %}
+                            <form method="POST" action="{% url 'checkout-upgrade' %}" class="mt-2">
+                                {% csrf_token %}
+                                <input type="hidden" name="plan_id" value="{{ item.stripe_id }}">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    Upgrade to {{ item.product.name }}
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // Show the appropriate plans based on the toggle
+    function showPlans(type) {
+        const monthlyPlans = document.getElementById('monthly-plans');
+        const yearlyPlans = document.getElementById('yearly-plans');
+        const monthlyBtn = document.getElementById('monthly-btn');
+        const yearlyBtn = document.getElementById('yearly-btn');
+        if (type === 'monthly') {
+            monthlyPlans.style.display = 'block';
+            yearlyPlans.style.display = 'none';
+            monthlyBtn.classList.add('btn-primary');
+            monthlyBtn.classList.remove('btn-secondary');
+            yearlyBtn.classList.add('btn-secondary');
+            yearlyBtn.classList.remove('btn-primary');
+        } else {
+            monthlyPlans.style.display = 'none';
+            yearlyPlans.style.display = 'block';
+            yearlyBtn.classList.add('btn-primary');
+            yearlyBtn.classList.remove('btn-secondary');
+            monthlyBtn.classList.add('btn-secondary');
+            monthlyBtn.classList.remove('btn-primary');
+        }
+    }
+    // Default to showing monthly plans on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        showPlans('monthly');
+    });
+</script>
+{% endblock %}
+
+
+File: templates/system/404.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+
+{% block content %}
+    <div style="text-align: center; padding: 50px 0;">
+        <h1 style="font-size: 72px; font-weight: bold; color: #ff0000;">404</h1>
+        <h2 style="font-size: 36px;">Page Not Found</h2>
+        <p style="font-size: 18px; color: #555;">Sorry, the page you're looking for doesn't exist or has been moved.</p>
+        <a href="{% url 'index' %}" style="text-decoration: none; font-size: 18px; color: #007bff;">
+            Go back to Home
+        </a>
+    </div>
+{% endblock %}
+
+
+
+File: templates/system/resources.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+
+{% block title %}
+Resources - CleanSMRs
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Resources</h1>
+            <p>Welcome to the CleanSMRs Resources page. Here you will find a collection of materials designed to help you better understand and utilize our products and services. Explore our guides, tutorials, and more to get the most out of your experience with CleanSMRs.</p>
+            
+            <h2>User Guides</h2>
+            <p>Our user guides provide detailed instructions on how to set up and use our products:</p>
+            <ul>
+                <li><a href="{% url 'user-guide-smr' %}">Small Modular Reactor User Guide</a></li>
+                <li><a href="{% url 'user-guide-portal' %}">Customer Portal User Guide</a></li>
+            </ul>
+            
+            <h2>Tutorials</h2>
+            <p>Watch our step-by-step tutorials to learn more about our products and services:</p>
+            <ul>
+                <li><a href="{% url 'tutorial-setup' %}">Setting Up Your SMR</a></li>
+                <li><a href="{% url 'tutorial-maintenance' %}">Maintenance Tips and Tricks</a></li>
+            </ul>
+            
+            <h2>Whitepapers</h2>
+            <p>Explore our whitepapers for in-depth insights into the clean energy industry and our innovative solutions:</p>
+            <ul>
+                <li><a href="{% url 'whitepaper-clean-energy' %}">The Future of Clean Energy</a></li>
+                <li><a href="{% url 'whitepaper-smr-technology' %}">Advancements in SMR Technology</a></li>
+            </ul>
+            
+            <h2>FAQs</h2>
+            <p>Find answers to common questions about our products and services in our <a href="{% url 'faqs' %}">Frequently Asked Questions</a> section.</p>
+            
+            <h2>Community Forum</h2>
+            <p>Join our <a href="{% url 'community-forum' %}">Community Forum</a> to connect with other users, share experiences, and get advice from experts.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+File: templates/system/user-guide.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+
+{% block title %}
+User Guide - CleanSMRs
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>User Guide: CleanSMRs Product</h1>
+            <p>This user guide provides detailed instructions on how to set up, configure, and use your CleanSMRs product. Follow the steps below to get started and make the most of your product.</p>
+            
+            <h2>Table of Contents</h2>
+            <ul>
+                <li><a href="#introduction">Introduction</a></li>
+                <li><a href="#setup">Setup and Installation</a></li>
+                <li><a href="#configuration">Configuration</a></li>
+                <li><a href="#usage">Usage</a></li>
+                <li><a href="#troubleshooting">Troubleshooting</a></li>
+                <li><a href="#support">Support and Resources</a></li>
+            </ul>
+            
+            <h2 id="introduction">Introduction</h2>
+            <p>Welcome to the CleanSMRs family! Our products are designed to provide efficient and sustainable energy solutions. This guide will help you understand the features and benefits of your CleanSMRs product.</p>
+            
+            <h2 id="setup">Setup and Installation</h2>
+            <p>Follow these steps to set up and install your CleanSMRs product:</p>
+            <ol>
+                <li>Unbox the product and ensure all components are included.</li>
+                <li>Connect the device to a power source using the provided cables.</li>
+                <li>Follow the on-screen instructions to complete the initial setup.</li>
+            </ol>
+            
+            <h2 id="configuration">Configuration</h2>
+            <p>Configure your product settings to suit your needs:</p>
+            <ul>
+                <li>Access the settings menu to adjust network preferences.</li>
+                <li>Set up user accounts and permissions.</li>
+                <li>Enable additional features and integrations.</li>
+            </ul>
+            
+            <h2 id="usage">Usage</h2>
+            <p>Learn how to use your CleanSMRs product effectively:</p>
+            <ul>
+                <li>Monitor performance through the dashboard.</li>
+                <li>Schedule regular maintenance checks.</li>
+                <li>Utilize advanced features for enhanced functionality.</li>
+            </ul>
+            
+            <h2 id="troubleshooting">Troubleshooting</h2>
+            <p>If you encounter any issues, refer to the troubleshooting section for solutions:</p>
+            <ul>
+                <li>Common error messages and their meanings.</li>
+                <li>Steps to resolve connectivity issues.</li>
+                <li>Contact support for further assistance.</li>
+            </ul>
+            
+            <h2 id="support">Support and Resources</h2>
+            <p>For additional support, visit our <a href="{% url 'support' %}">Support</a> page or contact our team. You can also explore more resources in the <a href="{% url 'resources' %}">Resources</a> section.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+File: templates/system/whitepaper.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% load static %}
+
+{% block title %}
+White Paper - CleanSMRs
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>White Paper: The Future of Clean Energy</h1>
+            <p>This white paper explores the advancements in clean energy technologies and the role of Small Modular Reactors (SMRs) in shaping a sustainable future. It provides insights into the benefits, challenges, and potential of SMRs in the energy landscape.</p>
+            
+            <h2>Overview</h2>
+            <p>As the world moves towards more sustainable energy solutions, the demand for clean and efficient power sources is increasing. This white paper examines how SMRs can meet this demand by offering a reliable and scalable energy solution.</p>
+            
+            <h2>Key Insights</h2>
+            <ul>
+                <li><strong>Environmental Benefits:</strong> SMRs produce minimal greenhouse gas emissions, contributing to a reduction in global carbon footprint.</li>
+                <li><strong>Economic Impact:</strong> The deployment of SMRs can drive economic growth by creating jobs and stimulating investment in the energy sector.</li>
+                <li><strong>Technological Advancements:</strong> Recent innovations in SMR technology have improved safety, efficiency, and cost-effectiveness.</li>
+                <li><strong>Challenges and Opportunities:</strong> The paper discusses the regulatory, financial, and technical challenges facing SMR deployment and the opportunities for overcoming these barriers.</li>
+            </ul>
+            
+            <h2>Conclusion</h2>
+            <p>SMRs represent a promising solution for the future of clean energy. By addressing the challenges and leveraging the opportunities, SMRs can play a crucial role in achieving global sustainability goals.</p>
+            
+            <h2>Download the Full White Paper</h2>
+            <p>To access the complete white paper, please click the link below:</p>
+            <a href="{% static 'documents/whitepaper-clean-energy.pdf' %}" class="btn btn-primary" target="_blank">Download White Paper</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+File: templates/system/terms-of-service.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+
+{% block title %}
+Terms of Service - CleanSMRs
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Terms of Service</h1>
+            <p>Welcome to CleanSMRs. By accessing or using our website and services, you agree to be bound by the following terms and conditions. Please read them carefully.</p>
+            
+            <h2>1. Acceptance of Terms</h2>
+            <p>By accessing or using our website, you agree to comply with and be bound by these Terms of Service and our Privacy Policy. If you do not agree to these terms, please do not use our website.</p>
+            
+            <h2>2. Changes to Terms</h2>
+            <p>We reserve the right to modify these terms at any time. Any changes will be effective immediately upon posting on this page. Your continued use of the website after any changes constitutes your acceptance of the new terms.</p>
+            
+            <h2>3. Use of Our Services</h2>
+            <p>You agree to use our services only for lawful purposes and in accordance with these terms. You are responsible for ensuring that your use of the website complies with all applicable laws and regulations.</p>
+            
+            <h2>4. User Accounts</h2>
+            <p>To access certain features of our website, you may be required to create an account. You agree to provide accurate and complete information and to keep your account information updated. You are responsible for maintaining the confidentiality of your account and password.</p>
+            
+            <h2>5. Intellectual Property</h2>
+            <p>All content on our website, including text, graphics, logos, and images, is the property of CleanSMRs or our licensors and is protected by copyright and other intellectual property laws. You may not use, reproduce, or distribute any content without our express written permission.</p>
+            
+            <h2>6. Limitation of Liability</h2>
+            <p>CleanSMRs shall not be liable for any direct, indirect, incidental, special, or consequential damages resulting from the use or inability to use our website or services, even if we have been advised of the possibility of such damages.</p>
+            
+            <h2>7. Governing Law</h2>
+            <p>These terms shall be governed by and construed in accordance with the laws of the jurisdiction in which CleanSMRs operates, without regard to its conflict of law principles.</p>
+            
+            <h2>8. Contact Us</h2>
+            <p>If you have any questions about these Terms of Service, please contact us at:</p>
+            <p>Email: legal@cleansmrs.com</p>
+            <p>Phone: +1 (123) 456-7890</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+File: templates/system/user-guides.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+
+{% block title %}
+User Guides - CleanSMRs
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>User Guides</h1>
+            <p>Welcome to the CleanSMRs User Guides page. Here you will find a collection of guides designed to help you understand and effectively use our products and services. Click on a guide to learn more.</p>
+            
+            <div class="list-group">
+                <a href="{% url 'user-guide-smr' %}" class="list-group-item list-group-item-action">
+                    <h5 class="mb-1">Small Modular Reactor User Guide</h5>
+                    <p class="mb-1">Comprehensive instructions on setting up and using your Small Modular Reactor.</p>
+                </a>
+                <a href="{% url 'user-guide-portal' %}" class="list-group-item list-group-item-action">
+                    <h5 class="mb-1">Customer Portal User Guide</h5>
+                    <p class="mb-1">Step-by-step guide to navigating and utilizing the features of the Customer Portal.</p>
+                </a>
+                <!-- Add more user guide links as needed -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+File: templates/system/tutorials.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+
+{% block title %}
+Tutorials - CleanSMRs
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Tutorials</h1>
+            <p>Welcome to the CleanSMRs Tutorials page. Here you will find a collection of tutorials designed to help you get the most out of your CleanSMRs products and services. Click on a tutorial to learn more.</p>
+            
+            <div class="list-group">
+                <a href="{% url 'tutorial-setup' %}" class="list-group-item list-group-item-action">
+                    <h5 class="mb-1">Setting Up Your CleanSMRs Product</h5>
+                    <p class="mb-1">Learn how to unbox, set up, and configure your CleanSMRs product for optimal performance.</p>
+                </a>
+                <a href="{% url 'tutorial-maintenance' %}" class="list-group-item list-group-item-action">
+                    <h5 class="mb-1">Maintenance Tips and Tricks</h5>
+                    <p class="mb-1">Discover best practices for maintaining your CleanSMRs product to ensure long-lasting performance.</p>
+                </a>
+                <!-- Add more tutorial links as needed -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+File: templates/system/error.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% block content %}
+<div style="text-align: center; padding: 50px 0;">
+    <h1 style="font-size: 72px; font-weight: bold; color: #ff0000;">Error</h1>
+    <h2 style="font-size: 36px;">An Error Occurred</h2>
+    <p style="font-size: 18px; color: #555;">{{ error_message }}</p>
+    <a href="{% url 'index' %}" style="text-decoration: none; font-size: 18px; color: #007bff;">
+        Go back to Home
+    </a>
+</div>
+{% endblock %}
+
+
+File: templates/system/community-forum.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+
+{% block title %}
+Community Forum - CleanSMRs
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Community Forum</h1>
+            <p>Welcome to the CleanSMRs Community Forum! This is a place for users to connect, share experiences, and discuss topics related to clean energy and our products. Whether you're a new user or a seasoned expert, we encourage you to participate and contribute to the community.</p>
+            
+            <h2>Forum Categories</h2>
+            <div class="list-group mb-4">
+                <a href="#" class="list-group-item list-group-item-action">
+                    <h5 class="mb-1">General Discussion</h5>
+                    <p class="mb-1">Talk about anything related to clean energy and SMRs.</p>
+                </a>
+                <a href="#" class="list-group-item list-group-item-action">
+                    <h5 class="mb-1">Product Support</h5>
+                    <p class="mb-1">Get help and support for CleanSMRs products.</p>
+                </a>
+                <a href="#" class="list-group-item list-group-item-action">
+                    <h5 class="mb-1">Feature Requests</h5>
+                    <p class="mb-1">Suggest new features or improvements for our products.</p>
+                </a>
+                <a href="#" class="list-group-item list-group-item-action">
+                    <h5 class="mb-1">Technical Discussions</h5>
+                    <p class="mb-1">Dive deep into technical topics and share your expertise.</p>
+                </a>
+            </div>
+            
+            <h2>Recent Topics</h2>
+            <ul class="list-group mb-4">
+                <li class="list-group-item">
+                    <a href="#">How to optimize SMR performance?</a> - Posted by User123
+                </li>
+                <li class="list-group-item">
+                    <a href="#">Upcoming features in the next product update</a> - Posted by Admin
+                </li>
+                <li class="list-group-item">
+                    <a href="#">Best practices for maintaining your SMR</a> - Posted by EnergyExpert
+                </li>
+            </ul>
+            
+            <h2>Join the Conversation</h2>
+            <p>To participate in the forum, please <a href="{% url 'register' %}">register</a> for an account or <a href="{% url 'login' %}">log in</a> if you already have one. We look forward to your contributions!</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+File: templates/payment-link/payment-link.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% block content %}
+{% endblock %}
+
+
+File: templates/cart/carts.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% block content %}
+{% endblock %}
+
+
+File: templates/cart/cart.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% load custom_filters %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Your Cart</h2>
+    {% if cart_items %}
+    <div id="cart-content" class="table-responsive">
+        <table class="table table-bordered table-hover mt-3">
+            <thead class="thead-light">
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart_items %}
+                <tr id="cart-item-{{ item.id }}">
+                    <td>{{ item.product.name }}</td>
+                    <td>
+                        <input type="number" class="update-quantity form-control d-inline"
+                               style="width: 70px;"
+                               value="{{ item.quantity }}"
+                               data-url="{% url 'update-cart-item' item.id %}">
+                    </td>
+                    <td>
+                        {% if item.product.prices.all %}
+                        {% with item.product.prices.all.0 as price %}
+                        ${{ price.unit_amount|floatformat:2 }}
+                        {% endwith %}
+                        {% else %}
+                        <span class="text-danger">Price Not Available</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if item.product.prices.all %}
+                        {% with item.product.prices.all.0 as price %}
+                        ${{ item.quantity|multiply:price.unit_amount|floatformat:2 }}
+                        {% endwith %}
+                        {% else %}
+                        --
+                        {% endif %}
+                    </td>
+                    <td>
+                        <button class="btn btn-danger btn-sm remove-cart-item" data-url="{% url 'remove-cart-item' item.id %}">Remove</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="text-end mt-3">
+        <h4 id="cart-total">Total: ${{ cart_items|cart_total|floatformat:2 }}</h4>
+    </div>
+    <form method="POST" action="{% url 'checkout-create' %}" class="text-end mt-3">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">Proceed to Checkout</button>
+    </form>
+    {% else %}
+    <p class="text-center">Your cart is empty!</p>
+    {% endif %}
+</div>
+<!-- Popup Notification -->
+<div id="popup-notification" class="position-fixed bottom-0 end-0 m-3"></div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Remove item
+        $('.remove-cart-item').on('click', function () {
+            const url = $(this).data('url');
+            const csrfToken = '{{ csrf_token }}';
+            $.ajax({
+                url: url,
+                type: 'POST',
+                headers: { 'X-CSRFToken': csrfToken },
+                success: function (response) {
+                    $(`#cart-item-${response.item_id}`).remove();
+                    updateCartTotal(response.cart_total);
+                    showNotification('Item removed from cart!');
+                },
+                error: function () {
+                    showNotification('Failed to remove item.', true);
+                }
+            });
+        });
+
+        // Update quantity
+        $('.update-quantity').on('change', function () {
+            const url = $(this).data('url');
+            const quantity = $(this).val();
+            const csrfToken = '{{ csrf_token }}';
+            if (quantity < 1) {
+                alert('Quantity must be at least 1.');
+                $(this).val(1);
+                return;
+            }
+            $.ajax({
+                url: url,
+                type: 'POST',
+                headers: { 'X-CSRFToken': csrfToken },
+                data: { quantity: quantity },
+                success: function (response) {
+                    updateCartTotal(response.cart_total);
+                    showNotification('Quantity updated!');
+                },
+                error: function () {
+                    showNotification('Failed to update quantity.', true);
+                }
+            });
+        });
+
+        // Helper to update cart total
+        function updateCartTotal(total) {
+            $('#cart-total').text(`Total: $${total.toFixed(2)}`);
+            if (total === 0) {
+                $('#cart-content').html('<p class="text-center">Your cart is empty!</p>');
+            }
+        }
+
+        // Popup Notification
+        function showNotification(message, isError = false) {
+            const notification = $('#popup-notification');
+            notification.text(message);
+            notification.css('background-color', isError ? '#f44336' : '#4CAF50');
+            notification.fadeIn(300);
+            setTimeout(function () {
+                notification.fadeOut(300);
+            }, 3000);
+        }
+    });
+</script>
+{% endblock %}
+
+
+File: templates/account/account.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <!-- Account Details Section -->
+    <div class="card mb-5 shadow-sm">
+        <div class="card-body">
+            <h2 class="card-title">Account Details</h2>
+            <p><strong>Name:</strong> {{ account.name }}</p>
+            <p><strong>Email:</strong> {{ account.email }}</p>
+            <p><strong>Description:</strong> {{ account.description }}</p>
+            <p><strong>JWT Token:</strong> <span class="jwt-token">{{ token }}</span></p>
+            <p><strong>Email Confirmed:</strong> {{ account.email_confirmed }}</p>
+            <p><strong>2FA Enabled:</strong> {{ account.mfa_enabled }}</p>
+            {% if not account.email_confirmed %}
+            <form method="GET" action="{% url 'confirm-email' %}">
+                <button type="submit" class="btn btn-warning mt-2">Confirm Email</button>
+            </form>
+            {% endif %}
+            {% if account.mfa_enabled %}
+            <div class="mfa-section">
+                <form method="POST" action="{% url 'disable-mfa' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger mt-2">Disable MFA</button>
+                </form>
+            </div>
+            {% else %}
+            <div class="mfa-section">
+                <img src="{{ qrcode }}" alt="QR Code" class="mt-3 img-fluid">
+                <form method="GET" action="{% url 'enable-mfa' %}">
+                    <button type="submit" class="btn btn-warning mt-2">Enable MFA</button>
+                </form>
+            </div>
+            {% endif %}
+            <form method="GET" action="{% url 'account-edit' %}">
+                <button type="submit" class="btn btn-primary mt-3">Edit Details</button>
+            </form>
+        </div>
+    </div>
+    <!-- API Key Management Section -->
+    <h2 class="mb-4">API Key Management</h2>
+    <p>Manage your API keys and current subscription plan here.</p>
+    <!-- API Keys Section -->
+    <div class="mt-4">
+        <h4>Your API Keys</h4>
+        {% if api_keys %}
+        <div class="table-responsive mt-3">
+            <table class="table table-bordered table-hover">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Key ID</th>
+                        <th>API Key</th>
+                        <th>Primary</th>
+                        <th>Credit Limit</th>
+                        <th>Credits Used</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for key in api_keys %}
+                    <tr>
+                        <td>{{ key.id }}</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <span id="api-key-{{ key.id }}" style="display: none;"></span>
+                                <span id="api-key-masked-{{ key.id }}">••••••••••••</span>
+                                <button type="button" class="btn btn-sm btn-secondary ms-2 reveal-button" data-key-id="{{ key.id }}" data-revealed="{{ key.revealed|yesno:'true,false' }}">
+                                    Reveal
+                                </button>
+                            </div>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-warning btn-sm set-primary-button" data-key-id="{{ key.id }}">
+                                {% if key.primary %}
+                                Primary
+                                {% else %}
+                                Set as Primary
+                                {% endif %}
+                            </button>
+                        </td>
+                        <td>{{ key.credit_limit }}</td>
+                        <td>{{ key.credits_used }}</td>
+                        <td>
+                            <button type="button" class="btn btn-primary btn-sm regenerate-button" data-key-id="{{ key.id }}">
+                                Regenerate
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p>No API keys found for your account.</p>
+        {% endif %}
+    </div>
+    <!-- Generate New API Key -->
+    <div class="mt-4">
+        <form id="generate-api-key-form" method="POST" action="{% url 'api-key-generate' %}">
+            {% csrf_token %}
+            <input type="hidden" name="account_id" value="{{ account.id }}">
+            <button type="button" id="generate-api-key-button" class="btn btn-success">Generate New API Key</button>
+        </form>
+    </div>
+    <!-- Current Subscription Plan Section -->
+    <div class="mt-5">
+        <h4>Current Subscription Plan</h4>
+        <div class="card shadow-sm">
+            <div class="card-body">
+                {% if current_plan %}
+                <h5 class="card-title">{{ current_plan.name }}</h5>
+                <p class="card-text">Cost: ${{ current_plan.amount }}</p>
+                <p class="card-text">Billing Interval: {{ current_plan.interval }}</p>
+                <p class="card-text">Status: {{ current_subscription.status }}</p>
+                <form method="POST" action="{% url 'subscription-cancel' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="cancel_subscription">
+                    <input type="hidden" name="subscription_id" value="{{ current_subscription.id }}">
+                    <button type="submit" class="btn btn-danger">Cancel Subscription</button>
+                </form>
+                {% else %}
+                <h5 class="card-title">No active subscription</h5>
+                <p class="card-text">You can subscribe to a plan to unlock premium features.</p>
+                {% endif %}
+                <form method="GET" action="{% url 'plans-and-pricing' %}" style="display: inline;">
+                    <button type="submit" class="btn btn-warning">View Plans</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // JavaScript for handling API key actions
+    document.addEventListener('DOMContentLoaded', function() {
+        const generateApiKeyButton = document.getElementById('generate-api-key-button');
+        generateApiKeyButton.addEventListener('click', function() {
+            const form = document.getElementById('generate-api-key-form');
+            const formData = new FormData(form);
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.api_key) {
+                    showNotification('API Key generated successfully.');
+                    location.reload(); // Reload the page to reflect changes
+                } else {
+                    showNotification(data.error, true);
+                }
+            })
+            .catch(error => {
+                console.error('Error generating API key:', error);
+                showNotification('An error occurred while generating the API key. Please try again later.', true);
+            });
+        });
+
+        // Other JavaScript for handling API key actions...
+    });
+
+    function showNotification(message, isError = false) {
+        const notification = document.getElementById('popup-notification');
+        notification.textContent = message;
+        notification.style.backgroundColor = isError ? '#f44336' : '#4CAF50';
+        notification.style.display = 'block';
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, 3000);
+    }
+</script>
+{% endblock %}
+
+
+File: templates/account/edit.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% load custom_filters %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">Edit Account Details</h2>
+            <form method="POST" action="{% url 'account-edit' %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="name" name="name" value="{{ account.name }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" value="{{ account.email }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea class="form-control" id="description" name="description" rows="3">{{ account.description }}</textarea>
+                </div>                
+                <hr>
+                <h5>Change Password (Optional)</h5>
+                <div class="mb-3">
+                    <label for="current_password" class="form-label">Current Password</label>
+                    <input type="password" class="form-control" id="current_password" name="current_password" placeholder="Enter current password">
+                </div>
+                <div class="mb-3">
+                    <label for="new_password" class="form-label">New Password</label>
+                    <input type="password" class="form-control" id="new_password" name="new_password" placeholder="Enter new password">
+                </div>
+                <div class="mb-3">
+                    <label for="confirm_password" class="form-label">Confirm New Password</label>
+                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Re-enter new password">
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">Update Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+File: templates/authentication/register.html
+----------------------------------------
+
+{% extends 'widgets/base.html' %}
+{% block content %}
+<!-- Register Form Container -->
+<div class="container">
+    <h1>Register</h1>
+    <form method="POST" action="{% url 'register' %}">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" id="name" name="name" class="form-control" placeholder="Enter your full name" required>
+        </div>
+        <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input type="text" id="username" name="username" class="form-control" placeholder="Choose a username" required>
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email" required>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" id="password" name="password" class="form-control" placeholder="Create a password" required>
+        </div>
+        <div class="mb-3">
+            <label for="confirm_password" class="form-label">Confirm Password</label>
+            <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Confirm your password" required>
+        </div>
+        <div class="mb-3">
+            <input type="checkbox" id="togglePassword" style="margin-top: 10px;"> Show Passwords
+        </div>
+        <div class="mb-3">
+            <button type="submit" class="btn">Register</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.getElementById('togglePassword').addEventListener('change', function() {
+        var passwordField = document.getElementById('password');
+        var confirmPasswordField = document.getElementById('confirm_password');
+        if (this.checked) {
+            passwordField.type = 'text';
+            confirmPasswordField.type = 'text';
+        } else {
+            passwordField.type = 'password';
+            confirmPasswordField.type = 'password';
+        }
+    });
+</script>
+{% endblock %}
+
+
+File: templates/authentication/login.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% block content %}
+<div class="container">
+    <h1>Login</h1>
+    <form method="POST" action="{% url 'login' %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
+        </div>
+        <div class="form-group">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+            <input type="checkbox" id="togglePassword" style="margin-top: 10px;"> Show Password
+        </div>
+        <div class="form-group">
+            <button type="submit">Login</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.getElementById('togglePassword').addEventListener('change', function() {
+        var passwordField = document.getElementById('password');
+        if (this.checked) {
+            passwordField.type = 'text';
+        } else {
+            passwordField.type = 'password';
+        }
+    });
+</script>
+{% endblock %}
+
+
+File: templates/authentication/enable-mfa.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% block content %}
+<div class="container">
+    <h1>Enable 2FA</h1>
+    {% if not account.mfa_enabled %}
+    <form method="POST" action="{% url 'enable-mfa' %}">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="otp" class="form-label">One-Time Password (OTP)</label>
+            <input type="text" class="form-control" id="otp" name="otp" placeholder="Enter OTP" required>
+            <input type="hidden" id="account_id" name="account_id" value="{{ account.id }}" required>
+        </div>
+        <div class="d-grid">
+            <button type="submit">Enable 2FA</button>
+        </div>
+    </form>
+    {% else %}
+    <p style="text-align: center; color: var(--primary-color); font-size: 1.2rem;">2FA Enabled Already!</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+
+File: templates/authentication/confirm-email.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% block content %}
+<div class="container">
+    <h1>Confirm Email</h1>
+    {% if not account.email_confirmed %}
+    <form method="POST" action="{% url 'confirm-email' %}">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="confirmation_secret" class="form-label">Confirmation Code</label>
+            <input type="text" class="form-control" id="confirmation_secret" name="confirmation_secret" required>
+        </div>
+        <button type="submit">Confirm Email</button>
+    </form>
+    <form method="POST" action="{% url 'confirm-email' %}">
+        {% csrf_token %}
+        <input type="hidden" name="resend" value="true">
+        <button type="submit">Resend Confirmation Code</button>
+    </form>
+    {% else %}
+    <p class="message">Email Confirmed Already!</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+
+File: templates/authentication/verify-mfa.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% block content %}
+<div class="container">
+    <h1>Verify MFA</h1>
+
+    <form method="POST" action="{% url 'verify-mfa' %}">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="otp" class="form-label">Enter OTP</label>
+            <input type="text" class="form-control" id="otp" name="otp" required placeholder="Enter your one-time password">
+            <input type="hidden" id="account_id" name="account_id" value="{{ account_id }}" required>
+        </div>
+        <button type="submit" class="btn">Verify OTP</button>
+    </form>
+
+    {% if error_message %}
+        <div class="alert">
+            {{ error_message }}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+
+File: templates/widgets/navbar.html
+----------------------------------------
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'index' %}">CleanSMRs</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'index' %}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'products' %}">Products</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'plans-and-pricing' %}">Plans & Pricing</a>
+                </li>
+
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'cart' %}">Cart</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'account' %}">Account</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'subscriptions' %}">Subscriptions</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'orders' %}">Orders</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'observations' %}">Observations</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'observation-create' %}">Create Observations</a>
+                    </li>
+                    {% if user.is_superuser %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'product-create' %}">Create Product</a>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <form method="POST" action="{% url 'logout' %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-link nav-link">Logout</button>
+                        </form>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'register' %}">Register</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+File: templates/widgets/base.html
+----------------------------------------
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CleanSMRs{% endblock %}</title>
+    <!-- Link to Bootswatch Zephyr theme -->
+    <link rel="stylesheet" href="https://bootswatch.com/5/zephyr/bootstrap.rtl.min.css">
+    <!-- Link to your custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+</head>
+<body class="d-flex flex-column min-vh-100">
+    {% include 'widgets/navbar.html' %}
+    <main class="flex-fill">
+        <div class="container">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </main>
+    {% include 'widgets/footer.html' %}
+    <!-- Link to your custom JS -->
+    <script src="{% static 'scripts/base.js' %}"></script>
+</body>
+</html>
+
+
+File: templates/widgets/footer.html
+----------------------------------------
+<footer class="footer bg-light text-dark py-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <h4>About Us</h4>
+                <p>CleanSMRs is committed to providing sustainable solutions. Learn more about us and our mission.</p>
+                <a href="{% url 'about' %}" class="footer-link">Learn More</a>
+            </div>
+            <div class="col-md-4 mb-3">
+                <h4>Quick Links</h4>
+                <ul class="list-unstyled">
+                    <li><a href="{% url 'contact' %}" class="footer-link">Contact</a></li>
+                    <li><a href="{% url 'privacy-policy' %}" class="footer-link">Privacy Policy</a></li>
+                    <li><a href="{% url 'terms-of-service' %}" class="footer-link">Terms of Service</a></li>
+                    <li><a href="{% url 'support' %}" class="footer-link">Support</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4 mb-3">
+                <h4>Stay Connected</h4>
+                <p>Follow us on social media for the latest updates:</p>
+                <div class="d-flex">
+                    <a href="https://facebook.com" target="_blank" class="social-icon me-3">
+                        <i class="bi bi-facebook"></i> Facebook
+                    </a>
+                    <a href="https://twitter.com" target="_blank" class="social-icon me-3">
+                        <i class="bi bi-twitter"></i> X
+                    </a>
+                    <a href="https://linkedin.com" target="_blank" class="social-icon">
+                        <i class="bi bi-linkedin"></i> Linkedin
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom text-center mt-3">
+            <p>© 2024 CleanSMRs. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+
+File: templates/observation/update.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% block content %}
+{% endblock %}
+
+
+File: templates/observation/observations.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Observations</h2>
+    {% if observations %}
+    <div class="table-responsive mt-4">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Coordinates</th>
+                    <th>Air Temp (°C)</th>
+                    <th>Water Temp (°C)</th>
+                    <th>Humidity (%)</th>
+                    <th>Wind Speed (m/s)</th>
+                    <th>Wind Direction (°)</th>
+                    <th>Precipitation (mm)</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for observation in observations %}
+                <tr>
+                    <td>{{ observation.id }}</td>
+                    <td>{{ observation.date }}</td>
+                    <td>{{ observation.time }}</td>
+                    <td>{{ observation.coordinates }}</td>
+                    <td>{{ observation.temperature_air }}</td>
+                    <td>{{ observation.temperature_water }}</td>
+                    <td>{{ observation.humidity }}</td>
+                    <td>{{ observation.wind_speed }}</td>
+                    <td>{{ observation.wind_direction }}</td>
+                    <td>{{ observation.precipitation }}</td>
+                    <td>{{ observation.notes }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="text-center">{{ message|default:"No observations found." }}</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+
+File: templates/observation/create.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Create Observation</h2>
+    {% if message %}
+    <div class="alert alert-success">
+        {{ message }}
+    </div>
+    {% elif error %}
+    <div class="alert alert-danger">
+        {{ error }}
+    </div>
+    {% endif %}
+    <form action="{% url 'observation-create' %}" method="POST" class="needs-validation" novalidate>
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="date" class="form-label">Date</label>
+                <input type="date" id="date" name="date" class="form-control" required>
+                <div class="invalid-feedback">
+                    Please provide a valid date.
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="time" class="form-label">Time</label>
+                <input type="time" id="time" name="time" class="form-control" required>
+                <div class="invalid-feedback">
+                    Please provide a valid time.
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="time_zone_offset" class="form-label">Time Zone Offset</label>
+                <input type="text" id="time_zone_offset" name="time_zone_offset" class="form-control" placeholder="UTC-05:00" required>
+                <div class="invalid-feedback">
+                    Please provide a valid time zone offset.
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="latitude" class="form-label">Latitude</label>
+                <input type="number" step="any" id="latitude" name="latitude" class="form-control" required>
+                <div class="invalid-feedback">
+                    Please provide a valid latitude.
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="longitude" class="form-label">Longitude</label>
+                <input type="number" step="any" id="longitude" name="longitude" class="form-control" required>
+                <div class="invalid-feedback">
+                    Please provide a valid longitude.
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="temperature_water" class="form-label">Water Temperature (°C)</label>
+                <input type="number" step="any" id="temperature_water" name="temperature_water" class="form-control">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="temperature_air" class="form-label">Air Temperature (°C)</label>
+                <input type="number" step="any" id="temperature_air" name="temperature_air" class="form-control">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="humidity" class="form-label">Humidity (%)</label>
+                <input type="number" step="any" id="humidity" name="humidity" class="form-control">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="wind_speed" class="form-label">Wind Speed (m/s)</label>
+                <input type="number" step="any" id="wind_speed" name="wind_speed" class="form-control">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="wind_direction" class="form-label">Wind Direction (°)</label>
+                <input type="number" step="any" id="wind_direction" name="wind_direction" class="form-control">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="precipitation" class="form-label">Precipitation (mm)</label>
+                <input type="number" step="any" id="precipitation" name="precipitation" class="form-control">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="haze" class="form-label">Haze</label>
+                <input type="number" step="any" id="haze" name="haze" class="form-control">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="becquerel" class="form-label">Becquerel</label>
+                <input type="number" step="any" id="becquerel" name="becquerel" class="form-control">
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="notes" class="form-label">Notes</label>
+                <textarea id="notes" name="notes" class="form-control" rows="3"></textarea>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+<script>
+    // Bootstrap validation
+    (function () {
+        'use strict';
+        window.addEventListener('load', function () {
+            var forms = document.getElementsByClassName('needs-validation');
+            Array.prototype.filter.call(forms, function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+</script>
+{% endblock %}
+
+
+File: templates/observation/observation.html
+----------------------------------------
+{% extends 'widgets/base.html' %}
+{% block content %}
+{% endblock %}
+
+

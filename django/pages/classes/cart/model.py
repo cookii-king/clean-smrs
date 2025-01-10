@@ -1,18 +1,16 @@
-import uuid
+import uuid, pyotp, random
 from django.db import models
 from django.utils.timezone import now
+from django.contrib.auth.models import AbstractUser
+from django.core.mail import send_mail
 from ...config.config import stripe
-from django.conf import settings
+from system.settings import DEFAULT_FROM_EMAIL, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD
 from ...models import Account, Product
+from django.conf import settings
 
 class Cart(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    # customer = models.ForeignKey(Account, to_field='stripe_customer_id', on_delete=models.CASCADE, )
-    user = models.OneToOneField(
-    settings.AUTH_USER_MODEL,
-    on_delete=models.CASCADE,
-    related_name='cart'
-    )
+    customer = models.ForeignKey(Account, to_field='stripe_customer_id',    on_delete=models.CASCADE, null=True)
     created = models.DateTimeField(default=now)
     updated = models.DateTimeField(auto_now=True)
     deleted = models.DateTimeField(null=True, blank=True)
@@ -72,6 +70,10 @@ class Cart(models.Model):
     def __str__(self):
         return str(self.id)
 
+    # Meta Class
+    class Meta:
+        db_table = "pages_cart"
+
 class CartItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     cart = models.ForeignKey(
@@ -100,6 +102,10 @@ class CartItem(models.Model):
         Remove this item from the cart.
         """
         self.delete()
-    
+
     def __str__(self):
         return str(self.id)
+
+    # Meta Class
+    class Meta:
+        db_table = "pages_cart_item"

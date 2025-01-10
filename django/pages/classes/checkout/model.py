@@ -1,8 +1,12 @@
-import uuid
+import uuid, pyotp, random
 from django.db import models
 from django.utils.timezone import now
+from django.contrib.auth.models import AbstractUser
+from django.core.mail import send_mail
 from ...config.config import stripe
-from ...models import Price, Plan, Account
+from system.settings import DEFAULT_FROM_EMAIL, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD
+
+from ...models import Account, Price, Plan
 
 class Checkout(models.Model):
     CHECKOUT_MODE_CHOICES = [
@@ -21,7 +25,7 @@ class Checkout(models.Model):
         ('open', 'Open')
     ]
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    customer = models.ForeignKey(Account, to_field='stripe_customer_id', on_delete=models.CASCADE)
+    customer = models.ForeignKey(Account, to_field='stripe_customer_id', on_delete=models.CASCADE,related_name='checkouts', null=True)
     mode = models.CharField(max_length=255, choices=CHECKOUT_MODE_CHOICES, default='payment')
     payment_status = models.CharField(max_length=255, choices=CHECKOUT_PAYMENT_STATUS_CHOICES, default='unpaid')
     status = models.CharField(max_length=255, choices=CHECKOUT_STATUS_CHOICES, null=True)
@@ -106,127 +110,55 @@ class Checkout(models.Model):
         """
         return self.checkout_line_items.all()
 
-    # def create_or_update_stripe_payment_link(self):
-    #     """
-    #     Create or update a Stripe payment_link based on the current items.
-    #     """
-    #     items = [
-    #         {
-    #             "price": item.plan.stripe_plan_id or item.plan.stripe_plan_id,
-    #             "quantity": item.quantity
-    #         } for item in self.get_items()
-    #     ]
 
-    #     print(f"model items: ${self.payment_link_line_items.all()}")
-
-    #     if not items:
-    #         raise ValueError("No items to create or update payment_link.")
-
-    #     if self.stripe_payment_link_id:
-    #         # Update existing Stripe payment_link
-    #         stripe.PaymentLink.modify(self.stripe_payment_link_id, line_items=items)
-    #     else:
-    #         # Create a new Stripe payment_link
-    #         stripe_payment_link = stripe.PaymentLink.create(
-    #             # customer=self.customer.stripe_customer_id,
-    #             line_items=items
-    #         )
-    #         self.stripe_payment_link_id = stripe_payment_link['id']
-    #         self.save()
-
-    def create_or_update_stripe_checkout(self):
+    def create_stripe_session(self):
         """
-        Create or update a Stripe checkout based on the current items.
+        Create a Stripe Checkout Session for this checkout instance.
         """
-        items = []
+        try:
+            # Collect line items for the checkout session
+            line_items = []
+            for item in self.checkout_line_items.all():
+                if item.price:  # If a price is associated
+                    line_items.append({
+                        "price": item.price.stripe_price_id,
+                        "quantity": item.quantity,
+                    })
+                elif item.plan:  # If a plan is associated
+                    line_items.append({
+                        "price": item.plan.stripe_plan_id,
+                        "quantity": item.quantity,
+                    })
+            print(f"line_items: ${line_items}")
 
-        # Iterate through all checkout items and add to the items list
-        for item in self.get_items():
-            if item.price:
-                stripe_id = item.price.stripe_price_id
-            elif item.plan:
-                stripe_id = item.plan.stripe_plan_id
-            else:
-                raise ValueError("CheckoutLineItem must have either a price or a plan.")
-
-            items.append({
-                "price": stripe_id,
-                "quantity": item.quantity
-            })
-
-        print(f"model items: {items}")
-
-        if not items:
-            raise ValueError("No items to create or update checkout.")
-
-        # Generate the success and cancel URLs using the checkout object's ID
-        success_url = f"{self.success_url}?checkout={self.id}"
-        cancel_url = f"{self.return_url}?checkout={self.id}"
-
-        if self.stripe_checkout_id:
-            # Update existing Stripe checkout
-            stripe.checkout.Session.modify(
-                self.stripe_checkout_id,
-                success_url=success_url,
-                cancel_url=cancel_url
+            # Create the Stripe Checkout session
+            session = stripe.checkout.Session.create(
+                payment_method_types=["card"],
+                mode=self.mode,  # Mode can be 'payment', 'setup', or 'subscription'
+                line_items=line_items,
+                success_url=self.success_url,
+                cancel_url=self.return_url,
+                customer=self.customer.stripe_customer_id if self.customer else None,
+                currency="usd",  # Ensure Euro handling
             )
-        else:
-            # Create a new Stripe checkout
-            stripe_checkout = stripe.checkout.Session.create(
-                success_url=success_url,
-                cancel_url=cancel_url,
-                line_items=items,
-                mode=self.mode,
-                customer=self.customer.stripe_customer_id
-            )
-            self.stripe_checkout_id = stripe_checkout['id']
+
+            # Save the session ID and update status
+            self.stripe_checkout_id = session.id
+            self.status = "open"
             self.save()
 
+            return session.url  # Return the Stripe Checkout session URL
 
-
-    # def create_or_update_stripe_checkout(self):
-    #     """
-    #     Create or update a Stripe checkout based on the current items.
-    #     """
-    #     items = []
-
-    #     # Iterate through all checkout items and add to the items list
-    #     for item in self.get_items():
-    #         if item.price:
-    #             stripe_id = item.price.stripe_price_id
-    #         elif item.plan:
-    #             stripe_id = item.plan.stripe_plan_id
-    #         else:
-    #             raise ValueError("CheckoutLineItem must have either a price or a plan.")
-
-    #         items.append({
-    #             "price": stripe_id,
-    #             "quantity": item.quantity
-    #         })
-
-    #     print(f"model items: {items}")
-
-    #     if not items:
-    #         raise ValueError("No items to create or update checkout.")
-
-    #     if self.stripe_checkout_id:
-    #         # Update existing Stripe checkout
-    #         stripe.checkout.Session.modify(self.stripe_checkout_id)
-    #     else:
-    #         # Create a new Stripe checkout
-    #         stripe_checkout = stripe.checkout.Session.create(
-    #             success_url=f"${self.success_url}?session_id=${self.stripe_checkout_id}",
-    #             cancel_url=f"${self.return_url}?session_id=${self.stripe_checkout_id}",
-    #             line_items=items,
-    #             mode=self.mode,
-    #             customer=self.customer.stripe_customer_id
-    #         )
-    #         self.stripe_checkout_id = stripe_checkout['id']
-    #         self.save()
-
+        except Exception as e:
+            raise Exception(f"Error creating Stripe Checkout Session: {e}")
+        
 
     def __str__(self):
         return str(self.id)
+
+    # Meta Class
+    class Meta:
+        db_table = "pages_checkout"
 
 class CheckoutLineItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -246,6 +178,10 @@ class CheckoutLineItem(models.Model):
         null=True
     )
     quantity = models.PositiveIntegerField(default=1)
+    created = models.DateTimeField(default=now)
+    updated = models.DateTimeField(auto_now=True)
+    deleted = models.DateTimeField(null=True, blank=True)
+
 
     def update_quantity(self, quantity):
         """
@@ -263,6 +199,6 @@ class CheckoutLineItem(models.Model):
         """
         self.delete()
 
-    def __str__(self):
-        return str(self.id)
-
+    # Meta Class
+    class Meta:
+        db_table = "pages_checkout_line_item"

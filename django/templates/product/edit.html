@@ -1,3 +1,93 @@
 {% extends 'widgets/base.html' %}
 {% block content %}
+<div class="container mt-5">
+    <h1>Edit Product: {{ product.name }}</h1>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <!-- Existing Images Section -->
+        {% if images %}
+        <div class="mb-4">
+            <h5>Existing Images</h5>
+            <div class="row">
+                {% for image in images %}
+                <div class="col-md-3 mb-3">
+                    <img src="{{ image.image.url }}" alt="Product Image" class="img-fluid">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="delete_images" value="{{ image.id }}" id="deleteImage{{ image.id }}">
+                        <label class="form-check-label" for="deleteImage{{ image.id }}">Delete</label>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Upload New Images -->
+        <div class="mb-4">
+            <label for="images" class="form-label">Add New Images</label>
+            <input type="file" id="images" name="images" class="form-control" multiple>
+        </div>
+
+        <!-- Existing Videos Section -->
+        {% if videos %}
+        <div class="mb-4">
+            <h5>Existing Videos</h5>
+            <div class="row">
+                {% for video in videos %}
+                <div class="col-md-3 mb-3">
+                    <video controls class="img-fluid">
+                        <source src="{{ video.video.url }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="delete_videos" value="{{ video.id }}" id="deleteVideo{{ video.id }}">
+                        <label class="form-check-label" for="deleteVideo{{ video.id }}">Delete</label>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Upload New Videos -->
+        <div class="mb-4">
+            <label for="videos" class="form-label">Add New Videos</label>
+            <input type="file" id="videos" name="videos" class="form-control" multiple>
+        </div>
+
+        <!-- Price Details -->
+        <div class="mb-4">
+            <h5>Price Details</h5>
+            <label for="price_amount" class="form-label">Price Amount (in dollars)</label>
+            <input 
+                type="number" 
+                step="0.01" 
+                id="price_amount" 
+                name="price_amount" 
+                class="form-control" 
+                placeholder="e.g., 10.50 (for $10.50)" 
+                min="0.01" 
+                max="1000000.00" 
+                required>
+            
+            <label for="price_currency" class="form-label mt-3">Currency</label>
+            <select id="price_currency" name="price_currency" class="form-select" required>
+                <option value="usd">USD</option>
+                <option value="eur">EUR</option>
+                <!-- Add other currencies as needed -->
+            </select>
+
+            <label for="price_interval" class="form-label mt-3">Billing Interval</label>
+            <select id="price_interval" name="price_interval" class="form-select">
+                <option value="one_time">One Time</option>
+                <option value="month">Monthly</option>
+                <option value="year">Yearly</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+    </form>
+</div>
 {% endblock %}

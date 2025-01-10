@@ -1,8 +1,5 @@
-from flask import Blueprint
+from config.config import app
 
-# Create a Blueprint for the system routes
-system_bp = Blueprint('system', __name__)
-
-@system_bp.route("/", methods=["GET"])
+@app.get("/")
 def root():
     return "Hello World!"

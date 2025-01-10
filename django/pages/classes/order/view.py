@@ -1,176 +1,200 @@
+from django.shortcuts import render, redirect
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.shortcuts import render, redirect
 from ...models import Order, Account
-from django.utils.decorators import method_decorator
-from django.contrib.auth.decorators import login_required
-from ..authentication.view import JWTAuthentication, IsAuthenticated, LoginRequiredMixin, AuthenticationFailed
-
-class OrderView(APIView): 
-    def authenticate_user(self, request):
-        """Authenticate the user using JWT and return the account."""
-        jwt_auth = JWTAuthentication()
-        account, _ = jwt_auth.authenticate(request)
-        if account is None:
-            raise AuthenticationFailed('Authentication failed')
-        return account
-    # @method_decorator(login_required)
+from ...views import authenticate_user, check_mfa
+class OrderView(APIView):
     def post(self, request):
         try:
-            account = self.authenticate_user(request)
             # Handle POST requests
-            return Response({"message": "POST request received"}, status=201)
-        except AuthenticationFailed as e:
-            return redirect('login')  
+            message = "POST request received"
+            is_error = False
+            status_code = 201
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'POST' Method Failed for OrderView: {e}"}, status=400)
-    # @method_decorator(login_required)
+            message = f"'POST' Method Failed for OrderView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+
     def get(self, request):
         try:
-            account = self.authenticate_user(request)
             # Handle GET requests
-            return render(request, 'order/order.html')
-        except AuthenticationFailed as e:
-            return redirect('login')  
-        except Exception as e:
-            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for OrderView: {e}", "is_error": True}, status=400)
-                    # return Response(data={"error": f"'GET' Method Failed for OrderView: {e}"}, status=400)
-    # @method_decorator(login_required)
-    def put(self, request):
-        try:
-            account = self.authenticate_user(request)
-            # Handle PUT requests
-            return Response({"message": "PUT request received"}, status=201)
-        except AuthenticationFailed as e:
-            return redirect('login')  
-        except Exception as e:
-            return Response(data={"error": f"'PUT' Method Failed for OrderView: {e}"}, status=400)
-    # @method_decorator(login_required)
-    def patch(self, request):
-        try:
-            account = self.authenticate_user(request)
-            # Handle PATCH requests
-            return Response({"message": "PATCH request received"}, status=200)
-        except AuthenticationFailed as e:
-            return redirect('login')  
-        except Exception as e:
-            return Response(data={"error": f"'PATCH' Method Failed for OrderView: {e}"}, status=400)
-    # @method_decorator(login_required)
-    def delete(self, request):
-        try:
-            account = self.authenticate_user(request)
-            # Handle DELETE requests
-            return Response({"message": "DELETE request received"}, status=200)
-        except AuthenticationFailed as e:
-            return redirect('login')  
-        except Exception as e:
-            return Response(data={"error": f"'DELETE' Method Failed for OrderView: {e}"}, status=400)
-    # @method_decorator(login_required)
-    def options(self, request, *args, **kwargs):
-        try:
-            account = self.authenticate_user(request)
-            # Handle OPTIONS requests
-            return Response({"message": "OPTIONS request received"}, status=204)
-        except AuthenticationFailed as e:
-            return redirect('login')  
-        except Exception as e:
-            return Response(data={"error": f"'OPTIONS' Method Failed for OrderView: {e}"}, status=400)
-    # @method_decorator(login_required)
-    def head(self, request, *args, **kwargs):
-        try:
-            account = self.authenticate_user(request)
-            # Handle HEAD requests
-            # Since Django automatically handles HEAD, no implementation is required
-            # The HEAD response will be the same as GET but without the body
-            return Response({"message": "HEAD request received"}, status=200)
-        except AuthenticationFailed as e:
-            return redirect('login')  
-        except Exception as e:
-            return Response(data={"error": f"'HEAD' Method Failed for OrderView: {e}"}, status=400)
-
-class OrdersView(APIView):
-    def authenticate_user(self, request):
-        """Authenticate the user using JWT and return the account."""
-        jwt_auth = JWTAuthentication()
-        account, _ = jwt_auth.authenticate(request)
-        if account is None:
-            raise AuthenticationFailed('Authentication failed')
-        return account
-    # @method_decorator(login_required)
-    def post(self, request):
-        try:
-            account = self.authenticate_user(request)
-            # Handle POST requests
-            return Response({"message": "POST request received"}, status=201)
-        except AuthenticationFailed as e:
-            return redirect('login')  
-        except Exception as e:
-            return Response(data={"error": f"'POST' Method Failed for OrdersView: {e}"}, status=400)
-    # @method_decorator(login_required)
-    def get(self, request):
-        try:
-            account = self.authenticate_user(request)
-            user = request.user
-            account = Account.objects.filter(id=user.id).first()
+            # message = "GET request received"
+            # is_error = False
+            # status_code = 200
+            # return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+            account = authenticate_user(request)
+            check_mfa(account=account)
             # Fetch all orders for the user
             orders = Order.objects.filter(customer=account.stripe_customer_id).select_related(
                 'customer'
             ).prefetch_related('order_items__product', 'order_items__price', 'order_items__plan')
             # Handle GET requests
             return render(request, 'order/orders.html', {"orders": orders})
-        except AuthenticationFailed as e:
-            return redirect('login')  
         except Exception as e:
-                    return Response(data={"error": f"'GET' Method Failed for OrdersView: {e}"}, status=400)
-    # @method_decorator(login_required)
+            message = f"'GET' Method Failed for OrderView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+
     def put(self, request):
         try:
-            account = self.authenticate_user(request)
             # Handle PUT requests
-            return Response({"message": "PUT request received"}, status=201)
-        except AuthenticationFailed as e:
-            return redirect('login')  
+            message = "PUT request received"
+            is_error = False
+            status_code = 201
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'PUT' Method Failed for OrdersView: {e}"}, status=400)
-    # @method_decorator(login_required)
+            message = f"'PUT' Method Failed for OrderView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+
     def patch(self, request):
         try:
-            account = self.authenticate_user(request)
             # Handle PATCH requests
-            return Response({"message": "PATCH request received"}, status=200)
-        except AuthenticationFailed as e:
-            return redirect('login')  
+            message = "PATCH request received"
+            is_error = False
+            status_code = 200
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'PATCH' Method Failed for OrdersView: {e}"}, status=400)
-    # @method_decorator(login_required)
+            message = f"'PATCH' Method Failed for OrderView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
     def delete(self, request):
         try:
-            account = self.authenticate_user(request)
             # Handle DELETE requests
-            return Response({"message": "DELETE request received"}, status=200)
-        except AuthenticationFailed as e:
-            return redirect('login')  
+            message = "DELETE request received"
+            is_error = False
+            status_code = 200
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'DELETE' Method Failed for OrdersView: {e}"}, status=400)
-    # @method_decorator(login_required)
+            message = f"'DELETE' Method Failed for OrderView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
     def options(self, request, *args, **kwargs):
         try:
-            account = self.authenticate_user(request)
             # Handle OPTIONS requests
-            return Response({"message": "OPTIONS request received"}, status=204)
-        except AuthenticationFailed as e:
-            return redirect('login')  
+            message = "OPTIONS request received"
+            is_error = False
+            status_code = 204
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'OPTIONS' Method Failed for OrdersView: {e}"}, status=400)
-    # @method_decorator(login_required)
+            message = f"'OPTIONS' Method Failed for OrderView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
     def head(self, request, *args, **kwargs):
         try:
-            account = self.authenticate_user(request)
             # Handle HEAD requests
             # Since Django automatically handles HEAD, no implementation is required
             # The HEAD response will be the same as GET but without the body
-            return Response({"message": "HEAD request received"}, status=200)
-        except AuthenticationFailed as e:
-            return redirect('login')  
+            message = "HEAD request received"
+            is_error = False
+            status_code = 200
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'HEAD' Method Failed for OrdersView: {e}"}, status=400)
+            message = f"'HEAD' Method Failed for OrderView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+
+
+class OrdersView(APIView):
+    def post(self, request):
+        try:
+            # Handle POST requests
+            message = "POST request received"
+            is_error = False
+            status_code = 201
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+        except Exception as e:
+            message = f"'POST' Method Failed for OrdersView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+
+    def get(self, request):
+        try:
+            account = authenticate_user(request)
+            check_mfa(account=account)
+            # Fetch orders for the authenticated user
+            if account.is_authenticated:
+                orders = Order.objects.filter(customer=account)
+            else:
+                orders = []
+
+            # Render the orders template with the orders context
+            return render(request, 'order/orders.html', {'orders': orders})
+        except Exception as e:
+            message = f"'GET' Method Failed for OrdersView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+
+    def put(self, request):
+        try:
+            # Handle PUT requests
+            message = "PUT request received"
+            is_error = False
+            status_code = 201
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+        except Exception as e:
+            message = f"'PUT' Method Failed for OrdersView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+
+    def patch(self, request):
+        try:
+            # Handle PATCH requests
+            message = "PATCH request received"
+            is_error = False
+            status_code = 200
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+        except Exception as e:
+            message = f"'PATCH' Method Failed for OrdersView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+    def delete(self, request):
+        try:
+            # Handle DELETE requests
+            message = "DELETE request received"
+            is_error = False
+            status_code = 200
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+        except Exception as e:
+            message = f"'DELETE' Method Failed for OrdersView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+    def options(self, request, *args, **kwargs):
+        try:
+            # Handle OPTIONS requests
+            message = "OPTIONS request received"
+            is_error = False
+            status_code = 204
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+        except Exception as e:
+            message = f"'OPTIONS' Method Failed for OrdersView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+    def head(self, request, *args, **kwargs):
+        try:
+            # Handle HEAD requests
+            # Since Django automatically handles HEAD, no implementation is required
+            # The HEAD response will be the same as GET but without the body
+            message = "HEAD request received"
+            is_error = False
+            status_code = 200
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+        except Exception as e:
+            message = f"'HEAD' Method Failed for OrdersView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')

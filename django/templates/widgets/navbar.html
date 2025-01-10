@@ -36,14 +36,16 @@
                         <a class="nav-link" href="{% url 'observation-create' %}">Create Observations</a>
                     </li>
                     {% if user.is_superuser %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'product-create' %}">Create Product</a>
-                        </li>
+                    <form method="GET" action="{% url 'product-create' %}" style="display:inline;">
+                        <input type="hidden" name="action" value="create">
+                        <button type="submit" class="btn btn-link nav-lin">Create Product</button>
+                    </form>
+             
                     {% endif %}
                     <li class="nav-item">
-                        <form method="POST" action="{% url 'logout' %}" class="d-inline">
+                        <form method="POST" action="{% url 'logout' %}" class="display:inline;">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-link nav-link">Logout</button>
+                            <button type="submit" class="btn btn-primary">Logout</button>
                         </form>
                     </li>
                 {% else %}

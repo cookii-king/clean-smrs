@@ -1,78 +1,10 @@
 {% extends 'widgets/base.html' %}
 {% block content %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Products</title>
-    <!-- <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet"> -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-    <style>
-        /* Popup Notification Styles */
-        #popup-notification {
-            display: none;
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #4CAF50;
-            color: white;
-            padding: 15px;
-            border-radius: 5px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-        }
-
-        /* Custom Card Styles */
-        .product-card {
-            border: none;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s;
-            height: 100%; /* Ensure full height */
-            display: flex;
-            flex-direction: column;
-        }
-
-        .product-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .product-card img {
-            height: 200px; /* Fixed height for images */
-            object-fit: cover; /* Ensure image covers the area */
-            width: 100%;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .product-card .card-body {
-            padding: 20px;
-            flex: 1; /* Allow body to fill remaining space */
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .product-card .card-title {
-            font-size: 1.25rem;
-            font-weight: bold;
-        }
-
-        .product-card .card-text {
-            color: #555;
-        }
-
-        .product-card .btn {
-            margin-top: 10px;
-        }
-    </style>
-</head>
-<body>
 <div class="container mt-5">
     <h1 class="text-center mb-4">Products</h1>
     <div class="row">
         {% for product in products %}
-        <div class="col-md-4 mb-4 d-flex align-items-stretch">
+        <div class="col-md-4 mb-4">
             <div class="card product-card">
                 {% if product.images.all %}
                 <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}" class="card-img-top img-fluid">
@@ -80,59 +12,38 @@
                 <div class="card-body">
                     <h2 class="card-title">{{ product.name }}</h2>
                     <p class="card-text">{{ product.description }}</p>
-                    <div>
-                        <h3>Price:</h3>
-                        {% for price in product.prices.all %}
-                        <p>${{ price.unit_amount }}</p>
-                        {% empty %}
-                        <p>No price available.</p>
-                        {% endfor %}
-                    </div>
-                    <!-- Button Group for Actions -->
+                    <!-- Display price -->
+                    {% if product.prices.exists %}
+                    <p class="card-text">
+                        <strong>Price:</strong>
+                        {{ product.prices.first.unit_amount|floatformat:2 }} {{ product.prices.first.currency|upper }}
+                    </p>
+                    {% else %}
+                    <p class="card-text text-muted"><em>No price available</em></p>
+                    {% endif %}
+                    <!-- Action Buttons -->
                     <div class="btn-group mt-3" role="group">
-                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#productModal{{ product.id }}">View Details</button>
-                        <button type="button" class="btn btn-success add-to-cart-button" data-product-id="{{ product.id }}">Add to Cart</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Product Details Modal -->
-        <div class="modal fade" id="productModal{{ product.id }}" tabindex="-1" aria-labelledby="productModalLabel{{ product.id }}" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="productModalLabel{{ product.id }}">{{ product.name }}</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <p>{{ product.description }}</p>
-                        <div>
-                            <h3>Images:</h3>
-                            {% for image in product.images.all %}
-                            {% if image.image %}
-                            <img src="{{ image.image.url }}" alt="Uploaded Image" class="img-fluid mb-2" style="max-width: 150px;">
-                            {% elif image.image_url %}
-                            <img src="{{ image.image_url }}" alt="External Image" class="img-fluid mb-2" style="max-width: 150px;">
-                            {% endif %}
-                            {% if image.stripe_file_url %}
-                            <p>Stripe File: <a href="{{ image.stripe_file_url }}" target="_blank">View on Stripe</a></p>
-                            {% endif %}
-                            {% endfor %}
-                        </div>
-                        <div>
-                            <h3>Price:</h3>
-                            {% for price in product.prices.all %}
-                            <p>${{ price.unit_amount }}</p>
-                            {% empty %}
-                            <p>No price available.</p>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        {% if request.user.is_superuser %}
+                        <form method="GET" action="{% url 'product-update' product.id %}" style="display:inline;">
+                            <input type="hidden" name="action" value="edit">
+                            <button type="submit" class="btn btn-primary">Edit</button>
+                        </form>
+                        <form method="POST" action="{% url 'product-delete' product.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="delete">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                        {% endif %}
+                        <!-- Add to Cart Button -->
+                        <form method="POST" action="{% url 'add-to-cart' product.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success">Add to Cart</button>
+                        </form>
+                        <!-- View Product Button -->
+                        <form method="GET" action="{% url 'product-detail' product.id %}" style="display:inline;">
+                            <input type="hidden" name="action" value="view">
+                            <button type="submit" class="btn btn-info">View Product</button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -140,42 +51,4 @@
         {% endfor %}
     </div>
 </div>
-<!-- Popup Notification -->
-<div id="popup-notification"></div>
-<script>
-    $(document).ready(function () {
-        $('.add-to-cart-button').on('click', function () {
-            const productId = $(this).data('product-id');
-            const quantity = 1; // Default quantity
-            const csrfToken = '{{ csrf_token }}'; // Use Django's template tag for CSRF token
-            $.ajax({
-                url: "{% url 'add_to_cart' %}",
-                method: "POST",
-                data: {
-                    product_id: productId,
-                    quantity: quantity,
-                    csrfmiddlewaretoken: csrfToken
-                },
-                success: function (response) {
-                    showNotification('Item added to cart!');
-                },
-                error: function (xhr) {
-                    showNotification('Failed to add item to cart.', true);
-                }
-            });
-        });
-
-        function showNotification(message, isError = false) {
-            const notification = $('#popup-notification');
-            notification.text(message);
-            notification.css('background-color', isError ? '#f44336' : '#4CAF50');
-            notification.fadeIn(300);
-            setTimeout(function () {
-                notification.fadeOut(300);
-            }, 3000);
-        }
-    });
-</script>
-</body>
-</html>
 {% endblock %}

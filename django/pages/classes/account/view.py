@@ -1,36 +1,24 @@
-import io, pyotp, base64, qrcode
+import uuid, pyotp, random, qrcode, io, base64
+from django.shortcuts import render, redirect
+from django.contrib.auth.hashers import check_password
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from ...models import ApiKey, Account, Subscription
-from django.contrib.auth.hashers import check_password
-from django.utils.decorators import method_decorator
-from django.contrib.auth.decorators import login_required
-from ..authentication.view import JWTAuthentication, IsAuthenticated, LoginRequiredMixin, AuthenticationFailed
+from ...models import ApiKey, Subscription
+from ...views import authenticate_user, check_mfa
+from django.contrib import messages 
 
-class AccountView(LoginRequiredMixin, APIView):
-    def authenticate_user(self, request):
-        """Authenticate the user using JWT and return the account."""
-        jwt_auth = JWTAuthentication()
-        account, _ = jwt_auth.authenticate(request)
-        if account is None:
-            raise AuthenticationFailed('Authentication failed')
-        return account
-    def check_mfa(self, account):
-        if not account.mfa_confirmed and account.mfa_enabled:
-              return redirect("verify-mfa")
-    
+class AccountView(APIView):
     def post(self, request):
- 
         try:
+            # Handle POST requests
+            # message = "POST request received"
+            # is_error = False
+            # status_code = 201
+            # return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
             # Use the authenticate_user method
-            account = self.authenticate_user(request)
-            self.check_mfa(account=account)
+            account = authenticate_user(request)
+            check_mfa(account=account)
             
-            
-            if not account.mfa_confirmed:
-              return redirect("verify-mfa")
             if request.path == '/account/edit':
                 name = request.POST.get('name')
                 email = request.POST.get('email')
@@ -63,32 +51,42 @@ class AccountView(LoginRequiredMixin, APIView):
                     messages.success(request, "Account details updated successfully.")
                     return redirect('account')  # Redirect to the account page
                 except Exception as e:
-                    messages.error(request, f"Failed to update account details: {str(e)}")
-                    raise
-
-            # Handle POST requests
-            return Response({"message": "POST request received"}, status=201)
-        except AuthenticationFailed as e:
-            return redirect('login')
+                    messages.er
         except Exception as e:
-            return Response(data={"error": f"'POST' Method Failed for AccountView: {e}", "is_error": True}, status=400)
-    
-    # @method_decorator(login_required)
+            message = f"'POST' Method Failed for AccountView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+
     def get(self, request):
         try:
-            # Use the authenticate_user method
-            account = self.authenticate_user(request)
-            self.check_mfa(account=account)
-            token = request.COOKIES.get('jwt')
-            if request.path == '/account/edit':
-                return render(request, 'account/edit.html',{"account": account, })
+            # Get the authenticated user's account
+            account = authenticate_user(request)
+            check_mfa(account=account)
             if(account.mfa_secret == None):
                 account.generate_mfa_secret_secret()
+            
+            if request.path == '/account/edit':
+                return render(request, 'account/edit.html',{"account": account, })
+
+            # Generate MFA QR code if needed
+            # qr_code_data_uri = None
+            # if not account.mfa_enabled and account.mfa_secret is None:
+            #     account.generate_mfa_secret_secret()
+            #     otp_uri = pyotp.totp.TOTP(account.mfa_secret).provisioning_uri(
+            #         name=account.email,
+            #         issuer_name="Clean SMRs"
+            #     )
+            #     qr = qrcode.make(otp_uri)
+            #     buffer = io.BytesIO()
+            #     qr.save(buffer, format="PNG")
+            #     buffer.seek(0)
+            #     qr_code = base64.b64encode(buffer.getvalue()).decode("utf-8")
+            #     qr_code_data_uri = f"data:image/png;base64,{qr_code}"
             otp_uri = pyotp.totp.TOTP(account.mfa_secret).provisioning_uri(
                 name=account.email,
                 issuer_name="Clean SMRs"
             )
-
             qr = qrcode.make(otp_uri)
             buffer = io.BytesIO()
             qr.save(buffer, format="PNG")
@@ -97,20 +95,17 @@ class AccountView(LoginRequiredMixin, APIView):
             qr_code = base64.b64encode(buffer.getvalue()).decode("utf-8")
 
             qr_code_data_uri = f"data:image/png;base64,{qr_code}"
-            # Handle GET requests
-            api_keys = ApiKey.objects.filter().all()
-            
-            print(f"stripe id: ${account.stripe_customer_id}")
+
+            # Fetch API keys and subscriptions
+            api_keys = ApiKey.objects.filter(account=account)
             subscriptions = Subscription.objects.filter(
-                   customer=account.stripe_customer_id, deleted__isnull=True, status='active' 
-                ).all()
-            print(f"subscriptions: ${subscriptions}")
+                customer=account.stripe_customer_id, deleted__isnull=True, status='active'
+            )
+
             # Get the active subscription plan
             current_subscription = subscriptions.first() if subscriptions.exists() else None
             current_plan = None
-
             if current_subscription:
-                # Assuming each subscription has one active subscription item
                 subscription_item = current_subscription.subscription_items.first()
                 if subscription_item:
                     current_plan = {
@@ -118,71 +113,81 @@ class AccountView(LoginRequiredMixin, APIView):
                         "amount": subscription_item.price.unit_amount,
                         "interval": subscription_item.price.recurring.get("interval", "N/A"),
                     }
-            return render(request, 'account/account.html', {"api_keys": api_keys, "account": account,   'current_plan': current_plan, 'current_subscription': current_subscription, 'token': token, 'qrcode': qr_code_data_uri})
-        except AuthenticationFailed as e:
-            return redirect('login')
+
+            # Render the account page with user data
+            return render(request, 'account/account.html', {
+                'account': account,
+                'api_keys': api_keys,
+                'current_plan': current_plan,
+                'current_subscription': current_subscription,
+                'token': request.COOKIES.get('jwt'),
+                'qrcode': qr_code_data_uri,
+            })
         except Exception as e:
-            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for AccountView: {e}", "is_error": True}, status=400)
-                    # return Response(data={"error": f"'GET' Method Failed for AccountView: {e}", "is_error": True}, status=400)
-    # @method_decorator(login_required)
+            message = f"'GET' Method Failed for AccountView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
     def put(self, request):
         try:
-            # Use the authenticate_user method
-            account = self.authenticate_user(request)
-            self.check_mfa(account=account)
             # Handle PUT requests
-            return Response({"message": "PUT request received"}, status=201)
-        except AuthenticationFailed as e:
-            return redirect('login')
+            message = "PUT request received"
+            is_error = False
+            status_code = 201
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'PUT' Method Failed for AccountView: {e}", "is_error": True}, status=400)
-    # @method_decorator(login_required)
+            message = f"'PUT' Method Failed for AccountView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+
     def patch(self, request):
         try:
-            # Use the authenticate_user method
-            account = self.authenticate_user(request)
-            self.check_mfa(account=account)
             # Handle PATCH requests
-            return Response({"message": "PATCH request received"}, status=200)
-        except AuthenticationFailed as e:
-            return redirect('login')
+            message = "PATCH request received"
+            is_error = False
+            status_code = 200
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'PATCH' Method Failed for AccountView: {e}", "is_error": True}, status=400)
-    # @method_decorator(login_required)
+            message = f"'PATCH' Method Failed for AccountView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
     def delete(self, request):
         try:
-            # Use the authenticate_user method
-            account = self.authenticate_user(request)
-            self.check_mfa(account=account)
             # Handle DELETE requests
-            return Response({"message": "DELETE request received"}, status=200)
-        except AuthenticationFailed as e:
-            return redirect('login')
+            message = "DELETE request received"
+            is_error = False
+            status_code = 200
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'DELETE' Method Failed for AccountView: {e}", "is_error": True}, status=400)
-    # @method_decorator(login_required)
+            message = f"'DELETE' Method Failed for AccountView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
     def options(self, request, *args, **kwargs):
         try:
-            # Use the authenticate_user method
-            account = self.authenticate_user(request)
-            self.check_mfa(account=account)
             # Handle OPTIONS requests
-            return Response({"message": "OPTIONS request received"}, status=204)
-        except AuthenticationFailed as e:
-            return redirect('login')
+            message = "OPTIONS request received"
+            is_error = False
+            status_code = 204
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'OPTIONS' Method Failed for AccountView: {e}", "is_error": True}, status=400)
-    # @method_decorator(login_required)
+            message = f"'OPTIONS' Method Failed for AccountView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
     def head(self, request, *args, **kwargs):
         try:
-            # Use the authenticate_user method
-            account = self.authenticate_user(request)
-            self.check_mfa(account=account)
             # Handle HEAD requests
             # Since Django automatically handles HEAD, no implementation is required
             # The HEAD response will be the same as GET but without the body
-            return Response({"message": "HEAD request received"}, status=200)
-        except AuthenticationFailed as e:
-            return redirect('login')
+            message = "HEAD request received"
+            is_error = False
+            status_code = 200
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'HEAD' Method Failed for AccountView: {e}", "is_error": True}, status=400)
+            message = f"'HEAD' Method Failed for AccountView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')

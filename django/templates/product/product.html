@@ -1,67 +1,71 @@
 {% extends 'widgets/base.html' %}
 {% block content %}
-<div class="product-container">
-    <h1>{{ product.name }}</h1>
-    <p>{{ product.description }}</p>
-
-    <!-- Product Images -->
-    <div class="product-images">
-        <h3>Images:</h3>
-        {% for image in product.images.all %}
-            {% if image.image %}
-                <img src="{{ image.image.url }}" alt="Uploaded Image">
-            {% elif image.image_url %}
-                <img src="{{ image.image_url }}" alt="External Image">
+<div class="container mt-5">
+    <div class="product-container">
+        <h1>{{ product.name }}</h1>
+        <p>{{ product.description }}</p>
+        
+        <!-- Product Images -->
+        <div class="product-images mb-4">
+            <h3>Images:</h3>
+            {% for image in product.images.all %}
+                {% if image.image %}
+                    <img src="{{ image.image.url }}" alt="Uploaded Image" class="img-fluid mb-2" style="max-width: 150px;">
+                {% elif image.image_url %}
+                    <img src="{{ image.image_url }}" alt="External Image" class="img-fluid mb-2" style="max-width: 150px;">
+                {% endif %}
+                {% if image.stripe_file_url %}
+                    <p><a href="{{ image.stripe_file_url }}" target="_blank">View Stripe File</a></p>
+                {% endif %}
+            {% endfor %}
+        </div>
+        
+        <!-- Product Prices -->
+        <div class="product-price mb-4">
+            <h3>Price:</h3>
+            {% if product.prices.exists %}
+                <p>${{ product.prices.first.unit_amount|floatformat:2 }} {{ product.prices.first.currency|upper }}</p>
+            {% else %}
+                <p>No price available.</p>
             {% endif %}
-            {% if image.stripe_file_url %}
-                <p><a href="{{ image.stripe_file_url }}" target="_blank">View Stripe File</a></p>
-            {% endif %}
-        {% endfor %}
+        </div>
+        
+        <!-- Add to Cart -->
+        <form class="add-to-cart-form" data-product-id="{{ product.id }}">
+            {% csrf_token %}
+            <div class="input-group mb-3" style="max-width: 200px;">
+                <input type="number" name="quantity" value="1" min="1" class="form-control">
+                <button type="button" class="btn btn-success add-to-cart-button">Add to Cart</button>
+            </div>
+        </form>
     </div>
-
-    <!-- Product Prices -->
-    <div class="product-price">
-        <h3>Price:</h3>
-        {% for price in product.prices.all %}
-            <p>${{ price.unit_amount }}</p>
-        {% empty %}
-            <p>No price available.</p>
-        {% endfor %}
-    </div>
-
-    <!-- Add to Cart -->
-    <form class="add-to-cart-form" data-product-id="{{ product.id }}">
-        {% csrf_token %}
-        <input type="number" name="quantity" value="1" min="1">
-        <button type="button" class="add-to-cart-button">Add to Cart</button>
-    </form>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $(document).ready(function() {
-        $('.add-to-cart-button').on('click', function() {
-            const form = $(this).closest('.add-to-cart-form');
-            const productId = form.data('product-id');
-            const quantity = form.find('input[name="quantity"]').val();
-            const csrfToken = form.find('input[name="csrfmiddlewaretoken"]').val();
-
-            $.ajax({
-                url: "{% url 'add_to_cart' %}",
-                method: "POST",
-                data: {
-                    product_id: productId,
-                    quantity: quantity,
-                    csrfmiddlewaretoken: csrfToken
-                },
-                success: function(response) {
-                    alert('Item added to cart!');
-                },
-                error: function(xhr) {
-                    alert('Failed to add item to cart.');
-                }
-            });
+$(document).ready(function() {
+    $('.add-to-cart-button').on('click', function() {
+        const form = $(this).closest('.add-to-cart-form');
+        const productId = form.data('product-id');
+        const quantity = form.find('input[name="quantity"]').val();
+        const csrfToken = form.find('input[name="csrfmiddlewaretoken"]').val();
+        
+        $.ajax({
+            url: "{% url 'add-to-cart' product.id %}",
+            method: "POST",
+            data: {
+                product_id: productId,
+                quantity: quantity,
+                csrfmiddlewaretoken: csrfToken
+            },
+            success: function(response) {
+                alert('Item added to cart!');
+            },
+            error: function(xhr) {
+                alert('Failed to add item to cart.');
+            }
         });
     });
+});
 </script>
 {% endblock %}

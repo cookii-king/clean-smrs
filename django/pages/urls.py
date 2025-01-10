@@ -45,10 +45,22 @@ urlpatterns = [
     # # ========================================================================== #
     # # ========================================================================== #
     # # product start
-    path('product', ProductView.as_view(), name="product"),
+    # Product-related URLs
+    path('products/', ProductsView.as_view(), name="products-list"),
+    path('product/create/', ProductView.as_view(), name="product-create"),
     path('product/create', ProductView.as_view(), name="product-create"),
-    path('product/<uuid:product_id>', ProductView.as_view(), name="product"),
-    path('product/<uuid:product_id>/', ProductView.as_view(), name="product"),
+    path('products/buy-now/<uuid:product_id>/', ProductsView.as_view(), name="buy-now"),
+    path('products/<uuid:product_id>/', ProductView.as_view(), name="product-detail"),
+    path('products/<uuid:product_id>/update/', ProductView.as_view(), name="product-update"),
+    path('products/<uuid:product_id>/update', ProductView.as_view(), name="product-update"),
+    path('products/<uuid:product_id>/delete/', ProductView.as_view(), name="product-delete"),
+    path('products/<uuid:product_id>/delete', ProductView.as_view(), name="product-delete"),
+    # path('product', ProductView.as_view(), name="product"),
+    # path('product/create', ProductView.as_view(), name="product-create"),
+    # path('product/update/<uuid:product_id>', ProductView.as_view(), name="product-update"),
+    # path('product/delete/<uuid:product_id>', ProductView.as_view(), name="product-delete"),
+    # path('product/<uuid:product_id>', ProductView.as_view(), name="product"),
+    # path('product/<uuid:product_id>/', ProductView.as_view(), name="product"),
     path('products', ProductsView.as_view(), name="products"),
     path('products/', ProductsView.as_view(), name="products"),
     # # product end
@@ -64,15 +76,6 @@ urlpatterns = [
     # # order end
     # # ========================================================================== #
     # # ========================================================================== #    
-    # # payment link start
-    path('payment-link', PaymentLinkView.as_view(), name="payment-link"),
-    path('payment-link/create', PaymentLinkView.as_view(), name="payment-link-create"),
-    path('payment-link/<uuid:payment_link_id>', PaymentLinkView.as_view(), name="payment-link"),
-    path('payment-links', PaymentLinksView.as_view(), name="payment-links"),
-    path('payment-links/', PaymentLinksView.as_view(), name="payment-links"),
-    # # payment link end
-    # # ========================================================================== #
-    # # ========================================================================== #
     # # checkout start
     path('checkout', CheckoutView.as_view(), name="checkout"),
     path('checkout/create', CheckoutView.as_view(), name="checkout-create"),
@@ -83,17 +86,17 @@ urlpatterns = [
     path('checkout/success/', CheckoutView.as_view(), name="checkout-success"),
     path('checkout/failure', CheckoutView.as_view(), name="checkout-failure"),
     path('checkout/failure/', CheckoutView.as_view(), name="checkout-failure"),
-    path('checkouts', CheckoutsView.as_view(), name="checkouts"),
-    path('checkouts/', CheckoutsView.as_view(), name="checkouts"),
     # # checkout end
     # # ========================================================================== #
     # # ========================================================================== #
     # # cart start
     path('cart', CartView.as_view(), name="cart"),
-    path('add-to-cart', CartView.as_view(), name='add_to_cart'),
-    path('remove-from-cart', CartView.as_view(), name='remove_from_cart'),
-    path('update-item/<uuid:cart_item_id>/', CartView.as_view(), name='update_cart_item'),
-    path('remove-item/<uuid:cart_item_id>/', CartView.as_view(), name='remove_cart_item'),# # cart end
+    # path('add-to-cart', CartView.as_view(), name='add-to-cart'),
+    # Updated URL pattern for 'add-to-cart' to accept a product_id
+    path('add-to-cart/<uuid:product_id>/', CartView.as_view(), name='add-to-cart'),
+    path('remove-from-cart', CartView.as_view(), name='remove-from-cart'),
+    path('update-item/<uuid:cart_item_id>/', CartView.as_view(), name='update-cart-item'),
+    path('remove-item/<uuid:cart_item_id>/', CartView.as_view(), name='remove-cart-item'),# # cart end
     # # ========================================================================== #
     # # ========================================================================== #
     # # order start
@@ -120,18 +123,19 @@ urlpatterns = [
     # # ========================================================================== #
     # # ========================================================================== #
     # # api key start
-    path('api-key', ApiKeyView.as_view(), name="api-key"),
-    path('api-key/validate', ApiKeyView.as_view(), name="api-key-validate"),
-    path('api-key/validate/', ApiKeyView.as_view(), name="api-key-validate"),
-    path('api-key/generate', ApiKeyView.as_view(), name="api-key-generate"),
-    path('api-key/generate/', ApiKeyView.as_view(), name="api-key-generate"),
-    path('api-key/re-generate', ApiKeyView.as_view(), name="api-key-re-generate"),
-    path('api-key/re-generate/', ApiKeyView.as_view(), name="api-key-re-generate"),
-    path('api-key/reveal', ApiKeyView.as_view(), name="api-key-reveal"),
-    path('api-key/reveal/', ApiKeyView.as_view(), name="api-key-reveal"),
-    path('api-key/set-primary', ApiKeyView.as_view(), name='set-primary-key'),
-    path('api-key/set-primary/', ApiKeyView.as_view(), name='set-primary-key'),
+    path('api-key', ApiView.as_view(), name="api-key"),
+    path('api-key/validate', ApiView.as_view(), name="api-key-validate"),
+    path('api-key/validate/', ApiView.as_view(), name="api-key-validate"),
+    path('api-key/generate', ApiView.as_view(), name="api-key-generate"),
+    path('api-key/generate/', ApiView.as_view(), name="api-key-generate"),
+    path('api-key/re-generate', ApiView.as_view(), name="api-key-re-generate"),
+    path('api-key/re-generate/', ApiView.as_view(), name="api-key-re-generate"),
+    path('api-key/reveal', ApiView.as_view(), name="api-key-reveal"),
+    path('api-key/reveal/', ApiView.as_view(), name="api-key-reveal"),
+    path('api-key/set-primary', ApiView.as_view(), name='set-primary-key'),
+    path('api-key/set-primary/', ApiView.as_view(), name='set-primary-key'),
     # # api key end
     # # ========================================================================== #
     # # ========================================================================== #
+    path('response', ResponseView.as_view(), name="response"),
 ]

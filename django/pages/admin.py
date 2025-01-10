@@ -1,11 +1,3 @@
-from .classes.account.admin import *
-from .classes.product.admin import *
-from .classes.plan.admin import *
-from .classes.price.admin import *
-from .classes.subscription.admin import *
-from .classes.cart.admin import *
-from .classes.payment_link.admin import *
-from .classes.checkout.admin import *
-from .classes.api_key.admin import *
-from .classes.observation.admin import *
-from .classes.webhook.admin import *
+from django.contrib import admin
+
+# Register your models here.

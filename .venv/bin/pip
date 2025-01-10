@@ -1,5 +1,5 @@
 #!/bin/sh
-'''exec' "/Users/cookii_king/Desktop/university/francis/swe6202/assignments/assignment 2/Clean SMRs/.venv/bin/python3.13" "$0" "$@"
+'''exec' "/Users/cookii_king/Desktop/university/francis/swe6202/assignments/assignment 2/Clean SMRS/.venv/bin/python3.13" "$0" "$@"
 ' '''
 # -*- coding: utf-8 -*-
 import re

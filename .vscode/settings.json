@@ -1,6 +1,13 @@
 {
     "cSpell.words": [
+        "collectstatic",
         "corsheaders",
-        "swaggerui"
-    ]
+        "createsuperuser",
+        "makemigrations",
+        "runserver",
+        "startapp",
+        "startproject",
+        "venv"
+    ],
+    "python.terminal.activateEnvironment": false
 }

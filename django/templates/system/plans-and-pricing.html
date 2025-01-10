@@ -2,7 +2,6 @@
 {% block title %}
     Plans & Pricing - CleanSMRs
 {% endblock %}
-{% load custom_filters %}
 {% block content %}
 <div class="container mt-5">
     <h1 class="text-center mb-4">Plans and Pricing</h1>
@@ -11,40 +10,32 @@
         <button class="btn btn-secondary" id="yearly-btn" onclick="showPlans('yearly')">Yearly</button>
     </div>
     <div class="plans mt-5">
-        <!-- Monthly Plans -->
+        <!-- Monthly Items -->
         <div id="monthly-plans" style="display: none;">
             <h2 class="text-center mb-4">Monthly Plans</h2>
             <div class="row">
-                {% for plan in monthly_plans %}
+                {% for item in monthly_items %}
                 <div class="col-md-4 mb-4">
                     <div class="card h-100 shadow-sm">
                         <div class="card-body">
-                            <h3 class="card-title">{{ plan.product.name }}</h3>
-                            <p class="card-text">${{ plan.amount }} / month</p>
-                            {% with monthly_plans_subscription_data|get_item:plan.stripe_plan_id as subscription_data %}
-                            {% if subscription_data %}
-                            <p>Subscribed: x{{ subscription_data.count }}</p>
-                            <p>Duration: {{ subscription_data.durations|join:", " }} days</p>
-                            {% endif %}
-                            {% endwith %}
+                            <h3 class="card-title">{{ item.product.name }}</h3>
+                            <p class="card-text">
+                                ${{ item.amount }} / month
+                            </p>
                             <form method="POST" action="{% url 'checkout-subscribe' %}">
                                 {% csrf_token %}
-                                <input type="hidden" name="plan_id" value="{{ plan.stripe_plan_id }}">
+                                <input type="hidden" name="plan_id" value="{{ item.stripe_id }}">
                                 <input type="hidden" name="mode" value="subscription">
-                                <button type="submit" class="btn btn-success w-100" {% if active_subscription %} disabled {% endif %}>
-                                    {% if active_subscription %}
-                                    Already Subscribed
-                                    {% else %}
+                                <button type="submit" class="btn btn-success w-100">
                                     Subscribe
-                                    {% endif %}
                                 </button>
                             </form>
-                            {% if active_subscription and active_subscription.plan.stripe_plan_id != plan.stripe_plan_id %}
+                            {% if active_subscription and active_subscription.plan.stripe_plan_id != item.stripe_id %}
                             <form method="POST" action="{% url 'checkout-upgrade' %}" class="mt-2">
                                 {% csrf_token %}
-                                <input type="hidden" name="plan_id" value="{{ plan.stripe_plan_id }}">
+                                <input type="hidden" name="plan_id" value="{{ item.stripe_id }}">
                                 <button type="submit" class="btn btn-primary w-100">
-                                    Upgrade to {{ plan.product.name }}
+                                    Upgrade to {{ item.product.name }}
                                 </button>
                             </form>
                             {% endif %}
@@ -54,40 +45,32 @@
                 {% endfor %}
             </div>
         </div>
-        <!-- Yearly Plans -->
+        <!-- Yearly Items -->
         <div id="yearly-plans" style="display: none;">
             <h2 class="text-center mb-4">(-30% off) Yearly Plans</h2>
             <div class="row">
-                {% for plan in yearly_plans %}
+                {% for item in yearly_items %}
                 <div class="col-md-4 mb-4">
                     <div class="card h-100 shadow-sm">
                         <div class="card-body">
-                            <h3 class="card-title">{{ plan.product.name }}</h3>
-                            <p class="card-text">${{ plan.amount }} / year</p>
-                            {% with yearly_plans_subscription_data|get_item:plan.stripe_plan_id as subscription_data %}
-                            {% if subscription_data %}
-                            <p>Subscribed: x{{ subscription_data.count }}</p>
-                            <p>Duration: {{ subscription_data.durations|join:", " }} days</p>
-                            {% endif %}
-                            {% endwith %}
+                            <h3 class="card-title">{{ item.product.name }}</h3>
+                            <p class="card-text">
+                                ${{ item.amount }} / year
+                            </p>
                             <form method="POST" action="{% url 'checkout-subscribe' %}">
                                 {% csrf_token %}
-                                <input type="hidden" name="plan_id" value="{{ plan.stripe_plan_id }}">
+                                <input type="hidden" name="plan_id" value="{{ item.stripe_id }}">
                                 <input type="hidden" name="mode" value="subscription">
-                                <button type="submit" class="btn btn-success w-100" {% if active_subscription %} disabled {% endif %}>
-                                    {% if active_subscription %}
-                                    Already Subscribed
-                                    {% else %}
+                                <button type="submit" class="btn btn-success w-100">
                                     Subscribe
-                                    {% endif %}
                                 </button>
                             </form>
-                            {% if active_subscription and active_subscription.plan.stripe_plan_id != plan.stripe_plan_id %}
+                            {% if active_subscription and active_subscription.plan.stripe_plan_id != item.stripe_id %}
                             <form method="POST" action="{% url 'checkout-upgrade' %}" class="mt-2">
                                 {% csrf_token %}
-                                <input type="hidden" name="plan_id" value="{{ plan.stripe_plan_id }}">
+                                <input type="hidden" name="plan_id" value="{{ item.stripe_id }}">
                                 <button type="submit" class="btn btn-primary w-100">
-                                    Upgrade to {{ plan.product.name }}
+                                    Upgrade to {{ item.product.name }}
                                 </button>
                             </form>
                             {% endif %}

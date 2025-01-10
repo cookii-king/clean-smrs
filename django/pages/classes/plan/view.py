@@ -1,180 +1,190 @@
+from django.shortcuts import render, redirect
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.shortcuts import render, redirect
-from ...models import Plan
-from django.utils.decorators import method_decorator
-from django.contrib.auth.decorators import login_required
-from ..authentication.view import JWTAuthentication, IsAuthenticated, LoginRequiredMixin, AuthenticationFailed
-
+from ...views import authenticate_user, check_mfa
 class PlanView(APIView):
-    def authenticate_user(self, request):
-        """Authenticate the user using JWT and return the account."""
-        jwt_auth = JWTAuthentication()
-        account, _ = jwt_auth.authenticate(request)
-        if account is None:
-            raise AuthenticationFailed('Authentication failed')
-        return account
-    # @method_decorator(login_required)
     def post(self, request):
         try:
-            account = self.authenticate_user(request)
             # Handle POST requests
-            return Response({"message": "POST request received"}, status=201)
-        except AuthenticationFailed as e:
-            return redirect('login') 
+            message = "POST request received"
+            is_error = False
+            status_code = 201
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'POST' Method Failed for PlanView: {e}"}, status=400)
-    # @method_decorator(login_required)
+            message = f"'POST' Method Failed for PlanView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+
     def get(self, request):
         try:
-            account = self.authenticate_user(request)
+            account = authenticate_user(request)
+            check_mfa(account=account)
             # Handle GET requests
-           # Fetch plans and group by interval
-            monthly_plans = Plan.objects.filter(interval='month')
-            yearly_plans = Plan.objects.filter(interval='year')
-
-            # Render the template with plans
-            return render(request, 'plan/plan.html')
-        except AuthenticationFailed as e:
-            return redirect('login') 
+            message = "GET request received"
+            is_error = False
+            status_code = 200
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for PlanView: {e}", "is_error": True}, status=400)
-                    # return Response(data={"error": f"'GET' Method Failed for PlanView: {e}"}, status=400)
-    # @method_decorator(login_required)
+            message = f"'GET' Method Failed for PlanView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+
     def put(self, request):
         try:
-            account = self.authenticate_user(request)
             # Handle PUT requests
-            return Response({"message": "PUT request received"}, status=201)
-        except AuthenticationFailed as e:
-            return redirect('login') 
+            message = "PUT request received"
+            is_error = False
+            status_code = 201
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'PUT' Method Failed for PlanView: {e}"}, status=400)
-    # @method_decorator(login_required)
+            message = f"'PUT' Method Failed for PlanView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+
     def patch(self, request):
         try:
-            account = self.authenticate_user(request)
             # Handle PATCH requests
-            return Response({"message": "PATCH request received"}, status=200)
-        except AuthenticationFailed as e:
-            return redirect('login') 
+            message = "PATCH request received"
+            is_error = False
+            status_code = 200
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'PATCH' Method Failed for PlanView: {e}"}, status=400)
-    # @method_decorator(login_required)
+            message = f"'PATCH' Method Failed for PlanView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
     def delete(self, request):
         try:
-            account = self.authenticate_user(request)
             # Handle DELETE requests
-            return Response({"message": "DELETE request received"}, status=200)
-        except AuthenticationFailed as e:
-            return redirect('login') 
+            message = "DELETE request received"
+            is_error = False
+            status_code = 200
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'DELETE' Method Failed for PlanView: {e}"}, status=400)
-    # @method_decorator(login_required)
+            message = f"'DELETE' Method Failed for PlanView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
     def options(self, request, *args, **kwargs):
         try:
-            account = self.authenticate_user(request)
             # Handle OPTIONS requests
-            return Response({"message": "OPTIONS request received"}, status=204)
-        except AuthenticationFailed as e:
-            return redirect('login') 
+            message = "OPTIONS request received"
+            is_error = False
+            status_code = 204
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'OPTIONS' Method Failed for PlanView: {e}"}, status=400)
-    # @method_decorator(login_required)
+            message = f"'OPTIONS' Method Failed for PlanView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
     def head(self, request, *args, **kwargs):
         try:
-            account = self.authenticate_user(request)
             # Handle HEAD requests
             # Since Django automatically handles HEAD, no implementation is required
             # The HEAD response will be the same as GET but without the body
-            return Response({"message": "HEAD request received"}, status=200)
-        except AuthenticationFailed as e:
-            return redirect('login') 
+            message = "HEAD request received"
+            is_error = False
+            status_code = 200
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'HEAD' Method Failed for PlanView: {e}"}, status=400)
+            message = f"'HEAD' Method Failed for PlanView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
     
 
 class PlansView(APIView):
-    def authenticate_user(self, request):
-        """Authenticate the user using JWT and return the account."""
-        jwt_auth = JWTAuthentication()
-        account, _ = jwt_auth.authenticate(request)
-        if account is None:
-            raise AuthenticationFailed('Authentication failed')
-        return account
-    # @method_decorator(login_required)
     def post(self, request):
         try:
-            account = self.authenticate_user(request)
             # Handle POST requests
-            return Response({"message": "POST request received"}, status=201)
-        except AuthenticationFailed as e:
-            return redirect('login') 
+            message = "POST request received"
+            is_error = False
+            status_code = 201
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'POST' Method Failed for PlansView: {e}"}, status=400)
-    # @method_decorator(login_required)
+            message = f"'POST' Method Failed for PlansView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+
     def get(self, request):
         try:
-            account = self.authenticate_user(request)
+            account = authenticate_user(request)
+            check_mfa(account=account)
             # Handle GET requests
-           # Fetch plans and group by interval
-            plans = Plan.objects.all()
-            # Render the template with plans
-            return render(request, 'plan/plans.html', {"plans": plans})
-        except AuthenticationFailed as e:
-            return redirect('login') 
+            message = "GET request received"
+            is_error = False
+            status_code = 200
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return render(request, 'system/response.html', {'message': f"'GET' Method Failed for PlansView: {e}", "is_error": True}, status=400)
-                    # return Response(data={"error": f"'GET' Method Failed for PlansView: {e}"}, status=400)
-    # @method_decorator(login_required)
+            message = f"'GET' Method Failed for PlansView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+
     def put(self, request):
         try:
-            account = self.authenticate_user(request)
             # Handle PUT requests
-            return Response({"message": "PUT request received"}, status=201)
-        except AuthenticationFailed as e:
-            return redirect('login') 
+            message = "PUT request received"
+            is_error = False
+            status_code = 201
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'PUT' Method Failed for PlansView: {e}"}, status=400)
-    # @method_decorator(login_required)
+            message = f"'PUT' Method Failed for PlansView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
+
     def patch(self, request):
         try:
-            account = self.authenticate_user(request)
             # Handle PATCH requests
-            return Response({"message": "PATCH request received"}, status=200)
-        except AuthenticationFailed as e:
-            return redirect('login') 
+            message = "PATCH request received"
+            is_error = False
+            status_code = 200
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'PATCH' Method Failed for PlansView: {e}"}, status=400)
-    # @method_decorator(login_required)
+            message = f"'PATCH' Method Failed for PlansView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
     def delete(self, request):
         try:
-            account = self.authenticate_user(request)
             # Handle DELETE requests
-            return Response({"message": "DELETE request received"}, status=200)
-        except AuthenticationFailed as e:
-            return redirect('login') 
+            message = "DELETE request received"
+            is_error = False
+            status_code = 200
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'DELETE' Method Failed for PlansView: {e}"}, status=400)
-    # @method_decorator(login_required)
+            message = f"'DELETE' Method Failed for PlansView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
     def options(self, request, *args, **kwargs):
         try:
-            account = self.authenticate_user(request)
             # Handle OPTIONS requests
-            return Response({"message": "OPTIONS request received"}, status=204)
-        except AuthenticationFailed as e:
-            return redirect('login') 
+            message = "OPTIONS request received"
+            is_error = False
+            status_code = 204
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'OPTIONS' Method Failed for PlansView: {e}"}, status=400)
-    # @method_decorator(login_required)
+            message = f"'OPTIONS' Method Failed for PlansView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
     def head(self, request, *args, **kwargs):
         try:
-            account = self.authenticate_user(request)
             # Handle HEAD requests
             # Since Django automatically handles HEAD, no implementation is required
             # The HEAD response will be the same as GET but without the body
-            return Response({"message": "HEAD request received"}, status=200)
-        except AuthenticationFailed as e:
-            return redirect('login') 
+            message = "HEAD request received"
+            is_error = False
+            status_code = 200
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
         except Exception as e:
-            return Response(data={"error": f"'HEAD' Method Failed for PlansView: {e}"}, status=400)
+            message = f"'HEAD' Method Failed for PlansView: {e}"
+            is_error = True
+            status_code = 500
+            return redirect(f'/response?message={message}&is_error={is_error}&status_code={status_code}')
